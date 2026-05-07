@@ -503,18 +503,27 @@
       setTimeout(() => toast.classList.remove('show'), 1800);
     }
 
-    function sendDistrictCommand(action) {
-      showToast('DistrictOS: ' + action + ' queued');
+const SL_BRIDGE_URL = "PASTE_YOUR_LSL_HTTP_URL_HERE";
 
-      // Later this will call your SL object HTTP URL, for example:
-      // fetch('https://your-lsl-http-url', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ action })
-      // });
+function sendDistrictCommand(action) {
+  showToast('DistrictOS: ' + action + ' queued');
 
-      console.log('DistrictOS action:', action);
-    }
+  fetch(SL_BRIDGE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: "action=" + encodeURIComponent(action)
+  })
+  .then(() => {
+    showToast("DistrictOS: " + action + " sent");
+  })
+  .catch(() => {
+    showToast("DistrictOS: bridge offline");
+  });
+
+  console.log("DistrictOS action:", action);
+  }
 
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => setPage(btn.dataset.page));
