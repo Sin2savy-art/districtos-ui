@@ -508,28 +508,17 @@
       setTimeout(() => toast.classList.remove('show'), 1800);
     }
 
-    function sendDistrictCommand(action) {
-      showToast('DistrictOS: ' + action + ' sent');
-      console.log("DistrictOS action:", action);
+function sendDistrictCommand(action) {
+  showToast('DistrictOS: ' + action + ' sent');
+  console.log("DistrictOS action:", action);
 
-      const form = document.createElement('form');
-      form.method = 'GET';
-      form.action = SL_BRIDGE_URL;
-      form.target = 'hidden_frame';
+  // SL browser can navigate URLs — use that as the trigger
+  const img = new Image();
+  img.src = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action) + "&t=" + Date.now();
 
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'action';
-      input.value = action;
-
-      form.appendChild(input);
-      document.body.appendChild(form);
-      form.submit();
-      document.body.removeChild(form);
-
-      if (action === 'pairDoor') setPage('doors');
-      if (action === 'autoAssign') setPage('units');
-    }
+  if (action === 'pairDoor') setPage('doors');
+  if (action === 'autoAssign') setPage('units');
+}
 
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => setPage(btn.dataset.page));
