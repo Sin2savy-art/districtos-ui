@@ -348,6 +348,9 @@
     }
 
     function sendDistrictCommand(action, unit = "") {
+
+      console.log("DistrictOS command:", action, "unit:", unit);
+
       const unitPart = unit ? `&unit=${encodeURIComponent(unit)}` : "";
       const url = `${SL_BRIDGE_URL}/?action=${encodeURIComponent(action)}${unitPart}&t=${Date.now()}`;
 
@@ -392,7 +395,14 @@
         units.sort((a, b) => String(a.unit || "").localeCompare(String(b.unit || "")));
 
         units.forEach(unit => {
-          const unitID = unit.unit || unit.unitID || "UNKNOWN";
+          const unitID =
+          unit.unit ||
+          unit.unitID ||
+          unit.id ||
+          unit.name ||
+          unit.Unit ||
+          unit.UNIT ||
+          "";
           const tenant = unit.tenant || "Vacant";
           const status = unit.status || "Vacant";
           const lease = unit.lease || "--";
@@ -421,13 +431,19 @@
             </div>
           `;
 
-          row.querySelector(".lock-btn").addEventListener("click", () => sendDistrictCommand("lockUnit", unitID));
-          row.querySelector(".unlock-btn").addEventListener("click", () => sendDistrictCommand("unlockUnit", unitID));
-          row.querySelector(".reset-btn").addEventListener("click", () => {
-            if (confirm(`Reset tenant for ${unitID}? This will clear the resident from this unit.`)) {
-              sendDistrictCommand("resetTenant", unitID);
-            }
-          });
+        row.querySelector(".lock-btn").addEventListener("click", () => {
+          sendDistrictCommand("lockUnit", unitID);
+        });
+
+        row.querySelector(".unlock-btn").addEventListener("click", () => {
+          sendDistrictCommand("unlockUnit", unitID);
+        });
+
+        row.querySelector(".reset-btn").addEventListener("click", () => {
+          if (confirm(`Reset tenant for ${unitID}? This will clear the resident from this unit.`)) {
+            sendDistrictCommand("resetTenant", unitID);
+          }
+        });
 
           list.appendChild(row);
         });
