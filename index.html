@@ -22,7 +22,7 @@
     .nav-btn { height: 10.2%; min-height: 44px; margin-bottom: 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.035); color: #d8d8d8; display: flex; align-items: center; padding: 0 14px; gap: 10px; font-size: 14px; cursor: pointer; transition: 0.18s ease; }
     .nav-btn:hover, .nav-btn.active { background: linear-gradient(135deg, rgba(255,42,22,0.28), rgba(255,130,48,0.08)); border-color: rgba(255,72,45,0.45); color: white; transform: translateX(3px); }
     .icon { color: #ff4a35; width: 22px; text-align: center; font-size: 17px; }
-    .content { padding: 3.2%; position: relative; }
+    .content { padding: 3.2%; position: relative; overflow-y: auto; height: 100%; }
     .page { display: none; animation: fadeIn 0.22s ease; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -47,7 +47,7 @@
     .pill { width: fit-content; padding: 5px 10px; border-radius: 999px; background: rgba(49,255,120,0.12); color: #5dff91; border: 1px solid rgba(49,255,120,0.24); font-size: 12px; }
     .pill.warn { background: rgba(255,173,51,0.12); color: #ffbe55; border-color: rgba(255,173,51,0.24); }
     .pill.bad { background: rgba(255,42,22,0.12); color: #ff5b47; border-color: rgba(255,42,22,0.24); }
-    .toast { position: absolute; right: 3.2%; bottom: 4%; min-width: 280px; background: rgba(10,10,12,0.92); border: 1px solid rgba(255,70,45,0.38); border-radius: 18px; padding: 14px 18px; box-shadow: 0 0 28px rgba(255,42,22,0.16); transform: translateY(130%); opacity: 0; transition: 0.22s ease; color: #fff; font-size: 14px; }
+    .toast { position: absolute; right: 3.2%; bottom: 4%; min-width: 280px; background: rgba(10,10,12,0.92); border: 1px solid rgba(255,70,45,0.38); border-radius: 18px; padding: 14px 18px; box-shadow: 0 0 28px rgba(255,42,22,0.16); transform: translateY(130%); opacity: 0; transition: 0.22s ease; color: #fff; font-size: 14px; z-index: 100; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .muted { color: #999; }
     .coming { height: 65vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08); border-radius: 30px; background: rgba(255,255,255,0.035); text-align: center; }
@@ -83,6 +83,8 @@
       </nav>
 
       <main class="content">
+
+        <!-- DASHBOARD -->
         <section id="dashboard" class="page active">
           <div class="page-title">
             <div>
@@ -92,12 +94,35 @@
             <div class="pill">Medium RP Preset</div>
           </div>
           <div class="grid">
-            <div class="card"><label>Total Units</label><div class="stat">24</div><div class="sub">18 active leases</div></div>
-            <div class="card"><label>Occupancy</label><div class="stat">75%</div><div class="sub">6 units vacant</div></div>
-            <div class="card"><label>Doors Synced</label><div class="stat">31</div><div class="sub">Last sync: ready</div></div>
-            <div class="card"><label>Open Issues</label><div class="stat">3</div><div class="sub">2 maintenance, 1 notice</div></div>
-            <div class="card wide"><label>System Feed</label><div class="sub">APT-101 lease active</div><div class="sub">APT-103 door paired</div><div class="sub">APT-108 rent warning queued</div></div>
-            <div class="card wide"><label>District Health</label><div class="stat">Stable</div><div class="sub">Access grid, terminals, and mailbox routing online.</div></div>
+            <div class="card">
+              <label>Total Units</label>
+              <div class="stat" id="stat-total">--</div>
+              <div class="sub" id="stat-active">Loading...</div>
+            </div>
+            <div class="card">
+              <label>Occupancy</label>
+              <div class="stat" id="stat-occupancy">--%</div>
+              <div class="sub" id="stat-vacant">Loading...</div>
+            </div>
+            <div class="card">
+              <label>Doors Synced</label>
+              <div class="stat">--</div>
+              <div class="sub">Click Sync All Doors</div>
+            </div>
+            <div class="card">
+              <label>Expired Leases</label>
+              <div class="stat" id="stat-expired">--</div>
+              <div class="sub">Needs attention</div>
+            </div>
+            <div class="card wide">
+              <label>System Feed</label>
+              <div id="system-feed"><div class="sub" style="color:#999;">Loading unit data...</div></div>
+            </div>
+            <div class="card wide">
+              <label>District Health</label>
+              <div class="stat" id="stat-health">--</div>
+              <div class="sub" id="stat-health-sub">Fetching status...</div>
+            </div>
           </div>
           <div class="action-row">
             <button class="action" data-action="syncDoors"><strong>Sync All Doors</strong><span>Resend unit access data.</span></button>
@@ -107,28 +132,25 @@
           </div>
         </section>
 
-<section id="units" class="page">
-  <div class="page-title">
-    <div><h2>Units</h2><p>Apartment registry and lease status.</p></div>
-    <div class="pill warn" id="units-last-sync">Not synced</div>
-  </div>
-  <div class="list" id="units-list">
-    <div class="row header">
-      <div>Unit</div>
-      <div>Tenant</div>
-      <div>Status</div>
-      <div>Lease</div>
-    </div>
-    <div class="row"><div colspan="4" style="color:#999;">Loading...</div></div>
-  </div>
-  <div class="action-row">
-    <button class="action" data-action="scanTerminals"><strong>Refresh Units</strong><span>Pull live data from terminals.</span></button>
-    <button class="action" data-action="autoAssign"><strong>Auto Number</strong><span>Reuse missing unit numbers.</span></button>
-    <button class="action" data-action="resetTenant"><strong>Reset Tenant</strong><span>Coming soon.</span></button>
-    <button class="action" data-action="lockUnit"><strong>Lock Unit</strong><span>Coming soon.</span></button>
-  </div>
-</section>
+        <!-- UNITS -->
+        <section id="units" class="page">
+          <div class="page-title">
+            <div><h2>Units</h2><p>Apartment registry and lease status.</p></div>
+            <div class="pill warn" id="units-last-sync">Not synced</div>
+          </div>
+          <div class="list" id="units-list">
+            <div class="row header"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>
+            <div class="row"><div style="color:#999;grid-column:span 4;">Loading...</div></div>
+          </div>
+          <div class="action-row">
+            <button class="action" data-action="scanTerminals"><strong>Refresh Units</strong><span>Pull live data from terminals.</span></button>
+            <button class="action" data-action="autoAssign"><strong>Auto Number</strong><span>Reuse missing unit numbers.</span></button>
+            <button class="action" data-action="resetTenant"><strong>Reset Tenant</strong><span>Coming soon.</span></button>
+            <button class="action" data-action="lockUnit"><strong>Lock Unit</strong><span>Coming soon.</span></button>
+          </div>
+        </section>
 
+        <!-- DOORS -->
         <section id="doors" class="page">
           <div class="page-title"><div><h2>Door Network</h2><p>Pair, sync, and recover access devices.</p></div><div class="pill">Access Grid</div></div>
           <div class="action-row">
@@ -137,7 +159,7 @@
             <button class="action" data-action="scanDoors"><strong>Scan Doors</strong><span>Coming soon.</span></button>
             <button class="action" data-action="clearDoor"><strong>Clear Pair</strong><span>Coming soon.</span></button>
           </div>
-          <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Next step: connect these actions to LSL HTTP command relay.</p></div></div>
+          <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Doors respond to Sync All from Dashboard.</p></div></div>
         </section>
 
         <section id="payments" class="page"><div class="coming"><div><h3>Payments</h3><p class="muted">Rent logs and payment routing will live here.</p></div></div></section>
@@ -162,12 +184,12 @@
     const SL_BRIDGE_URL = "https://districtos-bridge.districtos.workers.dev";
 
     function setPage(pageId) {
-  pages.forEach(p => p.classList.remove('active'));
-  navButtons.forEach(b => b.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-  document.querySelector('[data-page="' + pageId + '"]')?.classList.add('active');
-  if (pageId === 'units') loadUnits();
-}
+      pages.forEach(p => p.classList.remove('active'));
+      navButtons.forEach(b => b.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      document.querySelector('[data-page="' + pageId + '"]')?.classList.add('active');
+      if (pageId === 'units') loadUnits();
+    }
 
     function showToast(message) {
       toast.textContent = message;
@@ -182,6 +204,62 @@
       img.src = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action) + "&t=" + Date.now();
       if (action === 'pairDoor') setPage('doors');
       if (action === 'autoAssign') setPage('units');
+      if (action === 'scanTerminals') {
+        setTimeout(function() { loadUnits(); }, 3000);
+      }
+    }
+
+    function loadUnits() {
+      fetch(SL_BRIDGE_URL + "/units")
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var units = data.filter(function(u) { return u.unit && u.unit !== "APT-TEST"; });
+          units.sort(function(a, b) { return a.unit.localeCompare(b.unit); });
+
+          var list = document.getElementById('units-list');
+          var sync = document.getElementById('units-last-sync');
+          list.innerHTML = '<div class="row header"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>';
+
+          if (units.length === 0) {
+            list.innerHTML += '<div class="row"><div style="color:#999;grid-column:span 4;">No units found. Click Refresh Units.</div></div>';
+          } else {
+            units.forEach(function(u) {
+              var sc = u.status === "Active" ? "pill" : u.status === "Expired" ? "pill bad" : "pill warn";
+              list.innerHTML += '<div class="row"><div>' + u.unit + '</div><div>' + (u.tenant || "Vacant") + '</div><div><span class="' + sc + '">' + u.status + '</span></div><div>' + (u.lease || "--") + '</div></div>';
+            });
+          }
+
+          var now = new Date();
+          if (sync) sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+          var total    = units.length;
+          var active   = units.filter(function(u) { return u.status === "Active"; }).length;
+          var vacant   = units.filter(function(u) { return u.status === "Vacant"; }).length;
+          var expired  = units.filter(function(u) { return u.status === "Expired"; }).length;
+          var occupancy = total > 0 ? Math.round((active / total) * 100) : 0;
+
+          function el(id) { return document.getElementById(id); }
+          if (el('stat-total'))       el('stat-total').textContent      = total;
+          if (el('stat-occupancy'))   el('stat-occupancy').textContent  = occupancy + "%";
+          if (el('stat-active'))      el('stat-active').textContent     = active + " active leases";
+          if (el('stat-vacant'))      el('stat-vacant').textContent     = vacant + " units vacant";
+          if (el('stat-expired'))     el('stat-expired').textContent    = expired;
+          if (el('stat-health'))      el('stat-health').textContent     = expired === 0 ? "Stable" : "Warning";
+          if (el('stat-health-sub'))  el('stat-health-sub').textContent = expired === 0 ? "All leases current." : expired + " lease(s) need attention.";
+
+          var feed = document.getElementById('system-feed');
+          if (feed) {
+            feed.innerHTML = "";
+            units.slice(0, 6).forEach(function(u) {
+              var color = u.status === "Active" ? "#5dff91" : u.status === "Expired" ? "#ff5b47" : "#ffbe55";
+              feed.innerHTML += '<div class="sub" style="color:' + color + '">' + u.unit + ' — ' + u.status + (u.tenant && u.tenant !== "Vacant" ? ' · ' + u.tenant : '') + '</div>';
+            });
+          }
+        })
+        .catch(function() {
+          var list = document.getElementById('units-list');
+          if (list) list.innerHTML += '<div class="row"><div style="color:#f55;grid-column:span 4;">Failed to load units.</div></div>';
+        });
     }
 
     navButtons.forEach(function(btn) {
@@ -199,51 +277,10 @@
       document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
-    function loadUnits() {
-  fetch(SL_BRIDGE_URL + "/units")
-    .then(r => r.json())
-    .then(units => {
-      const list = document.getElementById('units-list');
-      const sync = document.getElementById('units-last-sync');
-
-      // Keep header row
-      list.innerHTML = '<div class="row header"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>';
-
-      if (units.length === 0) {
-        list.innerHTML += '<div class="row"><div style="color:#999;grid-column:span 4;">No units found. Click Refresh Units.</div></div>';
-        return;
-      }
-
-      // Filter out test entries
-      units = units.filter(u => u.unit && u.unit !== "APT-TEST");
-
-      // Sort by unit name
-      units.sort((a, b) => a.unit.localeCompare(b.unit));
-
-      units.forEach(u => {
-        const statusClass = u.status === "Active" ? "pill" : u.status === "Expired" ? "pill bad" : "pill warn";
-        list.innerHTML += `
-          <div class="row">
-            <div>${u.unit}</div>
-            <div>${u.tenant || "Vacant"}</div>
-            <div><span class="${statusClass}">${u.status}</span></div>
-            <div>${u.lease || "--"}</div>
-          </div>`;
-      });
-
-      const now = new Date();
-      sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    })
-    .catch(() => {
-      document.getElementById('units-list').innerHTML += '<div class="row"><div style="color:#f55;grid-column:span 4;">Failed to load units.</div></div>';
-    });
-}
-
-// Auto-load units when switching to units page
-const originalSetPage = setPage;
-
     updateClock();
     setInterval(updateClock, 1000);
+    loadUnits();
+    setInterval(loadUnits, 30000);
   </script>
 </body>
 </html>
