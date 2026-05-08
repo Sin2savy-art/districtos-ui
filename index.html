@@ -348,27 +348,39 @@
     }
 
     function sendDistrictCommand(action, unit = "") {
+    console.log("DistrictOS command:", action, "unit:", unit);
 
-      console.log("DistrictOS command:", action, "unit:", unit);
+    const unitPart = unit ? `&unit=${encodeURIComponent(unit)}` : "";
 
-      const unitPart = unit ? `&unit=${encodeURIComponent(unit)}` : "";
-      const url = `${SL_BRIDGE_URL}/?action=${encodeURIComponent(action)}${unitPart}&t=${Date.now()}`;
+    const url =
+      `${SL_BRIDGE_URL}/?action=${encodeURIComponent(action)}${unitPart}&t=${Date.now()}`;
 
-      showToast(unit ? `DistrictOS: ${action} queued for ${unit}` : `DistrictOS: ${action} queued`);
+    showToast(
+      unit
+        ? `DistrictOS: ${action} queued for ${unit}`
+        : `DistrictOS: ${action} queued`
+    );
 
-      fetch(url)
-        .then(() => {
-          showToast(unit ? `DistrictOS: ${action} sent for ${unit}` : `DistrictOS: ${action} sent`);
-          setTimeout(() => {
-            loadUnits();
-            loadDashboard();
-          }, 1200);
-        })
-        .catch(() => showToast("DistrictOS: bridge offline"));
+    fetch(url)
+      .then(() => {
+        showToast(
+          unit
+            ? `DistrictOS: ${action} sent for ${unit}`
+            : `DistrictOS: ${action} sent`
+        );
 
-      if (action === "pairDoor") setPage("doors");
-      if (action === "autoAssign") setPage("units");
-    }
+        setTimeout(() => {
+          loadUnits();
+          loadDashboard();
+        }, 1500);
+      })
+      .catch(() => {
+        showToast("DistrictOS: bridge offline");
+      });
+
+    if (action === "pairDoor") setPage("doors");
+    if (action === "autoAssign") setPage("units");
+  }
 
     async function loadUnits() {
       try {
