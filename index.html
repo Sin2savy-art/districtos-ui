@@ -5,364 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DistrictOS Landlord Tablet</title>
   <style>
-    * {
-      box-sizing: border-box;
-      user-select: none;
-    }
-
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      background: #050506;
-      font-family: Arial, Helvetica, sans-serif;
-      overflow: hidden;
-      color: #f4f4f4;
-    }
-
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .tablet {
-      width: 100vw;
-      height: 100vh;
-      background:
-        radial-gradient(circle at 80% 10%, rgba(255, 60, 30, 0.18), transparent 28%),
-        linear-gradient(135deg, #08090b 0%, #111318 48%, #050506 100%);
-      border: 1px solid rgba(255,255,255,0.08);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .scanline {
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.025),
-        rgba(255,255,255,0.025) 1px,
-        transparent 1px,
-        transparent 4px
-      );
-      opacity: 0.18;
-      pointer-events: none;
-    }
-
-    .topbar {
-      height: 9%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 3.2%;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.22);
-      backdrop-filter: blur(10px);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      letter-spacing: 1px;
-    }
-
-    .logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #ff2a16, #7a0b05);
-      box-shadow: 0 0 18px rgba(255, 42, 22, 0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-    }
-
-    .brand h1 {
-      font-size: 22px;
-      margin: 0;
-      font-weight: 800;
-    }
-
-    .brand span {
-      color: #ff4a35;
-    }
-
-    .status {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      color: #b8b8b8;
-      font-size: 13px;
-    }
-
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: #31ff78;
-      box-shadow: 0 0 12px rgba(49,255,120,0.8);
-      display: inline-block;
-      margin-right: 7px;
-    }
-
-    .layout {
-      height: 91%;
-      display: grid;
-      grid-template-columns: 20% 80%;
-    }
-
-    .sidebar {
-      padding: 4% 7%;
-      border-right: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.20);
-    }
-
-    .nav-btn {
-      height: 10.2%;
-      min-height: 44px;
-      margin-bottom: 10px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.07);
-      background: rgba(255,255,255,0.035);
-      color: #d8d8d8;
-      display: flex;
-      align-items: center;
-      padding: 0 14px;
-      gap: 10px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: 0.18s ease;
-    }
-
-    .nav-btn:hover, .nav-btn.active {
-      background: linear-gradient(135deg, rgba(255,42,22,0.28), rgba(255,130,48,0.08));
-      border-color: rgba(255,72,45,0.45);
-      color: white;
-      transform: translateX(3px);
-    }
-
-    .icon {
-      color: #ff4a35;
-      width: 22px;
-      text-align: center;
-      font-size: 17px;
-    }
-
-    .content {
-      padding: 3.2%;
-      position: relative;
-    }
-
-    .page {
-      display: none;
-      animation: fadeIn 0.22s ease;
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .page-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      margin-bottom: 24px;
-    }
-
-    .page-title h2 {
-      margin: 0;
-      font-size: 28px;
-    }
-
-    .page-title p {
-      margin: 6px 0 0;
-      color: #a7a7a7;
-      font-size: 14px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-    }
-
-    .card {
-      min-height: 132px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
-      border-radius: 24px;
-      padding: 18px;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.22);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card::after {
-      content: "";
-      position: absolute;
-      top: -40%;
-      right: -40%;
-      width: 90%;
-      height: 90%;
-      background: radial-gradient(circle, rgba(255,55,30,0.18), transparent 60%);
-      pointer-events: none;
-    }
-
-    .card label {
-      display: block;
-      color: #aaa;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1.1px;
-      margin-bottom: 12px;
-    }
-
-    .stat {
-      font-size: 31px;
-      font-weight: 900;
-    }
-
-    .sub {
-      color: #9c9c9c;
-      font-size: 13px;
-      margin-top: 7px;
-    }
-
-    .wide {
-      grid-column: span 2;
-    }
-
-    .action-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-top: 22px;
-    }
-
-    .action {
-      border: 1px solid rgba(255,70,45,0.35);
-      background: linear-gradient(135deg, rgba(255,43,22,0.22), rgba(255,255,255,0.035));
-      color: #fff;
-      border-radius: 22px;
-      padding: 18px 16px;
-      cursor: pointer;
-      min-height: 92px;
-      transition: 0.16s ease;
-      text-align: left;
-    }
-
-    .action:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 22px rgba(255,42,22,0.20);
-    }
-
-    .action strong {
-      display: block;
-      font-size: 16px;
-      margin-bottom: 8px;
-    }
-
-    .action span {
-      color: #c8c8c8;
-      font-size: 12px;
-    }
-
-    .list {
-      margin-top: 18px;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,0.08);
-      overflow: hidden;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      padding: 15px 18px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      color: #d6d6d6;
-      font-size: 14px;
-    }
-
-    .row.header {
-      color: #ff5a43;
-      background: rgba(255,255,255,0.035);
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 1px;
-    }
-
-    .pill {
-      width: fit-content;
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: rgba(49,255,120,0.12);
-      color: #5dff91;
-      border: 1px solid rgba(49,255,120,0.24);
-      font-size: 12px;
-    }
-
-    .pill.warn {
-      background: rgba(255,173,51,0.12);
-      color: #ffbe55;
-      border-color: rgba(255,173,51,0.24);
-    }
-
-    .pill.bad {
-      background: rgba(255,42,22,0.12);
-      color: #ff5b47;
-      border-color: rgba(255,42,22,0.24);
-    }
-
-    .toast {
-      position: absolute;
-      right: 3.2%;
-      bottom: 4%;
-      min-width: 280px;
-      background: rgba(10,10,12,0.92);
-      border: 1px solid rgba(255,70,45,0.38);
-      border-radius: 18px;
-      padding: 14px 18px;
-      box-shadow: 0 0 28px rgba(255,42,22,0.16);
-      transform: translateY(130%);
-      opacity: 0;
-      transition: 0.22s ease;
-      color: #fff;
-      font-size: 14px;
-    }
-
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    .muted {
-      color: #999;
-    }
-
-    .coming {
-      height: 65vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 30px;
-      background: rgba(255,255,255,0.035);
-      text-align: center;
-    }
-
-    .coming h3 {
-      font-size: 32px;
-      margin: 0 0 10px;
-    }
+    * { box-sizing: border-box; user-select: none; }
+    html, body { margin: 0; width: 100%; height: 100%; background: #050506; font-family: Arial, Helvetica, sans-serif; overflow: hidden; color: #f4f4f4; }
+    body { display: flex; align-items: center; justify-content: center; }
+    .tablet { width: 100vw; height: 100vh; background: radial-gradient(circle at 80% 10%, rgba(255,60,30,0.18), transparent 28%), linear-gradient(135deg, #08090b 0%, #111318 48%, #050506 100%); border: 1px solid rgba(255,255,255,0.08); position: relative; overflow: hidden; }
+    .scanline { position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.025), rgba(255,255,255,0.025) 1px, transparent 1px, transparent 4px); opacity: 0.18; pointer-events: none; }
+    .topbar { height: 9%; display: flex; align-items: center; justify-content: space-between; padding: 0 3.2%; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.22); backdrop-filter: blur(10px); }
+    .brand { display: flex; align-items: center; gap: 14px; letter-spacing: 1px; }
+    .logo { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, #ff2a16, #7a0b05); box-shadow: 0 0 18px rgba(255,42,22,0.45); display: flex; align-items: center; justify-content: center; font-weight: 900; }
+    .brand h1 { font-size: 22px; margin: 0; font-weight: 800; }
+    .brand span { color: #ff4a35; }
+    .status { display: flex; gap: 16px; align-items: center; color: #b8b8b8; font-size: 13px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #31ff78; box-shadow: 0 0 12px rgba(49,255,120,0.8); display: inline-block; margin-right: 7px; }
+    .layout { height: 91%; display: grid; grid-template-columns: 20% 80%; }
+    .sidebar { padding: 4% 7%; border-right: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.20); }
+    .nav-btn { height: 10.2%; min-height: 44px; margin-bottom: 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.035); color: #d8d8d8; display: flex; align-items: center; padding: 0 14px; gap: 10px; font-size: 14px; cursor: pointer; transition: 0.18s ease; }
+    .nav-btn:hover, .nav-btn.active { background: linear-gradient(135deg, rgba(255,42,22,0.28), rgba(255,130,48,0.08)); border-color: rgba(255,72,45,0.45); color: white; transform: translateX(3px); }
+    .icon { color: #ff4a35; width: 22px; text-align: center; font-size: 17px; }
+    .content { padding: 3.2%; position: relative; }
+    .page { display: none; animation: fadeIn 0.22s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .page-title { display: flex; justify-content: space-between; align-items: end; margin-bottom: 24px; }
+    .page-title h2 { margin: 0; font-size: 28px; }
+    .page-title p { margin: 6px 0 0; color: #a7a7a7; font-size: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .card { min-height: 132px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025)); border-radius: 24px; padding: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.22); position: relative; overflow: hidden; }
+    .card::after { content: ""; position: absolute; top: -40%; right: -40%; width: 90%; height: 90%; background: radial-gradient(circle, rgba(255,55,30,0.18), transparent 60%); pointer-events: none; }
+    .card label { display: block; color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 12px; }
+    .stat { font-size: 31px; font-weight: 900; }
+    .sub { color: #9c9c9c; font-size: 13px; margin-top: 7px; }
+    .wide { grid-column: span 2; }
+    .action-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 22px; }
+    .action { border: 1px solid rgba(255,70,45,0.35); background: linear-gradient(135deg, rgba(255,43,22,0.22), rgba(255,255,255,0.035)); color: #fff; border-radius: 22px; padding: 18px 16px; cursor: pointer; min-height: 92px; transition: 0.16s ease; text-align: left; }
+    .action:hover { transform: translateY(-3px); box-shadow: 0 0 22px rgba(255,42,22,0.20); }
+    .action strong { display: block; font-size: 16px; margin-bottom: 8px; }
+    .action span { color: #c8c8c8; font-size: 12px; }
+    .list { margin-top: 18px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
+    .row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #d6d6d6; font-size: 14px; }
+    .row.header { color: #ff5a43; background: rgba(255,255,255,0.035); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+    .pill { width: fit-content; padding: 5px 10px; border-radius: 999px; background: rgba(49,255,120,0.12); color: #5dff91; border: 1px solid rgba(49,255,120,0.24); font-size: 12px; }
+    .pill.warn { background: rgba(255,173,51,0.12); color: #ffbe55; border-color: rgba(255,173,51,0.24); }
+    .pill.bad { background: rgba(255,42,22,0.12); color: #ff5b47; border-color: rgba(255,42,22,0.24); }
+    .toast { position: absolute; right: 3.2%; bottom: 4%; min-width: 280px; background: rgba(10,10,12,0.92); border: 1px solid rgba(255,70,45,0.38); border-radius: 18px; padding: 14px 18px; box-shadow: 0 0 28px rgba(255,42,22,0.16); transform: translateY(130%); opacity: 0; transition: 0.22s ease; color: #fff; font-size: 14px; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .muted { color: #999; }
+    .coming { height: 65vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08); border-radius: 30px; background: rgba(255,255,255,0.035); text-align: center; }
+    .coming h3 { font-size: 32px; margin: 0 0 10px; }
   </style>
 </head>
 <body>
@@ -402,41 +91,14 @@
             </div>
             <div class="pill">Medium RP Preset</div>
           </div>
-
           <div class="grid">
-            <div class="card">
-              <label>Total Units</label>
-              <div class="stat">24</div>
-              <div class="sub">18 active leases</div>
-            </div>
-            <div class="card">
-              <label>Occupancy</label>
-              <div class="stat">75%</div>
-              <div class="sub">6 units vacant</div>
-            </div>
-            <div class="card">
-              <label>Doors Synced</label>
-              <div class="stat">31</div>
-              <div class="sub">Last sync: ready</div>
-            </div>
-            <div class="card">
-              <label>Open Issues</label>
-              <div class="stat">3</div>
-              <div class="sub">2 maintenance, 1 notice</div>
-            </div>
-            <div class="card wide">
-              <label>System Feed</label>
-              <div class="sub">APT-101 lease active</div>
-              <div class="sub">APT-103 door paired</div>
-              <div class="sub">APT-108 rent warning queued</div>
-            </div>
-            <div class="card wide">
-              <label>District Health</label>
-              <div class="stat">Stable</div>
-              <div class="sub">Access grid, terminals, and mailbox routing online.</div>
-            </div>
+            <div class="card"><label>Total Units</label><div class="stat">24</div><div class="sub">18 active leases</div></div>
+            <div class="card"><label>Occupancy</label><div class="stat">75%</div><div class="sub">6 units vacant</div></div>
+            <div class="card"><label>Doors Synced</label><div class="stat">31</div><div class="sub">Last sync: ready</div></div>
+            <div class="card"><label>Open Issues</label><div class="stat">3</div><div class="sub">2 maintenance, 1 notice</div></div>
+            <div class="card wide"><label>System Feed</label><div class="sub">APT-101 lease active</div><div class="sub">APT-103 door paired</div><div class="sub">APT-108 rent warning queued</div></div>
+            <div class="card wide"><label>District Health</label><div class="stat">Stable</div><div class="sub">Access grid, terminals, and mailbox routing online.</div></div>
           </div>
-
           <div class="action-row">
             <button class="action" data-action="syncDoors"><strong>Sync All Doors</strong><span>Resend unit access data.</span></button>
             <button class="action" data-action="pairDoor"><strong>Pair New Door</strong><span>Add a new door to a unit.</span></button>
@@ -485,8 +147,7 @@
     <div class="scanline"></div>
   </div>
 
-  <script>
-    <iframe name="hidden_frame" style="display:none;"></iframe>
+  <iframe name="hidden_frame" style="display:none;"></iframe>
 
   <script>
     const pages = document.querySelectorAll('.page');
@@ -499,7 +160,7 @@
       pages.forEach(p => p.classList.remove('active'));
       navButtons.forEach(b => b.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
-      document.querySelector(`[data-page="${pageId}"]`)?.classList.add('active');
+      document.querySelector('[data-page="' + pageId + '"]')?.classList.add('active');
     }
 
     function showToast(message) {
@@ -508,31 +169,27 @@
       setTimeout(() => toast.classList.remove('show'), 1800);
     }
 
-function sendDistrictCommand(action) {
-  showToast('DistrictOS: ' + action + ' sent');
-  console.log("DistrictOS action:", action);
+    function sendDistrictCommand(action) {
+      showToast('DistrictOS: ' + action + ' sent');
+      console.log("DistrictOS action:", action);
+      var img = new Image();
+      img.src = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action) + "&t=" + Date.now();
+      if (action === 'pairDoor') setPage('doors');
+      if (action === 'autoAssign') setPage('units');
+    }
 
-  // SL browser can navigate URLs — use that as the trigger
-  const img = new Image();
-  img.src = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action) + "&t=" + Date.now();
-
-  if (action === 'pairDoor') setPage('doors');
-  if (action === 'autoAssign') setPage('units');
-}
-
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', () => setPage(btn.dataset.page));
+    navButtons.forEach(function(btn) {
+      btn.addEventListener('click', function() { setPage(btn.dataset.page); });
     });
 
-    document.querySelectorAll('[data-action]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const action = btn.dataset.action;
-        sendDistrictCommand(action);
+    document.querySelectorAll('[data-action]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        sendDistrictCommand(btn.dataset.action);
       });
     });
 
     function updateClock() {
-      const now = new Date();
+      var now = new Date();
       document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
