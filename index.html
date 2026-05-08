@@ -107,22 +107,27 @@
           </div>
         </section>
 
-        <section id="units" class="page">
-          <div class="page-title"><div><h2>Units</h2><p>Apartment registry and lease status.</p></div><div class="pill warn">Registry V1</div></div>
-          <div class="list">
-            <div class="row header"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>
-            <div class="row"><div>APT-101</div><div>Resident Name</div><div><span class="pill">Active</span></div><div>6d 12h</div></div>
-            <div class="row"><div>APT-102</div><div>Vacant</div><div><span class="pill warn">Open</span></div><div>--</div></div>
-            <div class="row"><div>APT-103</div><div>Resident Name</div><div><span class="pill">Active</span></div><div>2d 4h</div></div>
-            <div class="row"><div>APT-104</div><div>Expired</div><div><span class="pill bad">Past Due</span></div><div>Expired</div></div>
-          </div>
-          <div class="action-row">
-            <button class="action" data-action="autoAssign"><strong>Auto Number</strong><span>Reuse missing unit numbers.</span></button>
-            <button class="action" data-action="scanTerminals"><strong>Refresh Units</strong><span>Ask terminals for status.</span></button>
-            <button class="action" data-action="resetTenant"><strong>Reset Tenant</strong><span>Coming soon.</span></button>
-            <button class="action" data-action="lockUnit"><strong>Lock Unit</strong><span>Coming soon.</span></button>
-          </div>
-        </section>
+<section id="units" class="page">
+  <div class="page-title">
+    <div><h2>Units</h2><p>Apartment registry and lease status.</p></div>
+    <div class="pill warn" id="units-last-sync">Not synced</div>
+  </div>
+  <div class="list" id="units-list">
+    <div class="row header">
+      <div>Unit</div>
+      <div>Tenant</div>
+      <div>Status</div>
+      <div>Lease</div>
+    </div>
+    <div class="row"><div colspan="4" style="color:#999;">Loading...</div></div>
+  </div>
+  <div class="action-row">
+    <button class="action" data-action="scanTerminals"><strong>Refresh Units</strong><span>Pull live data from terminals.</span></button>
+    <button class="action" data-action="autoAssign"><strong>Auto Number</strong><span>Reuse missing unit numbers.</span></button>
+    <button class="action" data-action="resetTenant"><strong>Reset Tenant</strong><span>Coming soon.</span></button>
+    <button class="action" data-action="lockUnit"><strong>Lock Unit</strong><span>Coming soon.</span></button>
+  </div>
+</section>
 
         <section id="doors" class="page">
           <div class="page-title"><div><h2>Door Network</h2><p>Pair, sync, and recover access devices.</p></div><div class="pill">Access Grid</div></div>
@@ -157,11 +162,12 @@
     const SL_BRIDGE_URL = "https://districtos-bridge.districtos.workers.dev";
 
     function setPage(pageId) {
-      pages.forEach(p => p.classList.remove('active'));
-      navButtons.forEach(b => b.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
-      document.querySelector('[data-page="' + pageId + '"]')?.classList.add('active');
-    }
+  pages.forEach(p => p.classList.remove('active'));
+  navButtons.forEach(b => b.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  document.querySelector('[data-page="' + pageId + '"]')?.classList.add('active');
+  if (pageId === 'units') loadUnits();
+}
 
     function showToast(message) {
       toast.textContent = message;
@@ -192,6 +198,49 @@
       var now = new Date();
       document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
+
+    function loadUnits() {
+  fetch(SL_BRIDGE_URL + "/units")
+    .then(r => r.json())
+    .then(units => {
+      const list = document.getElementById('units-list');
+      const sync = document.getElementById('units-last-sync');
+
+      // Keep header row
+      list.innerHTML = '<div class="row header"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>';
+
+      if (units.length === 0) {
+        list.innerHTML += '<div class="row"><div style="color:#999;grid-column:span 4;">No units found. Click Refresh Units.</div></div>';
+        return;
+      }
+
+      // Filter out test entries
+      units = units.filter(u => u.unit && u.unit !== "APT-TEST");
+
+      // Sort by unit name
+      units.sort((a, b) => a.unit.localeCompare(b.unit));
+
+      units.forEach(u => {
+        const statusClass = u.status === "Active" ? "pill" : u.status === "Expired" ? "pill bad" : "pill warn";
+        list.innerHTML += `
+          <div class="row">
+            <div>${u.unit}</div>
+            <div>${u.tenant || "Vacant"}</div>
+            <div><span class="${statusClass}">${u.status}</span></div>
+            <div>${u.lease || "--"}</div>
+          </div>`;
+      });
+
+      const now = new Date();
+      sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    })
+    .catch(() => {
+      document.getElementById('units-list').innerHTML += '<div class="row"><div style="color:#f55;grid-column:span 4;">Failed to load units.</div></div>';
+    });
+}
+
+// Auto-load units when switching to units page
+const originalSetPage = setPage;
 
     updateClock();
     setInterval(updateClock, 1000);
