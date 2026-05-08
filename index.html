@@ -506,17 +506,26 @@
 const SL_BRIDGE_URL = "https://districtos-bridge.districtos.workers.dev";
 
 function sendDistrictCommand(action) {
-  showToast('DistrictOS: ' + action + ' queued');
+  showToast('DistrictOS: ' + action + ' sent');
 
-  fetch(SL_BRIDGE_URL + "?action=" + encodeURIComponent(action))
-    .then(r => r.json())
-    .then(data => {
-      showToast("DistrictOS: " + action + " sent ✓");
-    })
-    .catch(err => {
-      console.error("Bridge error:", err);
-      showToast("DistrictOS: bridge offline");
-    });
+  const form = document.createElement('form');
+  form.method = 'GET';
+  form.action = SL_BRIDGE_URL;
+  form.target = 'hidden_frame';
+
+  const input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'action';
+  input.value = action;
+
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+
+  if (action === 'pairDoor') setPage('doors');
+  if (action === 'autoAssign') setPage('units');
+}
   
   console.log("DistrictOS action:", action);
   }
