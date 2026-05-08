@@ -162,7 +162,21 @@
           <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Doors respond to Sync All from Dashboard.</p></div></div>
         </section>
 
-        <section id="payments" class="page"><div class="coming"><div><h3>Payments</h3><p class="muted">Rent logs and payment routing will live here.</p></div></div></section>
+        <section id="payments" class="page">
+  <div class="page-title">
+    <div><h2>Payments</h2><p>Rent payment history across all units.</p></div>
+    <div class="pill warn" id="payments-last-sync">Not loaded</div>
+  </div>
+  <div class="list" id="payments-list">
+    <div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+      <div>Unit</div>
+      <div>Tenant</div>
+      <div>Amount</div>
+      <div>Date</div>
+    </div>
+    <div class="row"><div style="color:#999;grid-column:span 4;">Loading...</div></div>
+  </div>
+</section>
         <section id="maintenance" class="page"><div class="coming"><div><h3>Maintenance</h3><p class="muted">Repair tickets, unit condition, and inspections.</p></div></div></section>
         <section id="admins" class="page"><div class="coming"><div><h3>Admin Access</h3><p class="muted">Add/remove managers without script editing.</p></div></div></section>
         <section id="reports" class="page"><div class="coming"><div><h3>Reports</h3><p class="muted">Occupancy, violations, collections, activity logs.</p></div></div></section>
@@ -189,6 +203,7 @@
       document.getElementById(pageId).classList.add('active');
       document.querySelector('[data-page="' + pageId + '"]')?.classList.add('active');
       if (pageId === 'units') loadUnits();
+      if (pageId === 'payments') loadPayments();
     }
 
     function showToast(message) {
@@ -261,6 +276,40 @@
           if (list) list.innerHTML += '<div class="row"><div style="color:#f55;grid-column:span 4;">Failed to load units.</div></div>';
         });
     }
+
+    function loadPayments() {
+  fetch(SL_BRIDGE_URL + "/payments")
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var list = document.getElementById('payments-list');
+      var sync = document.getElementById('payments-last-sync');
+      if (!list) return;
+
+      list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Amount</div><div>Date</div></div>';
+
+      if (data.length === 0) {
+        list.innerHTML += '<div class="row"><div style="color:#999;grid-column:span 4;">No payments recorded yet.</div></div>';
+      } else {
+        data.forEach(function(p) {
+          var date = new Date(p.timestamp * 1000);
+          var dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+          list.innerHTML += '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr;">' +
+            '<div>' + p.unit + '</div>' +
+            '<div>' + (p.tenant || "Unknown") + '</div>' +
+            '<div style="color:#5dff91;">L$' + p.amount + '</div>' +
+            '<div style="color:#999;font-size:12px;">' + dateStr + '</div>' +
+            '</div>';
+        });
+      }
+
+      var now = new Date();
+      if (sync) sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    })
+    .catch(function() {
+      var list = document.getElementById('payments-list');
+      if (list) list.innerHTML += '<div class="row"><div style="color:#f55;grid-column:span 4;">Failed to load payments.</div></div>';
+    });
+}
 
     navButtons.forEach(function(btn) {
       btn.addEventListener('click', function() { setPage(btn.dataset.page); });
