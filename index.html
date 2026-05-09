@@ -6,55 +6,23 @@
   <title>DistrictOS Landlord Tablet</title>
   <style>
     * { box-sizing: border-box; user-select: none; }
-    html, body {
-      margin: 0; width: 100%; height: 100%; background: #050506;
-      font-family: Arial, Helvetica, sans-serif; overflow: hidden; color: #f4f4f4;
-    }
+    html, body { margin: 0; width: 100%; height: 100%; background: #050506; font-family: Arial, Helvetica, sans-serif; overflow: hidden; color: #f4f4f4; }
     body { display: flex; align-items: center; justify-content: center; }
-    .tablet {
-      width: 100vw; height: 100vh;
-      background: radial-gradient(circle at 80% 10%, rgba(255, 60, 30, 0.18), transparent 28%),
-      linear-gradient(135deg, #08090b 0%, #111318 48%, #050506 100%);
-      border: 1px solid rgba(255,255,255,0.08); position: relative; overflow: hidden;
-    }
-    .scanline {
-      position: absolute; inset: 0;
-      background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.025), rgba(255,255,255,0.025) 1px, transparent 1px, transparent 4px);
-      opacity: 0.18; pointer-events: none;
-    }
-    .topbar {
-      height: 9%; display: flex; align-items: center; justify-content: space-between;
-      padding: 0 3.2%; border-bottom: 1px solid rgba(255,255,255,0.08);
-      background: rgba(0,0,0,0.22); backdrop-filter: blur(10px);
-    }
+    .tablet { width: 100vw; height: 100vh; background: radial-gradient(circle at 80% 10%, rgba(255,60,30,0.18), transparent 28%), linear-gradient(135deg, #08090b 0%, #111318 48%, #050506 100%); border: 1px solid rgba(255,255,255,0.08); position: relative; overflow: hidden; }
+    .scanline { position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.025), rgba(255,255,255,0.025) 1px, transparent 1px, transparent 4px); opacity: 0.18; pointer-events: none; }
+    .topbar { height: 9%; display: flex; align-items: center; justify-content: space-between; padding: 0 3.2%; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.22); backdrop-filter: blur(10px); }
     .brand { display: flex; align-items: center; gap: 14px; letter-spacing: 1px; }
-    .logo {
-      width: 38px; height: 38px; border-radius: 12px;
-      background: linear-gradient(135deg, #ff2a16, #7a0b05);
-      box-shadow: 0 0 18px rgba(255, 42, 22, 0.45);
-      display: flex; align-items: center; justify-content: center; font-weight: 900;
-    }
+    .logo { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, #ff2a16, #7a0b05); box-shadow: 0 0 18px rgba(255,42,22,0.45); display: flex; align-items: center; justify-content: center; font-weight: 900; }
     .brand h1 { font-size: 22px; margin: 0; font-weight: 800; }
     .brand span { color: #ff4a35; }
     .status { display: flex; gap: 16px; align-items: center; color: #b8b8b8; font-size: 13px; }
-    .dot {
-      width: 9px; height: 9px; border-radius: 50%; background: #31ff78;
-      box-shadow: 0 0 12px rgba(49,255,120,0.8); display: inline-block; margin-right: 7px;
-    }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #31ff78; box-shadow: 0 0 12px rgba(49,255,120,0.8); display: inline-block; margin-right: 7px; }
     .layout { height: 91%; display: grid; grid-template-columns: 20% 80%; }
-    .sidebar { padding: 4% 7%; border-right: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.20); }
-    .nav-btn {
-      height: 10.2%; min-height: 44px; margin-bottom: 10px; border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.035);
-      color: #d8d8d8; display: flex; align-items: center; padding: 0 14px; gap: 10px;
-      font-size: 14px; cursor: pointer; transition: 0.18s ease;
-    }
-    .nav-btn:hover, .nav-btn.active {
-      background: linear-gradient(135deg, rgba(255,42,22,0.28), rgba(255,130,48,0.08));
-      border-color: rgba(255,72,45,0.45); color: white; transform: translateX(3px);
-    }
+    .sidebar { padding: 4% 7%; border-right: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.20); overflow-y: auto; }
+    .nav-btn { min-height: 44px; margin-bottom: 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.035); color: #d8d8d8; display: flex; align-items: center; padding: 0 14px; gap: 10px; font-size: 14px; cursor: pointer; transition: 0.18s ease; }
+    .nav-btn:hover, .nav-btn.active { background: linear-gradient(135deg, rgba(255,42,22,0.28), rgba(255,130,48,0.08)); border-color: rgba(255,72,45,0.45); color: white; transform: translateX(3px); }
     .icon { color: #ff4a35; width: 22px; text-align: center; font-size: 17px; }
-    .content { padding: 3.2%; position: relative; }
+    .content { padding: 3.2%; position: relative; overflow-y: auto; height: 100%; }
     .page { display: none; animation: fadeIn 0.22s ease; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -62,79 +30,48 @@
     .page-title h2 { margin: 0; font-size: 28px; }
     .page-title p { margin: 6px 0 0; color: #a7a7a7; font-size: 14px; }
     .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-    .card {
-      min-height: 132px; border: 1px solid rgba(255,255,255,0.08);
-      background: linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
-      border-radius: 24px; padding: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.22);
-      position: relative; overflow: hidden;
-    }
-    .card::after {
-      content: ""; position: absolute; top: -40%; right: -40%; width: 90%; height: 90%;
-      background: radial-gradient(circle, rgba(255,55,30,0.18), transparent 60%); pointer-events: none;
-    }
-    .card label {
-      display: block; color: #aaa; font-size: 12px; text-transform: uppercase;
-      letter-spacing: 1.1px; margin-bottom: 12px;
-    }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .card { min-height: 120px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025)); border-radius: 24px; padding: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.22); position: relative; overflow: hidden; }
+    .card::after { content: ""; position: absolute; top: -40%; right: -40%; width: 90%; height: 90%; background: radial-gradient(circle, rgba(255,55,30,0.18), transparent 60%); pointer-events: none; }
+    .card label { display: block; color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 12px; }
     .stat { font-size: 31px; font-weight: 900; }
     .sub { color: #9c9c9c; font-size: 13px; margin-top: 7px; }
     .wide { grid-column: span 2; }
     .action-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 22px; }
-    .action {
-      border: 1px solid rgba(255,70,45,0.35);
-      background: linear-gradient(135deg, rgba(255,43,22,0.22), rgba(255,255,255,0.035));
-      color: #fff; border-radius: 22px; padding: 18px 16px; cursor: pointer;
-      min-height: 92px; transition: 0.16s ease; text-align: left;
-    }
+    .action-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
+    .action { border: 1px solid rgba(255,70,45,0.35); background: linear-gradient(135deg, rgba(255,43,22,0.22), rgba(255,255,255,0.035)); color: #fff; border-radius: 22px; padding: 18px 16px; cursor: pointer; min-height: 92px; transition: 0.16s ease; text-align: left; }
     .action:hover { transform: translateY(-3px); box-shadow: 0 0 22px rgba(255,42,22,0.20); }
-    .action strong { display: block; font-size: 16px; margin-bottom: 8px; }
+    .action.blue { border-color: rgba(45,130,255,0.35); background: linear-gradient(135deg, rgba(22,80,255,0.22), rgba(255,255,255,0.035)); }
+    .action.blue:hover { box-shadow: 0 0 22px rgba(22,80,255,0.20); }
+    .action strong { display: block; font-size: 15px; margin-bottom: 6px; }
     .action span { color: #c8c8c8; font-size: 12px; }
-    .list {
-      margin-top: 18px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.08);
-      overflow: hidden; max-height: 48vh; overflow-y: auto;
-    }
-    .row {
-      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
-      padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.06);
-      color: #d6d6d6; font-size: 14px; gap: 10px; align-items: center;
-    }
-    .units-row { grid-template-columns: 0.8fr 1.1fr 0.8fr 0.8fr 1.35fr; }
-    .row.header {
-      color: #ff5a43; background: rgba(255,255,255,0.035);
-      text-transform: uppercase; font-size: 11px; letter-spacing: 1px;
-    }
-    .pill {
-      width: fit-content; padding: 5px 10px; border-radius: 999px;
-      background: rgba(49,255,120,0.12); color: #5dff91;
-      border: 1px solid rgba(49,255,120,0.24); font-size: 12px;
-    }
+    .list { margin-top: 18px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
+    .row { display: grid; padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #d6d6d6; font-size: 14px; }
+    .row.header { color: #ff5a43; background: rgba(255,255,255,0.035); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+    .pill { width: fit-content; padding: 5px 10px; border-radius: 999px; background: rgba(49,255,120,0.12); color: #5dff91; border: 1px solid rgba(49,255,120,0.24); font-size: 12px; }
     .pill.warn { background: rgba(255,173,51,0.12); color: #ffbe55; border-color: rgba(255,173,51,0.24); }
     .pill.bad { background: rgba(255,42,22,0.12); color: #ff5b47; border-color: rgba(255,42,22,0.24); }
-    .pill.locked { background: rgba(255,42,22,0.18); color: #ff5b47; border-color: rgba(255,42,22,0.35); }
-    .mini-actions { display: flex; gap: 7px; flex-wrap: wrap; }
-    .mini-btn {
-      border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.055);
-      color: #fff; border-radius: 10px; padding: 7px 10px; cursor: pointer; font-size: 12px;
-    }
-    .mini-btn:hover { border-color: rgba(255,72,45,0.5); background: rgba(255,42,22,0.18); }
-    .mini-btn.danger { border-color: rgba(255,42,22,0.35); color: #ff6b5a; }
-    .toast {
-      position: absolute; right: 3.2%; bottom: 4%; min-width: 280px;
-      background: rgba(10,10,12,0.92); border: 1px solid rgba(255,70,45,0.38);
-      border-radius: 18px; padding: 14px 18px; box-shadow: 0 0 28px rgba(255,42,22,0.16);
-      transform: translateY(130%); opacity: 0; transition: 0.22s ease; color: #fff; font-size: 14px;
-    }
+    .pill.off { background: rgba(255,42,22,0.18); color: #ff5b47; border-color: rgba(255,42,22,0.35); }
+    .toast { position: absolute; right: 3.2%; bottom: 4%; min-width: 280px; background: rgba(10,10,12,0.92); border: 1px solid rgba(255,70,45,0.38); border-radius: 18px; padding: 14px 18px; box-shadow: 0 0 28px rgba(255,42,22,0.16); transform: translateY(130%); opacity: 0; transition: 0.22s ease; color: #fff; font-size: 14px; z-index: 100; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .muted { color: #999; }
-    .coming {
-      height: 65vh; display: flex; align-items: center; justify-content: center;
-      border: 1px solid rgba(255,255,255,0.08); border-radius: 30px;
-      background: rgba(255,255,255,0.035); text-align: center;
-    }
+    .coming { height: 55vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08); border-radius: 30px; background: rgba(255,255,255,0.035); text-align: center; }
     .coming h3 { font-size: 32px; margin: 0 0 10px; }
+    .meter-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; margin-top: 8px; overflow: hidden; }
+    .meter-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
+    .util-card { border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius: 20px; padding: 16px; margin-bottom: 12px; }
+    .util-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .util-name { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #ff4a35; }
+    .util-actions { display: flex; gap: 8px; }
+    .util-btn { padding: 5px 12px; border-radius: 999px; font-size: 11px; cursor: pointer; border: 1px solid; transition: 0.15s; }
+    .util-btn.on { background: rgba(49,255,120,0.12); color: #5dff91; border-color: rgba(49,255,120,0.3); }
+    .util-btn.on:hover { background: rgba(49,255,120,0.25); }
+    .util-btn.off { background: rgba(255,42,22,0.12); color: #ff5b47; border-color: rgba(255,42,22,0.3); }
+    .util-btn.off:hover { background: rgba(255,42,22,0.25); }
+    .unit-section { margin-bottom: 24px; }
+    .unit-section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #fff; display: flex; align-items: center; gap: 10px; }
   </style>
 </head>
-
 <body>
   <div class="tablet">
     <div class="topbar">
@@ -155,6 +92,7 @@
       <nav class="sidebar">
         <div class="nav-btn active" data-page="dashboard"><span class="icon">◆</span>Dashboard</div>
         <div class="nav-btn" data-page="units"><span class="icon">▦</span>Units</div>
+        <div class="nav-btn" data-page="utilities"><span class="icon">⚡</span>Utilities</div>
         <div class="nav-btn" data-page="doors"><span class="icon">▣</span>Doors</div>
         <div class="nav-btn" data-page="payments"><span class="icon">$</span>Payments</div>
         <div class="nav-btn" data-page="maintenance"><span class="icon">⚙</span>Maintenance</div>
@@ -164,49 +102,21 @@
       </nav>
 
       <main class="content">
+
+        <!-- DASHBOARD -->
         <section id="dashboard" class="page active">
           <div class="page-title">
-            <div>
-              <h2>Building Overview</h2>
-              <p>Smart housing network status and quick controls.</p>
-            </div>
+            <div><h2>Building Overview</h2><p>Smart housing network status and quick controls.</p></div>
             <div class="pill">Medium RP Preset</div>
           </div>
-
           <div class="grid">
-            <div class="card">
-              <label>Total Units</label>
-              <div class="stat" id="dashTotalUnits">0</div>
-              <div class="sub" id="dashActiveLeases">0 active leases</div>
-            </div>
-            <div class="card">
-              <label>Occupancy</label>
-              <div class="stat" id="dashOccupancy">0%</div>
-              <div class="sub" id="dashVacant">0 vacant</div>
-            </div>
-            <div class="card">
-              <label>Locked Units</label>
-              <div class="stat" id="dashLocked">0</div>
-              <div class="sub">Management lockouts</div>
-            </div>
-            <div class="card">
-              <label>Total Revenue</label>
-              <div class="stat" id="dashRevenue">L$0</div>
-              <div class="sub" id="dashPaymentsToday">0 payments today</div>
-            </div>
-            <div class="card wide">
-              <label>System Feed</label>
-              <div class="sub" id="feedLine1">Waiting for live unit data...</div>
-              <div class="sub" id="feedLine2">Payments feed standing by...</div>
-              <div class="sub" id="feedLine3">Admin console online.</div>
-            </div>
-            <div class="card wide">
-              <label>District Health</label>
-              <div class="stat" id="dashHealth">Stable</div>
-              <div class="sub">Access grid, terminals, payments, and HUD routing online.</div>
-            </div>
+            <div class="card"><label>Total Units</label><div class="stat" id="stat-total">--</div><div class="sub" id="stat-active">Loading...</div></div>
+            <div class="card"><label>Occupancy</label><div class="stat" id="stat-occupancy">--%</div><div class="sub" id="stat-vacant">Loading...</div></div>
+            <div class="card"><label>Expired Leases</label><div class="stat" id="stat-expired">--</div><div class="sub">Needs attention</div></div>
+            <div class="card"><label>Utility Alerts</label><div class="stat" id="stat-util-alerts">--</div><div class="sub">Services offline</div></div>
+            <div class="card wide"><label>System Feed</label><div id="system-feed"><div class="sub" style="color:#999;">Loading...</div></div></div>
+            <div class="card wide"><label>District Health</label><div class="stat" id="stat-health">--</div><div class="sub" id="stat-health-sub">Fetching...</div></div>
           </div>
-
           <div class="action-row">
             <button class="action" data-action="syncDoors"><strong>Sync All Doors</strong><span>Resend unit access data.</span></button>
             <button class="action" data-action="pairDoor"><strong>Pair New Door</strong><span>Add a new door to a unit.</span></button>
@@ -215,66 +125,56 @@
           </div>
         </section>
 
+        <!-- UNITS -->
         <section id="units" class="page">
           <div class="page-title">
-            <div>
-              <h2>Units</h2>
-              <p>Live apartment registry, lease status, and admin controls.</p>
-            </div>
-            <div class="pill warn">Registry V1</div>
+            <div><h2>Units</h2><p>Apartment registry and lease status.</p></div>
+            <div class="pill warn" id="units-last-sync">Not synced</div>
           </div>
-
-          <div class="list" id="unitsList">
-            <div class="row header units-row">
-              <div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div><div>Admin Controls</div>
-            </div>
+          <div class="list" id="units-list">
+            <div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>
+            <div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">Loading...</div></div>
           </div>
-
           <div class="action-row">
+            <button class="action" data-action="scanTerminals"><strong>Refresh Units</strong><span>Pull live data from terminals.</span></button>
             <button class="action" data-action="autoAssign"><strong>Auto Number</strong><span>Reuse missing unit numbers.</span></button>
-            <button class="action" data-action="scanTerminals"><strong>Refresh Units</strong><span>Ask terminals for status.</span></button>
-            <button class="action" data-page-jump="payments"><strong>View Payments</strong><span>Open rent history.</span></button>
-            <button class="action" data-action="syncDoors"><strong>Sync Doors</strong><span>Push latest access states.</span></button>
+            <button class="action" data-action="resetTenant"><strong>Reset Tenant</strong><span>Coming soon.</span></button>
+            <button class="action" data-action="lockUnit"><strong>Lock Unit</strong><span>Coming soon.</span></button>
           </div>
         </section>
 
+        <!-- UTILITIES -->
+        <section id="utilities" class="page">
+          <div class="page-title">
+            <div><h2>Utilities</h2><p>Smart meter status and service controls per unit.</p></div>
+            <div class="pill warn" id="util-last-sync">Not synced</div>
+          </div>
+          <div id="utilities-content">
+            <div style="color:#999;text-align:center;padding:40px;">Loading utility data... Click Scan Terminals first.</div>
+          </div>
+        </section>
+
+        <!-- DOORS -->
         <section id="doors" class="page">
           <div class="page-title"><div><h2>Door Network</h2><p>Pair, sync, and recover access devices.</p></div><div class="pill">Access Grid</div></div>
           <div class="action-row">
             <button class="action" data-action="pairDoor"><strong>Pair Door</strong><span>Start one-click pairing.</span></button>
             <button class="action" data-action="syncDoors"><strong>Sync All</strong><span>Repair desynced doors.</span></button>
-            <button class="action" data-action="scanTerminals"><strong>Scan Units</strong><span>Refresh terminal registry.</span></button>
-            <button class="action"><strong>Clear Pair</strong><span>Coming soon.</span></button>
+            <button class="action" data-action="scanDoors"><strong>Scan Doors</strong><span>Coming soon.</span></button>
+            <button class="action" data-action="clearDoor"><strong>Clear Pair</strong><span>Coming soon.</span></button>
           </div>
-          <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Door recovery and pairing actions route through the DistrictOS bridge.</p></div></div>
+          <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Doors respond to Sync All from Dashboard.</p></div></div>
         </section>
 
+        <!-- PAYMENTS -->
         <section id="payments" class="page">
           <div class="page-title">
-            <div><h2>Payments</h2><p>Live rent payment tracking and revenue overview.</p></div>
-            <div class="pill">Live Revenue Feed</div>
+            <div><h2>Payments</h2><p>Rent payment history across all units.</p></div>
+            <div class="pill warn" id="payments-last-sync">Not loaded</div>
           </div>
-
-          <div class="grid">
-            <div class="card">
-              <label>Total Revenue</label>
-              <div class="stat" id="totalRevenue">L$0</div>
-              <div class="sub">Collected across all units</div>
-            </div>
-            <div class="card">
-              <label>Payments Today</label>
-              <div class="stat" id="paymentsToday">0</div>
-              <div class="sub">Successful rent payments</div>
-            </div>
-            <div class="card wide">
-              <label>Latest Payment</label>
-              <div class="stat" id="latestPayment">No payments yet</div>
-              <div class="sub" id="latestPaymentSub">Waiting for activity...</div>
-            </div>
-          </div>
-
-          <div class="list" id="paymentsList">
-            <div class="row header"><div>Unit</div><div>Tenant</div><div>Amount</div><div>Time</div></div>
+          <div class="list" id="payments-list">
+            <div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Amount</div><div>Date</div></div>
+            <div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">Loading...</div></div>
           </div>
         </section>
 
@@ -286,326 +186,243 @@
         <div id="toast" class="toast">DistrictOS action sent.</div>
       </main>
     </div>
-
     <div class="scanline"></div>
   </div>
 
-  <script>
-    const API_BASE = "https://districtos-bridge.districtos.workers.dev";
-    const SL_BRIDGE_URL = API_BASE;
+  <iframe name="hidden_frame" style="display:none;"></iframe>
 
+  <script>
     const pages = document.querySelectorAll('.page');
     const navButtons = document.querySelectorAll('.nav-btn');
     const toast = document.getElementById('toast');
-
-    let cachedUnits = [];
-    let cachedPayments = [];
+    const SL_BRIDGE_URL = "https://districtos-bridge.districtos.workers.dev";
 
     function setPage(pageId) {
       pages.forEach(p => p.classList.remove('active'));
       navButtons.forEach(b => b.classList.remove('active'));
-
-      const page = document.getElementById(pageId);
-      if (page) page.classList.add('active');
-
-      document.querySelector(`[data-page="${pageId}"]`)?.classList.add('active');
-
-      if (pageId === "units") loadUnits();
-      if (pageId === "payments") loadPayments();
-      if (pageId === "dashboard") loadDashboard();
+      document.getElementById(pageId).classList.add('active');
+      document.querySelector('[data-page="' + pageId + '"]')?.classList.add('active');
+      if (pageId === 'units') loadUnits();
+      if (pageId === 'payments') loadPayments();
+      if (pageId === 'utilities') loadUtilities();
     }
 
     function showToast(message) {
       toast.textContent = message;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 1800);
+      setTimeout(function() { toast.classList.remove('show'); }, 1800);
     }
 
-    function escapeHTML(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function isLocked(unit) {
-      return unit.locked === "1" || unit.locked === 1 || unit.locked === true || unit.locked === "true";
-    }
-
-    function normalizeArray(data) {
-      if (Array.isArray(data)) return data;
-      if (data && Array.isArray(data.units)) return data.units;
-      if (data && Array.isArray(data.payments)) return data.payments;
-      if (data && typeof data === "object") return Object.values(data);
-      return [];
-    }
-
-    async function fetchJSON(url) {
-      const response = await fetch(url + "?t=" + Date.now());
-      return await response.json();
-    }
-
-    function sendDistrictCommand(action, unit = "") {
-    console.log("DistrictOS command:", action, "unit:", unit);
-
-    const unitPart = unit ? `&unit=${encodeURIComponent(unit)}` : "";
-
-    const url =
-      `${SL_BRIDGE_URL}/?action=${encodeURIComponent(action)}${unitPart}&t=${Date.now()}`;
-
-    showToast(
-      unit
-        ? `DistrictOS: ${action} queued for ${unit}`
-        : `DistrictOS: ${action} queued`
-    );
-
-    fetch(url)
-      .then(() => {
-        showToast(
-          unit
-            ? `DistrictOS: ${action} sent for ${unit}`
-            : `DistrictOS: ${action} sent`
-        );
-
-        setTimeout(() => {
-          loadUnits();
-          loadDashboard();
-        }, 1500);
-      })
-      .catch(() => {
-        showToast("DistrictOS: bridge offline");
-      });
-
-    if (action === "pairDoor") setPage("doors");
-    if (action === "autoAssign") setPage("units");
-  }
-
-    async function loadUnits() {
-      try {
-        const data = await fetchJSON(`${API_BASE}/units`);
-        const units = normalizeArray(data);
-        cachedUnits = units;
-
-        const list = document.getElementById("unitsList");
-        list.innerHTML = `
-          <div class="row header units-row">
-            <div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div><div>Admin Controls</div>
-          </div>
-        `;
-
-        if (!units || units.length === 0) {
-          list.innerHTML += `
-            <div class="row units-row">
-              <div>No units found.</div><div>---</div><div>---</div><div>---</div><div>Scan terminals to refresh.</div>
-            </div>
-          `;
-          return;
-        }
-
-        units.sort((a, b) => String(a.unit || "").localeCompare(String(b.unit || "")));
-
-        units.forEach(unit => {
-          const unitID =
-          unit.unit ||
-          unit.unitID ||
-          unit.id ||
-          unit.name ||
-          unit.Unit ||
-          unit.UNIT ||
-          "";
-          const tenant = unit.tenant || "Vacant";
-          const status = unit.status || "Vacant";
-          const lease = unit.lease || "--";
-          const locked = isLocked(unit);
-
-          let pillClass = "warn";
-          if (status === "Active") pillClass = "";
-          if (status === "Expired" || locked) pillClass = "bad";
-
-          const row = document.createElement("div");
-          row.className = "row units-row";
-
-          row.innerHTML = `
-            <div>${escapeHTML(unitID)}</div>
-            <div>${escapeHTML(tenant)}</div>
-            <div>
-              <span class="pill ${locked ? "locked" : pillClass}">
-                ${locked ? "Locked" : escapeHTML(status)}
-              </span>
-            </div>
-            <div>${escapeHTML(lease)}</div>
-            <div class="mini-actions">
-              <button class="mini-btn lock-btn">Lock</button>
-              <button class="mini-btn unlock-btn">Unlock</button>
-              <button class="mini-btn danger reset-btn">Reset</button>
-            </div>
-          `;
-
-        row.querySelector(".lock-btn").addEventListener("click", () => {
-          sendDistrictCommand("lockUnit", unitID);
+    function sendDistrictCommand(action, extraParams) {
+      showToast('DistrictOS: ' + action + ' sent');
+      var url = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action);
+      if (extraParams) {
+        Object.keys(extraParams).forEach(function(k) {
+          url += "&" + k + "=" + encodeURIComponent(extraParams[k]);
         });
+      }
+      var img = new Image();
+      img.src = url + "&t=" + Date.now();
+      if (action === 'pairDoor') setPage('doors');
+      if (action === 'autoAssign') setPage('units');
+      if (action === 'scanTerminals') {
+        setTimeout(function() { loadUnits(); loadUtilities(); }, 3000);
+      }
+    }
 
-        row.querySelector(".unlock-btn").addEventListener("click", () => {
-          sendDistrictCommand("unlockUnit", unitID);
-        });
+    function toggleUtility(unit, type, state) {
+      showToast('DistrictOS: ' + type + ' ' + state + ' for ' + unit);
+      var img = new Image();
+      img.src = SL_BRIDGE_URL + "?action=toggleUtility&unit=" + encodeURIComponent(unit) +
+        "&type=" + encodeURIComponent(type) + "&state=" + encodeURIComponent(state) + "&t=" + Date.now();
+      setTimeout(function() { loadUnits(); loadUtilities(); }, 2000);
+    }
 
-        row.querySelector(".reset-btn").addEventListener("click", () => {
-          if (confirm(`Reset tenant for ${unitID}? This will clear the resident from this unit.`)) {
-            sendDistrictCommand("resetTenant", unitID);
+    function getMeterColor(val) {
+      if (val > 60) return "#5dff91";
+      if (val > 30) return "#ffbe55";
+      return "#ff5b47";
+    }
+
+    function utilIcon(type) {
+      if (type === "electric") return "⚡";
+      if (type === "water") return "💧";
+      if (type === "internet") return "📶";
+      if (type === "gas") return "🔥";
+      return "◆";
+    }
+
+    function loadUtilities() {
+      fetch(SL_BRIDGE_URL + "/units")
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var units = data.filter(function(u) { return u.unit && u.unit !== "APT-TEST"; });
+          units.sort(function(a, b) { return a.unit.localeCompare(b.unit); });
+
+          var container = document.getElementById('utilities-content');
+          var sync = document.getElementById('util-last-sync');
+
+          if (units.length === 0) {
+            container.innerHTML = '<div style="color:#999;text-align:center;padding:40px;">No units found. Click Scan Terminals on Dashboard.</div>';
+            return;
           }
-        });
 
-          list.appendChild(row);
+          var utilTypes = ["electric", "water", "internet", "gas"];
+          var meterKeys = { electric: "electricMeter", water: "waterMeter", internet: "internetMeter", gas: "gasMeter" };
+          var alerts = 0;
+          var html = "";
+
+          units.forEach(function(u) {
+            html += '<div class="unit-section">';
+            html += '<div class="unit-section-title"><span>' + u.unit + '</span>';
+            if (u.tenant && u.tenant !== "Vacant") {
+              html += '<span style="color:#999;font-size:13px;font-weight:400;">· ' + u.tenant + '</span>';
+            }
+            html += '</div>';
+
+            utilTypes.forEach(function(type) {
+              var active = u[type];
+              var meter = u[meterKeys[type]];
+              if (active === undefined) active = 1;
+              if (meter === undefined) meter = 100;
+              if (!active) alerts++;
+
+              var meterColor = getMeterColor(meter);
+              var statusLabel = active ? '<span class="pill" style="font-size:11px;">ON</span>' : '<span class="pill off" style="font-size:11px;">OFF</span>';
+
+              html += '<div class="util-card">';
+              html += '<div class="util-header">';
+              html += '<div class="util-name">' + utilIcon(type) + ' ' + type.charAt(0).toUpperCase() + type.slice(1) + '</div>';
+              html += '<div style="display:flex;align-items:center;gap:10px;">' + statusLabel;
+              html += '<button class="util-btn ' + (active ? 'off' : 'on') + '" onclick="toggleUtility(\'' + u.unit + '\',\'' + type + '\',\'' + (active ? 'off' : 'on') + '\')">' + (active ? 'Shut Off' : 'Restore') + '</button>';
+              html += '</div></div>';
+              html += '<div style="display:flex;justify-content:space-between;font-size:12px;color:#999;margin-bottom:4px;"><span>Meter</span><span style="color:' + meterColor + ';">' + meter + '%</span></div>';
+              html += '<div class="meter-bar"><div class="meter-fill" style="width:' + meter + '%;background:' + meterColor + ';"></div></div>';
+              html += '</div>';
+            });
+
+            if (u.utilityBalance !== undefined && u.utilityBalance > 0) {
+              html += '<div style="color:#ffbe55;font-size:13px;margin-top:4px;">⚠ Balance due: L$' + u.utilityBalance + '</div>';
+            }
+
+            html += '</div>';
+          });
+
+          container.innerHTML = html;
+
+          var now = new Date();
+          if (sync) sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+          var utilEl = document.getElementById('stat-util-alerts');
+          if (utilEl) utilEl.textContent = alerts;
+        })
+        .catch(function() {
+          document.getElementById('utilities-content').innerHTML = '<div style="color:#f55;text-align:center;padding:40px;">Failed to load utility data.</div>';
         });
-      } catch (err) {
-        console.error("DistrictOS unit fetch failed:", err);
-      }
     }
 
-    async function loadPayments() {
-      try {
-        const data = await fetchJSON(`${API_BASE}/payments`);
-        const payments = normalizeArray(data);
-        cachedPayments = payments;
+    function loadUnits() {
+      fetch(SL_BRIDGE_URL + "/units")
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var units = data.filter(function(u) { return u.unit && u.unit !== "APT-TEST"; });
+          units.sort(function(a, b) { return a.unit.localeCompare(b.unit); });
 
-        const list = document.getElementById('paymentsList');
-        list.innerHTML = `<div class="row header"><div>Unit</div><div>Tenant</div><div>Amount</div><div>Time</div></div>`;
+          var list = document.getElementById('units-list');
+          var sync = document.getElementById('units-last-sync');
+          if (list) {
+            list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>';
+            if (units.length === 0) {
+              list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No units found.</div></div>';
+            } else {
+              units.forEach(function(u) {
+                var sc = u.status === "Active" ? "pill" : u.status === "Expired" ? "pill bad" : "pill warn";
+                list.innerHTML += '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>' + u.unit + '</div><div>' + (u.tenant || "Vacant") + '</div><div><span class="' + sc + '">' + u.status + '</span></div><div>' + (u.lease || "--") + '</div></div>';
+              });
+            }
+          }
 
-        if (!payments || payments.length === 0) {
-          list.innerHTML += `<div class="row"><div>No payments recorded yet.</div><div>---</div><div>---</div><div>---</div></div>`;
-          document.getElementById('totalRevenue').textContent = "L$0";
-          document.getElementById('paymentsToday').textContent = "0";
-          document.getElementById('latestPayment').textContent = "No payments yet";
-          document.getElementById('latestPaymentSub').textContent = "Waiting for activity...";
-          return;
-        }
+          var now = new Date();
+          if (sync) sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 
-        payments.sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
+          var total    = units.length;
+          var active   = units.filter(function(u) { return u.status === "Active"; }).length;
+          var vacant   = units.filter(function(u) { return u.status === "Vacant"; }).length;
+          var expired  = units.filter(function(u) { return u.status === "Expired"; }).length;
+          var occupancy = total > 0 ? Math.round((active / total) * 100) : 0;
 
-        let totalRevenue = 0;
-        let paymentsToday = 0;
-        const now = Date.now() / 1000;
+          function el(id) { return document.getElementById(id); }
+          if (el('stat-total'))      el('stat-total').textContent      = total;
+          if (el('stat-occupancy'))  el('stat-occupancy').textContent  = occupancy + "%";
+          if (el('stat-active'))     el('stat-active').textContent     = active + " active leases";
+          if (el('stat-vacant'))     el('stat-vacant').textContent     = vacant + " units vacant";
+          if (el('stat-expired'))    el('stat-expired').textContent    = expired;
+          if (el('stat-health'))     el('stat-health').textContent     = expired === 0 ? "Stable" : "Warning";
+          if (el('stat-health-sub')) el('stat-health-sub').textContent = expired === 0 ? "All leases current." : expired + " lease(s) need attention.";
 
-        payments.forEach(payment => {
-          totalRevenue += Number(payment.amount || 0);
-          if ((now - Number(payment.timestamp || 0)) < 86400) paymentsToday++;
-
-          const row = document.createElement('div');
-          row.className = 'row';
-
-          const paymentDate = payment.timestamp
-            ? new Date(Number(payment.timestamp) * 1000).toLocaleString()
-            : "--";
-
-          row.innerHTML = `
-            <div>${escapeHTML(payment.unit || 'UNKNOWN')}</div>
-            <div>${escapeHTML(payment.tenant || 'UNKNOWN')}</div>
-            <div>L$${escapeHTML(payment.amount || 0)}</div>
-            <div>${escapeHTML(paymentDate)}</div>
-          `;
-
-          list.appendChild(row);
+          var feed = document.getElementById('system-feed');
+          if (feed) {
+            feed.innerHTML = "";
+            units.slice(0, 6).forEach(function(u) {
+              var color = u.status === "Active" ? "#5dff91" : u.status === "Expired" ? "#ff5b47" : "#ffbe55";
+              feed.innerHTML += '<div class="sub" style="color:' + color + '">' + u.unit + ' — ' + u.status + (u.tenant && u.tenant !== "Vacant" ? ' · ' + u.tenant : '') + '</div>';
+            });
+          }
+        })
+        .catch(function() {
+          var list = document.getElementById('units-list');
+          if (list) list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#f55;">Failed to load units.</div></div>';
         });
-
-        document.getElementById('totalRevenue').textContent = `L$${totalRevenue}`;
-        document.getElementById('paymentsToday').textContent = paymentsToday;
-
-        const latest = payments[0];
-        document.getElementById('latestPayment').textContent = `${latest.unit || "UNKNOWN"} • L$${latest.amount || 0}`;
-        document.getElementById('latestPaymentSub').textContent =
-          `${latest.tenant || "UNKNOWN"} • ${new Date(Number(latest.timestamp || 0) * 1000).toLocaleString()}`;
-      } catch (err) {
-        console.error('DistrictOS payment fetch failed:', err);
-      }
     }
 
-    async function loadDashboard() {
-      try {
-        const unitsData = await fetchJSON(`${API_BASE}/units`);
-        const paymentsData = await fetchJSON(`${API_BASE}/payments`);
+    function loadPayments() {
+      fetch(SL_BRIDGE_URL + "/payments")
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var list = document.getElementById('payments-list');
+          var sync = document.getElementById('payments-last-sync');
+          if (!list) return;
 
-        const units = normalizeArray(unitsData);
-        const payments = normalizeArray(paymentsData);
+          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Amount</div><div>Date</div></div>';
 
-        cachedUnits = units;
-        cachedPayments = payments;
+          if (data.length === 0) {
+            list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No payments recorded yet.</div></div>';
+          } else {
+            data.forEach(function(p) {
+              var date = new Date(p.timestamp * 1000);
+              var dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+              list.innerHTML += '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>' + p.unit + '</div><div>' + (p.tenant || "Unknown") + '</div><div style="color:#5dff91;">L$' + p.amount + '</div><div style="color:#999;font-size:12px;">' + dateStr + '</div></div>';
+            });
+          }
 
-        const totalUnits = units.length;
-        const activeUnits = units.filter(u => u.status === "Active" && !isLocked(u)).length;
-        const vacantUnits = units.filter(u => u.status === "Vacant").length;
-        const lockedUnits = units.filter(u => isLocked(u)).length;
-        const occupancy = totalUnits > 0 ? Math.round((activeUnits / totalUnits) * 100) : 0;
-
-        let totalRevenue = 0;
-        let paymentsToday = 0;
-        const now = Date.now() / 1000;
-
-        payments.forEach(p => {
-          totalRevenue += Number(p.amount || 0);
-          if ((now - Number(p.timestamp || 0)) < 86400) paymentsToday++;
+          var now = new Date();
+          if (sync) sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        })
+        .catch(function() {
+          var list = document.getElementById('payments-list');
+          if (list) list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#f55;">Failed to load payments.</div></div>';
         });
-
-        payments.sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
-
-        document.getElementById("dashTotalUnits").textContent = totalUnits;
-        document.getElementById("dashActiveLeases").textContent = `${activeUnits} active leases`;
-        document.getElementById("dashOccupancy").textContent = `${occupancy}%`;
-        document.getElementById("dashVacant").textContent = `${vacantUnits} vacant`;
-        document.getElementById("dashLocked").textContent = lockedUnits;
-        document.getElementById("dashRevenue").textContent = `L$${totalRevenue}`;
-        document.getElementById("dashPaymentsToday").textContent = `${paymentsToday} payments today`;
-
-        const latestUnit = units[0];
-        const latestPayment = payments[0];
-
-        document.getElementById("feedLine1").textContent = latestUnit
-          ? `${latestUnit.unit || "Unit"} • ${latestUnit.status || "Unknown"} • ${latestUnit.tenant || "Vacant"}`
-          : "No terminal data yet.";
-
-        document.getElementById("feedLine2").textContent = latestPayment
-          ? `Latest payment: ${latestPayment.unit || "Unit"} • L$${latestPayment.amount || 0}`
-          : "No payments recorded yet.";
-
-        document.getElementById("feedLine3").textContent =
-          lockedUnits > 0 ? `${lockedUnits} unit(s) currently locked by management.` : "No active lockouts.";
-
-        document.getElementById("dashHealth").textContent =
-          totalUnits > 0 ? "Stable" : "Waiting";
-      } catch (err) {
-        console.error("DistrictOS dashboard failed:", err);
-        document.getElementById("dashHealth").textContent = "Offline";
-      }
     }
+
+    navButtons.forEach(function(btn) {
+      btn.addEventListener('click', function() { setPage(btn.dataset.page); });
+    });
+
+    document.querySelectorAll('[data-action]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        sendDistrictCommand(btn.dataset.action);
+      });
+    });
 
     function updateClock() {
-      const now = new Date();
-      document.getElementById('clock').textContent =
-        now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      var now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', () => setPage(btn.dataset.page));
-    });
-
-    document.querySelectorAll('[data-action]').forEach(btn => {
-      btn.addEventListener('click', () => sendDistrictCommand(btn.dataset.action));
-    });
-
-    document.querySelectorAll('[data-page-jump]').forEach(btn => {
-      btn.addEventListener('click', () => setPage(btn.dataset.pageJump));
-    });
-
     updateClock();
-    loadDashboard();
-    loadUnits();
-    loadPayments();
-
     setInterval(updateClock, 1000);
-    setInterval(loadDashboard, 8000);
-    setInterval(loadUnits, 8000);
-    setInterval(loadPayments, 8000);
+    loadUnits();
+    setInterval(loadUnits, 30000);
   </script>
 </body>
 </html>
