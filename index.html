@@ -230,20 +230,17 @@
       }
     }
 
-function toggleUtility(unit, type, state) {
-  showToast('DistrictOS: ' + type + ' ' + state + ' for ' + unit);
-  fetch(SL_BRIDGE_URL + "/utility", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: "unit=" + encodeURIComponent(unit) +
-          "&type=" + encodeURIComponent(type) +
-          "&state=" + encodeURIComponent(state)
-  }).then(function() {
-    setTimeout(function() { loadUnits(); loadUtilities(); }, 2000);
-  }).catch(function() {
-    showToast("DistrictOS: utility command failed");
-  });
-}
+    function toggleUtility(unit, type, state) {
+      showToast('DistrictOS: ' + type + ' ' + state + ' for ' + unit);
+      var img = new Image();
+      img.src = SL_BRIDGE_URL + 
+        "?action=toggleUtility" +
+        "&unit=" + encodeURIComponent(unit) +
+        "&type=" + encodeURIComponent(type) +
+        "&state=" + encodeURIComponent(state) +
+        "&t=" + Date.now();
+      setTimeout(function() { loadUnits(); loadUtilities(); }, 2000);
+    }
 
     function getMeterColor(val) {
       if (val > 60) return "#5dff91";
