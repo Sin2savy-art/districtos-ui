@@ -65,6 +65,7 @@ html, body {
 
 .content {
   flex: 1;
+  min-height: 0;
   padding: 12px 18px 18px;
   overflow: hidden;
 }
@@ -185,7 +186,7 @@ html, body {
 }
 
 .nav {
-  height: 13%;
+  height: 17%;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   border-top: 1px solid rgba(255,255,255,0.08);
@@ -196,8 +197,9 @@ html, body {
   background: transparent;
   border: none;
   color: #aaa;
-  font-size: 11px;
+  font-size: 13px;
   cursor: pointer;
+  padding: 8px 2px;
 }
 
 .nav button.active {
@@ -470,11 +472,17 @@ async function loadResident() {
 
 function residentAction(action, type = "") {
   const unit = residentData.unit || "";
+  const avatar = RESIDENT_AVATAR || "";
 
   let url =
-    `${API_BASE}/?action=${encodeURIComponent(action)}&unit=${encodeURIComponent(unit)}&t=${Date.now()}`;
+    `${API_BASE}/?action=${encodeURIComponent(action)}` +
+    `&unit=${encodeURIComponent(unit)}` +
+    `&avatar=${encodeURIComponent(avatar)}` +
+    `&t=${Date.now()}`;
 
-  if (type) url += `&type=${encodeURIComponent(type)}`;
+  if (type) {
+    url += `&type=${encodeURIComponent(type)}`;
+  }
 
   fetch(url)
     .then(() => showToast("Request sent"))
