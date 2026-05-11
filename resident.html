@@ -512,6 +512,8 @@ function residentAction(action, type = "") {
 
   console.log("Resident action URL:", url);
 
+  showToast("Avatar: " + avatar.slice(0, 8));
+
   fetch(url)
     .then(() => showToast("Request sent"))
     .catch(() => showToast("Bridge offline"));
