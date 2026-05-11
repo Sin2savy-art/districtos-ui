@@ -363,7 +363,14 @@ const API_BASE = "https://districtos-bridge.districtos.workers.dev";
 
 // TEMP for shell testing.
 // Later the Resident HUD Controller will inject avatar UUID into URL.
-const RESIDENT_AVATAR = new URLSearchParams(window.location.search).get("avatar") || "";
+const URL_PARAMS = new URLSearchParams(window.location.search);
+
+const RESIDENT_AVATAR =
+  URL_PARAMS.get("avatar") ||
+  URL_PARAMS.get("key") ||
+  URL_PARAMS.get("id") ||
+  "";
+
 let residentData = {
   unit: "APT-101",
   tenant: "Resident Name",
@@ -472,7 +479,26 @@ async function loadResident() {
 
 function residentAction(action, type = "") {
   const unit = residentData.unit || "";
-  const avatar = RESIDENT_AVATAR || "";
+
+  const avatar =
+    RESIDENT_AVATAR ||
+    residentData.tenantKey ||
+    "";
+
+  if (!unit) {
+    showToast("No active unit found");
+    return;
+  }
+
+  if (!avatar) {
+    showToast("Resident ID missing");
+    console.log("Missing avatar", {
+      RESIDENT_AVATAR,
+      tenantKey: residentData.tenantKey,
+      url: window.location.href
+    });
+    return;
+  }
 
   let url =
     `${API_BASE}/?action=${encodeURIComponent(action)}` +
@@ -483,6 +509,8 @@ function residentAction(action, type = "") {
   if (type) {
     url += `&type=${encodeURIComponent(type)}`;
   }
+
+  console.log("Resident action URL:", url);
 
   fetch(url)
     .then(() => showToast("Request sent"))
