@@ -37,26 +37,21 @@ body {
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  padding: 22px 16px 14px;
 }
 
 .build-tag {
-  position: absolute;
-  top: 10px;
-  left: 14px;
-  font-size: 8px;
-  color: rgba(255,74,53,0.55);
-  z-index: 999;
-  pointer-events: none;
+  display: none;
 }
 
 .topbar {
-  height: 86px;
-  padding: 28px 18px 10px;
+  height: 72px;
+  padding: 8px 2px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255,255,255,0.08);
-  background: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.10);
 }
 
 .brand h1 {
@@ -85,7 +80,7 @@ body {
 .content {
   flex: 1;
   min-height: 0;
-  padding: 12px 14px 8px;
+  padding: 14px 0 10px;
   overflow: hidden;
 }
 
@@ -110,8 +105,8 @@ body {
   border: 1px solid rgba(255,255,255,0.08);
   background: linear-gradient(145deg, rgba(255,255,255,0.075), rgba(255,255,255,0.025));
   border-radius: 18px;
-  padding: 13px;
-  margin-bottom: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
   box-shadow: 0 14px 28px rgba(0,0,0,0.22);
 }
 
@@ -207,21 +202,22 @@ body {
 }
 
 .nav {
-  height: 66px;
+  height: 58px;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   border-top: 1px solid rgba(255,255,255,0.08);
-  background: rgba(0,0,0,0.40);
+  background: rgba(0,0,0,0.28);
   flex-shrink: 0;
+  margin: 0 -4px;
 }
 
 .nav button {
   background: transparent;
   border: none;
   color: #aaa;
-  font-size: 10px;
+  font-size: 9px;
   cursor: pointer;
-  padding: 8px 1px;
+  padding: 8px 0;
 }
 
 .nav button.active {
