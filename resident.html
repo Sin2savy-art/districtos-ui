@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=320, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>DistrictOS Resident HUD</title>
 
 <style>
 * {
   box-sizing: border-box;
   user-select: none;
+  margin: 0;
+  padding: 0;
 }
 
 html, body {
-  margin: 0;
-  padding: 0;
   width: 100%;
   height: 100%;
   background: #050506;
@@ -22,27 +22,9 @@ html, body {
   overflow: hidden;
 }
 
-/* Outer wrapper fills the whole viewport */
-#scaleWrap {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #050506;
-}
-
-/* Inner canvas is always 320×600; JS scales it */
-#scaleRoot {
-  width: 320px;
-  height: 740px;
-  flex-shrink: 0;
-  transform-origin: top left;
-}
-
 .phone {
-  width: 320px;
-  height: 740px;
+  width: 100%;
+  height: 100%;
   background:
     radial-gradient(circle at 85% 4%, rgba(255,55,30,0.22), transparent 32%),
     linear-gradient(145deg, #08090b, #111318 58%, #050506);
@@ -64,9 +46,8 @@ html, body {
   flex-shrink: 0;
 }
 
-.brand h1 { margin: 0; font-size: 18px; font-weight: 900; }
+.brand h1 { font-size: 18px; font-weight: 900; }
 .brand span { color: #ff4a35; }
-
 .small { color: #9c9c9c; font-size: 10px; margin-top: 2px; }
 
 .status-dot {
@@ -80,7 +61,7 @@ html, body {
 .content {
   flex: 1;
   min-height: 0;
-  padding: 8px 10px 4px;
+  padding: 10px 10px 4px;
   overflow: hidden;
 }
 
@@ -88,7 +69,7 @@ html, body {
   display: none;
   height: 100%;
   overflow-y: auto;
-  padding-bottom: 6px;
+  padding-bottom: 8px;
   animation: fade 0.2s ease;
   scrollbar-width: none;
 }
@@ -106,25 +87,25 @@ html, body {
   background: linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
   border-radius: 14px;
   padding: 13px 14px;
-  margin-bottom: 9px;
+  margin-bottom: 10px;
   box-shadow: 0 10px 24px rgba(0,0,0,0.22);
 }
 
 .label {
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #aaa;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 .big { font-size: 28px; font-weight: 900; line-height: 1; }
-.sub { font-size: 12px; color: #bbb; margin-top: 3px; }
+.sub { font-size: 12px; color: #bbb; margin-top: 4px; }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 9px;
+  gap: 10px;
 }
 
 /* Pills */
@@ -135,7 +116,7 @@ html, body {
   background: rgba(49,255,120,0.12);
   color: #5dff91;
   border: 1px solid rgba(49,255,120,0.24);
-  font-size: 10px;
+  font-size: 11px;
 }
 .pill.bad  { background: rgba(255,42,22,0.12);  color: #ff5b47; border-color: rgba(255,42,22,0.24); }
 .pill.warn { background: rgba(255,173,51,0.12); color: #ffbe55; border-color: rgba(255,173,51,0.24); }
@@ -148,21 +129,21 @@ html, body {
   color: #fff;
   border-radius: 13px;
   padding: 11px;
-  font-size: 12px;
+  font-size: 13px;
   font-family: inherit;
   cursor: pointer;
-  margin-top: 8px;
+  margin-top: 9px;
 }
 
 /* Utilities */
 .utility { margin-bottom: 12px; }
 .utility:last-child { margin-bottom: 0; }
-.utility-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+.utility-head { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
 .meter { height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; margin-top: 7px; }
 .bar   { height: 100%; background: linear-gradient(90deg, #ff2a16, #ffb347); border-radius: 999px; transition: width 0.4s ease; }
 
 /* Notices */
-.notice { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #d8d8d8; font-size: 11px; }
+.notice { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #d8d8d8; font-size: 12px; }
 .notice:last-child { border-bottom: none; }
 
 /* Nav */
@@ -178,7 +159,7 @@ html, body {
   background: transparent;
   border: none;
   color: #777;
-  font-size: 9.5px;
+  font-size: 10px;
   font-family: inherit;
   cursor: pointer;
   padding: 6px 2px;
@@ -197,7 +178,7 @@ html, body {
   padding: 8px 13px;
   opacity: 0;
   transition: 0.22s ease;
-  font-size: 11px;
+  font-size: 12px;
   z-index: 1000;
   white-space: nowrap;
 }
@@ -206,152 +187,133 @@ html, body {
 </head>
 
 <body>
-<div id="scaleWrap">
-  <div id="scaleRoot">
-    <div class="phone">
+<div class="phone">
 
-      <div class="topbar">
-        <div class="brand">
-          <h1>District<span>OS</span></h1>
-          <div class="small">Resident App</div>
-        </div>
-        <div class="status-dot"></div>
-      </div>
-
-      <main class="content">
-
-        <!-- Home -->
-        <section id="home" class="page active">
-          <div class="card">
-            <div class="label">Current Unit</div>
-            <div class="big" id="homeUnit">Loading…</div>
-            <div class="sub" id="homeTenant">Checking lease…</div>
-          </div>
-          <div class="grid">
-            <div class="card">
-              <div class="label">Lease</div>
-              <div class="big" id="homeLease">--</div>
-              <div class="sub">remaining</div>
-            </div>
-            <div class="card">
-              <div class="label">Rent</div>
-              <div class="big" id="homeRent">L$0</div>
-              <div class="sub">weekly</div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="label">Apartment Status</div>
-            <span class="pill" id="homeStatus">Checking</span>
-            <div class="sub" id="homeWarning" style="margin-top:5px;">Loading resident data…</div>
-          </div>
-          <div class="card">
-            <div class="label">Latest Notice</div>
-            <div class="sub" id="latestNotice">No notices yet.</div>
-          </div>
-        </section>
-
-        <!-- Lease -->
-        <section id="lease" class="page">
-          <div class="card">
-            <div class="label">Lease Status</div>
-            <div class="big" id="leaseStatus">--</div>
-            <div class="sub" id="leaseTime">Checking lease…</div>
-          </div>
-          <div class="card">
-            <div class="label">Rent Amount</div>
-            <div class="big" id="leaseRent">L$0</div>
-            <div class="sub">Pay before expiration to keep access active.</div>
-            <button class="action" onclick="residentAction('payRent')">Pay Rent</button>
-          </div>
-        </section>
-
-        <!-- Utilities -->
-        <section id="utilities" class="page">
-          <div class="card">
-            <div class="label">Utility Balance</div>
-            <div class="big" id="utilityBalance">L$0</div>
-            <div class="sub">Smart meter billing</div>
-          </div>
-          <div class="card">
-            <div class="utility">
-              <div class="utility-head">Electric <span id="electricState" class="pill">--</span></div>
-              <div class="meter"><div id="electricMeter" class="bar" style="width:0%"></div></div>
-            </div>
-            <div class="utility">
-              <div class="utility-head">Water <span id="waterState" class="pill">--</span></div>
-              <div class="meter"><div id="waterMeter" class="bar" style="width:0%"></div></div>
-            </div>
-            <div class="utility">
-              <div class="utility-head">Internet <span id="internetState" class="pill">--</span></div>
-              <div class="meter"><div id="internetMeter" class="bar" style="width:0%"></div></div>
-            </div>
-            <div class="utility">
-              <div class="utility-head">Gas <span id="gasState" class="pill">--</span></div>
-              <div class="meter"><div id="gasMeter" class="bar" style="width:0%"></div></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Mailbox -->
-        <section id="mailbox" class="page">
-          <div class="card">
-            <div class="label">Mailbox</div>
-            <div id="noticesList"><div class="notice">No notices yet.</div></div>
-          </div>
-        </section>
-
-        <!-- Maintenance -->
-        <section id="maintenance" class="page">
-          <div class="card">
-            <div class="label">Maintenance Request</div>
-            <div class="sub">Report an issue to management.</div>
-            <button class="action" onclick="residentAction('maintenanceRequest','plumbing')">Plumbing Issue</button>
-            <button class="action" onclick="residentAction('maintenanceRequest','electric')">Electrical Issue</button>
-            <button class="action" onclick="residentAction('maintenanceRequest','general')">General Repair</button>
-          </div>
-        </section>
-
-        <!-- Guests -->
-        <section id="guests" class="page">
-          <div class="card">
-            <div class="label">Guest Access</div>
-            <div class="sub">Temporary visitor access for your unit.</div>
-            <button class="action" onclick="residentAction('createGuestPass')">Create Guest Pass</button>
-          </div>
-        </section>
-
-      </main>
-
-      <nav class="nav">
-        <button class="active" data-page="home">Home</button>
-        <button data-page="lease">Lease</button>
-        <button data-page="utilities">Utilities</button>
-        <button data-page="mailbox">Mail</button>
-        <button data-page="maintenance">Repair</button>
-        <button data-page="guests">Guests</button>
-      </nav>
-
-      <div id="toast" class="toast">DistrictOS</div>
+  <div class="topbar">
+    <div class="brand">
+      <h1>District<span>OS</span></h1>
+      <div class="small">Resident App</div>
     </div>
+    <div class="status-dot"></div>
   </div>
+
+  <main class="content">
+
+    <!-- Home -->
+    <section id="home" class="page active">
+      <div class="card">
+        <div class="label">Current Unit</div>
+        <div class="big" id="homeUnit">Loading…</div>
+        <div class="sub" id="homeTenant">Checking lease…</div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <div class="label">Lease</div>
+          <div class="big" id="homeLease">--</div>
+          <div class="sub">remaining</div>
+        </div>
+        <div class="card">
+          <div class="label">Rent</div>
+          <div class="big" id="homeRent">L$0</div>
+          <div class="sub">weekly</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="label">Apartment Status</div>
+        <span class="pill" id="homeStatus">Checking</span>
+        <div class="sub" id="homeWarning" style="margin-top:5px;">Loading resident data…</div>
+      </div>
+      <div class="card">
+        <div class="label">Latest Notice</div>
+        <div class="sub" id="latestNotice">No notices yet.</div>
+      </div>
+    </section>
+
+    <!-- Lease -->
+    <section id="lease" class="page">
+      <div class="card">
+        <div class="label">Lease Status</div>
+        <div class="big" id="leaseStatus">--</div>
+        <div class="sub" id="leaseTime">Checking lease…</div>
+      </div>
+      <div class="card">
+        <div class="label">Rent Amount</div>
+        <div class="big" id="leaseRent">L$0</div>
+        <div class="sub">Pay before expiration to keep access active.</div>
+        <button class="action" onclick="residentAction('payRent')">Pay Rent</button>
+      </div>
+    </section>
+
+    <!-- Utilities -->
+    <section id="utilities" class="page">
+      <div class="card">
+        <div class="label">Utility Balance</div>
+        <div class="big" id="utilityBalance">L$0</div>
+        <div class="sub">Smart meter billing</div>
+      </div>
+      <div class="card">
+        <div class="utility">
+          <div class="utility-head">Electric <span id="electricState" class="pill">--</span></div>
+          <div class="meter"><div id="electricMeter" class="bar" style="width:0%"></div></div>
+        </div>
+        <div class="utility">
+          <div class="utility-head">Water <span id="waterState" class="pill">--</span></div>
+          <div class="meter"><div id="waterMeter" class="bar" style="width:0%"></div></div>
+        </div>
+        <div class="utility">
+          <div class="utility-head">Internet <span id="internetState" class="pill">--</span></div>
+          <div class="meter"><div id="internetMeter" class="bar" style="width:0%"></div></div>
+        </div>
+        <div class="utility">
+          <div class="utility-head">Gas <span id="gasState" class="pill">--</span></div>
+          <div class="meter"><div id="gasMeter" class="bar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mailbox -->
+    <section id="mailbox" class="page">
+      <div class="card">
+        <div class="label">Mailbox</div>
+        <div id="noticesList"><div class="notice">No notices yet.</div></div>
+      </div>
+    </section>
+
+    <!-- Maintenance -->
+    <section id="maintenance" class="page">
+      <div class="card">
+        <div class="label">Maintenance Request</div>
+        <div class="sub">Report an issue to management.</div>
+        <button class="action" onclick="residentAction('maintenanceRequest','plumbing')">Plumbing Issue</button>
+        <button class="action" onclick="residentAction('maintenanceRequest','electric')">Electrical Issue</button>
+        <button class="action" onclick="residentAction('maintenanceRequest','general')">General Repair</button>
+      </div>
+    </section>
+
+    <!-- Guests -->
+    <section id="guests" class="page">
+      <div class="card">
+        <div class="label">Guest Access</div>
+        <div class="sub">Temporary visitor access for your unit.</div>
+        <button class="action" onclick="residentAction('createGuestPass')">Create Guest Pass</button>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="nav">
+    <button class="active" data-page="home">Home</button>
+    <button data-page="lease">Lease</button>
+    <button data-page="utilities">Utilities</button>
+    <button data-page="mailbox">Mail</button>
+    <button data-page="maintenance">Repair</button>
+    <button data-page="guests">Guests</button>
+  </nav>
+
+  <div id="toast" class="toast">DistrictOS</div>
 </div>
 
 <script>
-/* ── Auto-scale to fill viewport, centered ── */
-function applyScale() {
-  const root  = document.getElementById("scaleRoot");
-  const scaleX = window.innerWidth  / 320;
-  const scaleY = window.innerHeight / 740;
-  const scale  = Math.min(scaleX, scaleY);
-  const offsetX = (window.innerWidth  - 320 * scale) / 2;
-  const offsetY = (window.innerHeight - 740 * scale) / 1.1;
-  root.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-  root.style.transformOrigin = "top left";
-}
-applyScale();
-window.addEventListener("resize", applyScale);
-
-/* ── App logic ── */
 const API_BASE   = "https://districtos-bridge.districtos.workers.dev";
 const URL_PARAMS = new URLSearchParams(window.location.search);
 const RESIDENT_AVATAR =
@@ -361,7 +323,7 @@ let residentData = {
   ok: false, unit: "", tenant: "Resident", tenantKey: RESIDENT_AVATAR,
   lease: "--", rent: 0, status: "No active lease",
   utilities: { electric: false, water: false, internet: false, gas: false },
-  meters:    { electric: 0,     water: 0,     internet: 0,     gas: 0 },
+  meters:    { electric: 0, water: 0, internet: 0, gas: 0 },
   utilityBalance: 0,
   notices: ["No active DistrictOS lease found."]
 };
