@@ -344,7 +344,7 @@ function applyScale() {
   const scaleY = window.innerHeight / 600;
   const scale  = Math.min(scaleX, scaleY);
   const offsetX = (window.innerWidth  - 320 * scale) / 2;
-  const offsetY = (window.innerHeight - 600 * scale) / 2;
+  const offsetY = (window.innerHeight - 600 * scale) / 1.2;
   root.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
   root.style.transformOrigin = "top left";
 }
