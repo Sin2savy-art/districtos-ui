@@ -23,15 +23,21 @@ html, body {
 }
 
 .phone {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+
   background:
-    radial-gradient(circle at 85% 4%, rgba(255,55,30,0.22), transparent 32%),
+    radial-gradient(circle at 85% 4%, rgba(255,55,30,0.20), transparent 32%),
     linear-gradient(145deg, #08090b, #111318 58%, #050506);
+
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  padding: 10px 8px 6px;
+
+  transform: none;
+  transform-origin: center center;
 }
 
 /* Top bar */
@@ -200,7 +206,7 @@ html, body {
   <main class="content">
 
     <!-- Home -->
-    <section id="home" class="page active" style="display:flex; flex-direction:column;">
+    <section id="home" class="page active">
       <div class="card">
         <div class="label">Current Unit</div>
         <div class="big" id="homeUnit">Loading…</div>
