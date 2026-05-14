@@ -341,10 +341,10 @@ html, body {
 function applyScale() {
   const root  = document.getElementById("scaleRoot");
   const scaleX = window.innerWidth  / 320;
-  const scaleY = window.innerHeight / 600;
+  const scaleY = window.innerHeight / 740;
   const scale  = Math.min(scaleX, scaleY);
   const offsetX = (window.innerWidth  - 320 * scale) / 2;
-  const offsetY = (window.innerHeight - 600 * scale) / 1.2;
+  const offsetY = (window.innerHeight - 740 * scale) / 1.1;
   root.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
   root.style.transformOrigin = "top left";
 }
