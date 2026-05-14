@@ -62,7 +62,7 @@ html, body {
   flex: 1;
   min-height: 0;
   padding: 10px 10px 4px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .page {
@@ -200,7 +200,7 @@ html, body {
   <main class="content">
 
     <!-- Home -->
-    <section id="home" class="page active">
+    <section id="home" class="page active" style="display:flex; flex-direction:column;">
       <div class="card">
         <div class="label">Current Unit</div>
         <div class="big" id="homeUnit">Loading…</div>
@@ -223,10 +223,10 @@ html, body {
         <span class="pill" id="homeStatus">Checking</span>
         <div class="sub" id="homeWarning" style="margin-top:5px;">Loading resident data…</div>
       </div>
-      <div class="card">
-        <div class="label">Latest Notice</div>
-        <div class="sub" id="latestNotice">No notices yet.</div>
-      </div>
+        <div class="card" style="flex:1; min-height:0;">
+          <div class="label">Latest Notice</div>
+          <div class="sub" id="latestNotice">No notices yet.</div>
+        </div>
     </section>
 
     <!-- Lease -->
