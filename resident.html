@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=420, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>DistrictOS Resident HUD</title>
 
 <style>
@@ -30,49 +30,35 @@ body {
 .phone {
   width: 100vw;
   height: 100vh;
-
   background:
     radial-gradient(circle at 85% 4%, rgba(255,55,30,0.20), transparent 32%),
     linear-gradient(145deg, #08090b, #111318 58%, #050506);
-
   display: flex;
   flex-direction: column;
-
   overflow: hidden;
   position: relative;
-
-  padding: 10px 8px 6px;
-
-  transform: scale(1.32) translate(58px, 38px);
-  transform-origin: top left;
+  padding: 10px 10px 6px;
 }
 
-.build-tag {
-  display: none;
-}
-
+/* Top bar */
 .topbar {
-  height: 64px;
-
-  padding: 12px 8px 10px;
-
+  height: 56px;
+  padding: 10px 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   border-bottom: 1px solid rgba(255,255,255,0.08);
-
   background: rgba(0,0,0,0.08);
+  flex-shrink: 0;
 }
 
 .brand h1 {
   margin: 0;
   font-size: 19px;
+  font-weight: 900;
 }
 
-.brand span {
-  color: #ff4a35;
-}
+.brand span { color: #ff4a35; }
 
 .small {
   color: #9c9c9c;
@@ -88,12 +74,11 @@ body {
   border-radius: 50%;
 }
 
+/* Content */
 .content {
   flex: 1;
   min-height: 0;
-
-  padding: 10px 2px 6px;
-
+  padding: 10px 2px 4px;
   overflow: hidden;
 }
 
@@ -103,33 +88,23 @@ body {
   overflow-y: auto;
   padding-bottom: 8px;
   animation: fade 0.2s ease;
+  scrollbar-width: none;
 }
-
-.page.active {
-  display: block;
-}
+.page::-webkit-scrollbar { display: none; }
+.page.active { display: block; }
 
 @keyframes fade {
   from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Cards */
 .card {
   border: 1px solid rgba(255,255,255,0.08);
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,0.075),
-      rgba(255,255,255,0.025)
-    );
-
+  background: linear-gradient(145deg, rgba(255,255,255,0.075), rgba(255,255,255,0.025));
   border-radius: 16px;
-
   padding: 16px;
-
-  margin-bottom: 12px;
-
+  margin-bottom: 10px;
   box-shadow: 0 14px 28px rgba(0,0,0,0.22);
 }
 
@@ -142,21 +117,21 @@ body {
 }
 
 .big {
-  font-size: 34px;
+  font-size: 30px;
   font-weight: 900;
   line-height: 1;
 }
 
-.sub {
-  font-size: 13px;
-}
+.sub { font-size: 13px; color: #ccc; }
 
+/* Grid — two equal columns, no overflow */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
+/* Pills */
 .pill {
   display: inline-block;
   padding: 4px 9px;
@@ -166,19 +141,18 @@ body {
   border: 1px solid rgba(49,255,120,0.24);
   font-size: 11px;
 }
-
 .pill.warn {
   background: rgba(255,173,51,0.12);
   color: #ffbe55;
   border-color: rgba(255,173,51,0.24);
 }
-
 .pill.bad {
   background: rgba(255,42,22,0.12);
   color: #ff5b47;
   border-color: rgba(255,42,22,0.24);
 }
 
+/* Buttons */
 .action {
   width: 100%;
   border: 1px solid rgba(255,70,45,0.35);
@@ -187,18 +161,24 @@ body {
   border-radius: 16px;
   padding: 12px;
   font-size: 13px;
+  font-family: inherit;
   cursor: pointer;
   margin-top: 9px;
+  transition: background 0.15s;
+}
+.action:hover {
+  background: linear-gradient(135deg, rgba(255,43,22,0.36), rgba(255,255,255,0.06));
 }
 
-.utility {
-  margin-bottom: 14px;
-}
+/* Utilities */
+.utility { margin-bottom: 14px; }
+.utility:last-child { margin-bottom: 0; }
 
 .utility-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 13px;
 }
 
 .meter {
@@ -213,52 +193,48 @@ body {
   height: 100%;
   background: linear-gradient(90deg, #ff2a16, #ffb347);
   border-radius: 999px;
+  transition: width 0.4s ease;
 }
 
+/* Notices */
 .notice {
   padding: 11px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
   color: #d8d8d8;
   font-size: 12px;
 }
+.notice:last-child { border-bottom: none; }
 
+/* Nav */
 .nav {
-  height: 62px;
-
+  height: 58px;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-
   border-top: 1px solid rgba(255,255,255,0.08);
-
   background: rgba(0,0,0,0.28);
-
   flex-shrink: 0;
-
-  margin: 0 -2px;
+  margin: 0 -10px;
 }
 
 .nav button {
   background: transparent;
   border: none;
-
-  color: #aaa;
-
+  color: #888;
   font-size: 10px;
-
+  font-family: inherit;
   cursor: pointer;
-
   padding: 8px 0;
+  transition: color 0.15s;
 }
+.nav button.active { color: #ff4a35; }
+.nav button:hover:not(.active) { color: #ccc; }
 
-.nav button.active {
-  color: #ff4a35;
-}
-
+/* Toast */
 .toast {
   position: absolute;
   left: 50%;
-  bottom: 78px;
-  transform: translateX(-50%) translateY(80px);
+  bottom: 70px;
+  transform: translateX(-50%) translateY(70px);
   background: rgba(10,10,12,0.94);
   border: 1px solid rgba(255,70,45,0.38);
   border-radius: 14px;
@@ -267,8 +243,8 @@ body {
   transition: 0.22s ease;
   font-size: 12px;
   z-index: 1000;
+  white-space: nowrap;
 }
-
 .toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
@@ -278,7 +254,6 @@ body {
 
 <body>
 <div class="phone">
-  <div class="build-tag">RESIDENT BUILD V6</div>
 
   <div class="topbar">
     <div class="brand">
@@ -289,11 +264,13 @@ body {
   </div>
 
   <main class="content">
+
+    <!-- Home -->
     <section id="home" class="page active">
       <div class="card">
         <div class="label">Current Unit</div>
-        <div class="big" id="homeUnit">Loading</div>
-        <div class="sub" id="homeTenant">Checking lease...</div>
+        <div class="big" id="homeUnit">Loading…</div>
+        <div class="sub" id="homeTenant">Checking lease…</div>
       </div>
 
       <div class="grid">
@@ -312,7 +289,7 @@ body {
       <div class="card">
         <div class="label">Apartment Status</div>
         <span class="pill" id="homeStatus">Checking</span>
-        <div class="sub" id="homeWarning">Loading resident data...</div>
+        <div class="sub" id="homeWarning" style="margin-top:6px;">Loading resident data…</div>
       </div>
 
       <div class="card">
@@ -321,13 +298,13 @@ body {
       </div>
     </section>
 
+    <!-- Lease -->
     <section id="lease" class="page">
       <div class="card">
         <div class="label">Lease Status</div>
         <div class="big" id="leaseStatus">--</div>
-        <div class="sub" id="leaseTime">Checking lease...</div>
+        <div class="sub" id="leaseTime">Checking lease…</div>
       </div>
-
       <div class="card">
         <div class="label">Rent Amount</div>
         <div class="big" id="leaseRent">L$0</div>
@@ -336,33 +313,34 @@ body {
       </div>
     </section>
 
+    <!-- Utilities -->
     <section id="utilities" class="page">
       <div class="card">
         <div class="label">Utility Balance</div>
         <div class="big" id="utilityBalance">L$0</div>
         <div class="sub">Smart meter billing</div>
       </div>
-
       <div class="card">
         <div class="utility">
           <div class="utility-head">Electric <span id="electricState" class="pill">--</span></div>
-          <div class="meter"><div id="electricMeter" class="bar" style="width:0%;"></div></div>
+          <div class="meter"><div id="electricMeter" class="bar" style="width:0%"></div></div>
         </div>
         <div class="utility">
           <div class="utility-head">Water <span id="waterState" class="pill">--</span></div>
-          <div class="meter"><div id="waterMeter" class="bar" style="width:0%;"></div></div>
+          <div class="meter"><div id="waterMeter" class="bar" style="width:0%"></div></div>
         </div>
         <div class="utility">
           <div class="utility-head">Internet <span id="internetState" class="pill">--</span></div>
-          <div class="meter"><div id="internetMeter" class="bar" style="width:0%;"></div></div>
+          <div class="meter"><div id="internetMeter" class="bar" style="width:0%"></div></div>
         </div>
         <div class="utility">
           <div class="utility-head">Gas <span id="gasState" class="pill">--</span></div>
-          <div class="meter"><div id="gasMeter" class="bar" style="width:0%;"></div></div>
+          <div class="meter"><div id="gasMeter" class="bar" style="width:0%"></div></div>
         </div>
       </div>
     </section>
 
+    <!-- Mailbox -->
     <section id="mailbox" class="page">
       <div class="card">
         <div class="label">Mailbox</div>
@@ -372,6 +350,7 @@ body {
       </div>
     </section>
 
+    <!-- Maintenance -->
     <section id="maintenance" class="page">
       <div class="card">
         <div class="label">Maintenance Request</div>
@@ -382,6 +361,7 @@ body {
       </div>
     </section>
 
+    <!-- Guests -->
     <section id="guests" class="page">
       <div class="card">
         <div class="label">Guest Access</div>
@@ -389,6 +369,7 @@ body {
         <button class="action" onclick="residentAction('createGuestPass')">Create Guest Pass</button>
       </div>
     </section>
+
   </main>
 
   <nav class="nav">
@@ -404,13 +385,13 @@ body {
 </div>
 
 <script>
-const API_BASE = "https://districtos-bridge.districtos.workers.dev";
-const URL_PARAMS = new URLSearchParams(window.location.search);
+const API_BASE     = "https://districtos-bridge.districtos.workers.dev";
+const URL_PARAMS   = new URLSearchParams(window.location.search);
 
 const RESIDENT_AVATAR =
   URL_PARAMS.get("avatar") ||
-  URL_PARAMS.get("key") ||
-  URL_PARAMS.get("id") ||
+  URL_PARAMS.get("key")    ||
+  URL_PARAMS.get("id")     ||
   "";
 
 let residentData = {
@@ -421,67 +402,64 @@ let residentData = {
   lease: "--",
   rent: 0,
   status: "No active lease",
-  utilities: { electric:false, water:false, internet:false, gas:false },
-  meters: { electric:0, water:0, internet:0, gas:0 },
+  utilities: { electric: false, water: false, internet: false, gas: false },
+  meters:    { electric: 0,     water: 0,     internet: 0,     gas: 0     },
   utilityBalance: 0,
   notices: ["No active DistrictOS lease found."]
 };
 
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 1800);
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1800);
 }
 
-function setPage(pageId) {
+function setPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
-  document.getElementById(pageId)?.classList.add("active");
-  document.querySelector(`[data-page="${pageId}"]`)?.classList.add("active");
+  document.getElementById(id)?.classList.add("active");
+  document.querySelector(`[data-page="${id}"]`)?.classList.add("active");
 }
 
 function statePill(id, active) {
   const el = document.getElementById(id);
   el.textContent = active ? "On" : "Off";
-  el.className = active ? "pill" : "pill bad";
+  el.className   = active ? "pill" : "pill bad";
 }
 
 function renderResident(data) {
   if (!data) data = residentData;
   residentData = data;
-
-  if (!residentData.tenantKey && RESIDENT_AVATAR) {
-    residentData.tenantKey = RESIDENT_AVATAR;
-  }
+  if (!residentData.tenantKey && RESIDENT_AVATAR) residentData.tenantKey = RESIDENT_AVATAR;
 
   const active = data.status === "Active";
 
-  document.getElementById("homeUnit").textContent = data.unit || "No Unit";
-  document.getElementById("homeTenant").textContent = data.tenant || "Resident";
-  document.getElementById("homeLease").textContent = data.lease || "--";
-  document.getElementById("homeRent").textContent = "L$" + (data.rent || 0);
+  document.getElementById("homeUnit").textContent    = data.unit   || "No Unit";
+  document.getElementById("homeTenant").textContent  = data.tenant || "Resident";
+  document.getElementById("homeLease").textContent   = data.lease  || "--";
+  document.getElementById("homeRent").textContent    = "L$" + (data.rent || 0);
 
   const statusEl = document.getElementById("homeStatus");
   statusEl.textContent = data.status || "Unknown";
-  statusEl.className = active ? "pill" : "pill bad";
+  statusEl.className   = active ? "pill" : "pill bad";
 
   document.getElementById("homeWarning").textContent =
     active ? "No active warnings." : "Check lease status.";
 
   document.getElementById("leaseStatus").textContent = data.status || "Unknown";
-  document.getElementById("leaseTime").textContent = data.lease || "--";
-  document.getElementById("leaseRent").textContent = "L$" + (data.rent || 0);
+  document.getElementById("leaseTime").textContent   = data.lease  || "--";
+  document.getElementById("leaseRent").textContent   = "L$" + (data.rent || 0);
 
-  statePill("electricState", data.utilities?.electric);
-  statePill("waterState", data.utilities?.water);
-  statePill("internetState", data.utilities?.internet);
-  statePill("gasState", data.utilities?.gas);
+  statePill("electricState",  data.utilities?.electric);
+  statePill("waterState",     data.utilities?.water);
+  statePill("internetState",  data.utilities?.internet);
+  statePill("gasState",       data.utilities?.gas);
 
-  document.getElementById("electricMeter").style.width = (data.meters?.electric || 0) + "%";
-  document.getElementById("waterMeter").style.width = (data.meters?.water || 0) + "%";
-  document.getElementById("internetMeter").style.width = (data.meters?.internet || 0) + "%";
-  document.getElementById("gasMeter").style.width = (data.meters?.gas || 0) + "%";
+  document.getElementById("electricMeter").style.width  = (data.meters?.electric  || 0) + "%";
+  document.getElementById("waterMeter").style.width     = (data.meters?.water     || 0) + "%";
+  document.getElementById("internetMeter").style.width  = (data.meters?.internet  || 0) + "%";
+  document.getElementById("gasMeter").style.width       = (data.meters?.gas       || 0) + "%";
 
   document.getElementById("utilityBalance").textContent = "L$" + (data.utilityBalance || 0);
 
@@ -490,13 +468,12 @@ function renderResident(data) {
 
   const list = document.getElementById("noticesList");
   list.innerHTML = "";
-
-  if (notices.length === 0) {
+  if (!notices.length) {
     list.innerHTML = `<div class="notice">No notices yet.</div>`;
   } else {
     notices.forEach(n => {
       const div = document.createElement("div");
-      div.className = "notice";
+      div.className   = "notice";
       div.textContent = n;
       list.appendChild(div);
     });
@@ -504,19 +481,11 @@ function renderResident(data) {
 }
 
 async function loadResident() {
-  if (!RESIDENT_AVATAR) {
-    renderResident(residentData);
-    return;
-  }
-
+  if (!RESIDENT_AVATAR) { renderResident(residentData); return; }
   try {
-    const res = await fetch(`${API_BASE}/resident?avatar=${encodeURIComponent(RESIDENT_AVATAR)}&t=${Date.now()}`);
+    const res  = await fetch(`${API_BASE}/resident?avatar=${encodeURIComponent(RESIDENT_AVATAR)}&t=${Date.now()}`);
     const data = await res.json();
-
-    if (!data.tenantKey && RESIDENT_AVATAR) {
-      data.tenantKey = RESIDENT_AVATAR;
-    }
-
+    if (!data.tenantKey && RESIDENT_AVATAR) data.tenantKey = RESIDENT_AVATAR;
     renderResident(data);
   } catch (e) {
     console.error("Resident fetch failed", e);
@@ -525,28 +494,13 @@ async function loadResident() {
 }
 
 function residentAction(action, type = "") {
-  const unit = residentData.unit || "";
+  const unit   = residentData.unit || "";
   const avatar = RESIDENT_AVATAR || residentData.tenantKey || "";
+  if (!unit)   { showToast("No active unit found"); return; }
+  if (!avatar) { showToast("Resident ID missing");  return; }
 
-  if (!unit) {
-    showToast("No active unit found");
-    return;
-  }
-
-  if (!avatar) {
-    showToast("Resident ID missing");
-    return;
-  }
-
-  let url =
-    `${API_BASE}/?action=${encodeURIComponent(action)}` +
-    `&unit=${encodeURIComponent(unit)}` +
-    `&avatar=${encodeURIComponent(avatar)}` +
-    `&t=${Date.now()}`;
-
-  if (type) {
-    url += `&type=${encodeURIComponent(type)}`;
-  }
+  let url = `${API_BASE}/?action=${encodeURIComponent(action)}&unit=${encodeURIComponent(unit)}&avatar=${encodeURIComponent(avatar)}&t=${Date.now()}`;
+  if (type) url += `&type=${encodeURIComponent(type)}`;
 
   fetch(url)
     .then(() => showToast("Request sent"))
