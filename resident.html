@@ -343,7 +343,10 @@ function applyScale() {
   const scaleX = window.innerWidth  / 320;
   const scaleY = window.innerHeight / 600;
   const scale  = Math.min(scaleX, scaleY);
-  root.style.transform = `scale(${scale})`;
+  const offsetX = (window.innerWidth  - 320 * scale) / 2;
+  const offsetY = (window.innerHeight - 600 * scale) / 2;
+  root.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+  root.style.transformOrigin = "top left";
 }
 applyScale();
 window.addEventListener("resize", applyScale);
