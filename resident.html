@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=320, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>DistrictOS Resident HUD</title>
 
 <style>
@@ -21,64 +21,71 @@ html, body {
   overflow: hidden;
 }
 
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* 
+  Strategy: render at a fixed 320×600 "design canvas"
+  then scale it up to fill the actual viewport.
+  This gives consistent, predictable sizing in SL.
+*/
+.scale-root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 320px;
+  height: 600px;
+  transform-origin: top left;
+  /* JS will set the actual scale */
 }
 
 .phone {
-  width: 100vw;
-  height: 100vh;
+  width: 320px;
+  height: 600px;
   background:
-    radial-gradient(circle at 85% 4%, rgba(255,55,30,0.20), transparent 32%),
+    radial-gradient(circle at 85% 4%, rgba(255,55,30,0.22), transparent 32%),
     linear-gradient(145deg, #08090b, #111318 58%, #050506);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  padding: 10px 10px 6px;
 }
 
-/* Top bar */
+/* ── Top bar ─────────────────────────────────── */
 .topbar {
-  height: 56px;
-  padding: 10px 8px;
+  height: 52px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255,255,255,0.08);
-  background: rgba(0,0,0,0.08);
+  background: rgba(0,0,0,0.12);
   flex-shrink: 0;
 }
 
 .brand h1 {
   margin: 0;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 900;
 }
-
 .brand span { color: #ff4a35; }
 
 .small {
   color: #9c9c9c;
-  font-size: 11px;
-  margin-top: 3px;
+  font-size: 10px;
+  margin-top: 2px;
 }
 
 .status-dot {
   width: 8px;
   height: 8px;
   background: #31ff78;
-  box-shadow: 0 0 12px rgba(49,255,120,0.8);
+  box-shadow: 0 0 10px rgba(49,255,120,0.8);
   border-radius: 50%;
 }
 
-/* Content */
+/* ── Content ─────────────────────────────────── */
 .content {
   flex: 1;
   min-height: 0;
-  padding: 10px 2px 4px;
+  padding: 8px 10px 4px;
   overflow: hidden;
 }
 
@@ -86,7 +93,7 @@ body {
   display: none;
   height: 100%;
   overflow-y: auto;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
   animation: fade 0.2s ease;
   scrollbar-width: none;
 }
@@ -94,101 +101,95 @@ body {
 .page.active { display: block; }
 
 @keyframes fade {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Cards */
+/* ── Cards ───────────────────────────────────── */
 .card {
   border: 1px solid rgba(255,255,255,0.08);
-  background: linear-gradient(145deg, rgba(255,255,255,0.075), rgba(255,255,255,0.025));
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 10px;
-  box-shadow: 0 14px 28px rgba(0,0,0,0.22);
+  background: linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+  border-radius: 14px;
+  padding: 13px 14px;
+  margin-bottom: 9px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.22);
 }
 
 .label {
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #aaa;
-  margin-bottom: 7px;
+  margin-bottom: 5px;
 }
 
 .big {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 900;
   line-height: 1;
 }
 
-.sub { font-size: 13px; color: #ccc; }
+.sub { font-size: 12px; color: #bbb; margin-top: 3px; }
 
-/* Grid — two equal columns, no overflow */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 9px;
 }
 
-/* Pills */
+/* ── Pills ───────────────────────────────────── */
 .pill {
   display: inline-block;
-  padding: 4px 9px;
+  padding: 3px 8px;
   border-radius: 999px;
   background: rgba(49,255,120,0.12);
   color: #5dff91;
   border: 1px solid rgba(49,255,120,0.24);
-  font-size: 11px;
-}
-.pill.warn {
-  background: rgba(255,173,51,0.12);
-  color: #ffbe55;
-  border-color: rgba(255,173,51,0.24);
+  font-size: 10px;
 }
 .pill.bad {
   background: rgba(255,42,22,0.12);
   color: #ff5b47;
   border-color: rgba(255,42,22,0.24);
 }
+.pill.warn {
+  background: rgba(255,173,51,0.12);
+  color: #ffbe55;
+  border-color: rgba(255,173,51,0.24);
+}
 
-/* Buttons */
+/* ── Buttons ─────────────────────────────────── */
 .action {
   width: 100%;
   border: 1px solid rgba(255,70,45,0.35);
-  background: linear-gradient(135deg, rgba(255,43,22,0.22), rgba(255,255,255,0.035));
+  background: linear-gradient(135deg, rgba(255,43,22,0.22), rgba(255,255,255,0.03));
   color: #fff;
-  border-radius: 16px;
-  padding: 12px;
-  font-size: 13px;
+  border-radius: 13px;
+  padding: 11px;
+  font-size: 12px;
   font-family: inherit;
   cursor: pointer;
-  margin-top: 9px;
-  transition: background 0.15s;
-}
-.action:hover {
-  background: linear-gradient(135deg, rgba(255,43,22,0.36), rgba(255,255,255,0.06));
+  margin-top: 8px;
 }
 
-/* Utilities */
-.utility { margin-bottom: 14px; }
+/* ── Utilities ───────────────────────────────── */
+.utility { margin-bottom: 12px; }
 .utility:last-child { margin-bottom: 0; }
 
 .utility-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .meter {
-  height: 7px;
+  height: 6px;
   background: rgba(255,255,255,0.08);
   border-radius: 999px;
   overflow: hidden;
-  margin-top: 8px;
+  margin-top: 7px;
 }
-
 .bar {
   height: 100%;
   background: linear-gradient(90deg, #ff2a16, #ffb347);
@@ -196,52 +197,50 @@ body {
   transition: width 0.4s ease;
 }
 
-/* Notices */
+/* ── Notices ─────────────────────────────────── */
 .notice {
-  padding: 11px;
+  padding: 10px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
   color: #d8d8d8;
-  font-size: 12px;
+  font-size: 11px;
 }
 .notice:last-child { border-bottom: none; }
 
-/* Nav */
+/* ── Nav ─────────────────────────────────────── */
 .nav {
-  height: 58px;
+  height: 52px;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   border-top: 1px solid rgba(255,255,255,0.08);
-  background: rgba(0,0,0,0.28);
+  background: rgba(0,0,0,0.30);
   flex-shrink: 0;
-  margin: 0 -10px;
 }
 
 .nav button {
   background: transparent;
   border: none;
-  color: #888;
-  font-size: 10px;
+  color: #777;
+  font-size: 9.5px;
   font-family: inherit;
   cursor: pointer;
-  padding: 8px 0;
+  padding: 6px 2px;
   transition: color 0.15s;
 }
 .nav button.active { color: #ff4a35; }
-.nav button:hover:not(.active) { color: #ccc; }
 
-/* Toast */
+/* ── Toast ───────────────────────────────────── */
 .toast {
   position: absolute;
   left: 50%;
-  bottom: 70px;
-  transform: translateX(-50%) translateY(70px);
+  bottom: 62px;
+  transform: translateX(-50%) translateY(60px);
   background: rgba(10,10,12,0.94);
   border: 1px solid rgba(255,70,45,0.38);
-  border-radius: 14px;
-  padding: 10px 14px;
+  border-radius: 12px;
+  padding: 8px 13px;
   opacity: 0;
   transition: 0.22s ease;
-  font-size: 12px;
+  font-size: 11px;
   z-index: 1000;
   white-space: nowrap;
 }
@@ -253,6 +252,7 @@ body {
 </head>
 
 <body>
+<div class="scale-root" id="scaleRoot">
 <div class="phone">
 
   <div class="topbar">
@@ -289,7 +289,7 @@ body {
       <div class="card">
         <div class="label">Apartment Status</div>
         <span class="pill" id="homeStatus">Checking</span>
-        <div class="sub" id="homeWarning" style="margin-top:6px;">Loading resident data…</div>
+        <div class="sub" id="homeWarning" style="margin-top:5px;">Loading resident data…</div>
       </div>
 
       <div class="card">
@@ -383,10 +383,34 @@ body {
 
   <div id="toast" class="toast">DistrictOS</div>
 </div>
+</div><!-- /scale-root -->
 
 <script>
-const API_BASE     = "https://districtos-bridge.districtos.workers.dev";
-const URL_PARAMS   = new URLSearchParams(window.location.search);
+/* ── Scale to fill viewport ───────────────────── */
+const DESIGN_W = 320;
+const DESIGN_H = 600;
+
+function applyScale() {
+  const scaleX = window.innerWidth  / DESIGN_W;
+  const scaleY = window.innerHeight / DESIGN_H;
+  const scale  = Math.min(scaleX, scaleY); /* fit, don't crop */
+  const root   = document.getElementById("scaleRoot");
+
+  root.style.transform = `scale(${scale})`;
+
+  /* Centre the scaled canvas */
+  const offsetX = (window.innerWidth  - DESIGN_W * scale) / 2;
+  const offsetY = (window.innerHeight - DESIGN_H * scale) / 2;
+  root.style.left = offsetX + "px";
+  root.style.top  = offsetY + "px";
+}
+
+applyScale();
+window.addEventListener("resize", applyScale);
+
+/* ── App ──────────────────────────────────────── */
+const API_BASE   = "https://districtos-bridge.districtos.workers.dev";
+const URL_PARAMS = new URLSearchParams(window.location.search);
 
 const RESIDENT_AVATAR =
   URL_PARAMS.get("avatar") ||
