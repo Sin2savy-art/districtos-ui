@@ -449,13 +449,36 @@ async function loadResident() {
 }
 
 function residentAction(action, type = "") {
-  const unit   = residentData.unit || "";
+  const unit = residentData.unit || "";
   const avatar = RESIDENT_AVATAR || residentData.tenantKey || "";
-  if (!unit)   { showToast("No active unit found"); return; }
-  if (!avatar) { showToast("Resident ID missing");  return; }
-  let url = `${API_BASE}/?action=${encodeURIComponent(action)}&unit=${encodeURIComponent(unit)}&avatar=${encodeURIComponent(avatar)}&t=${Date.now()}`;
-  if (type) url += `&type=${encodeURIComponent(type)}`;
-  fetch(url).then(() => showToast("Request sent")).catch(() => showToast("Bridge offline"));
+
+  showToast(action + " clicked");
+
+  if (!unit) {
+    showToast("No unit found");
+    return;
+  }
+
+  if (!avatar) {
+    showToast("No avatar found");
+    return;
+  }
+
+  let url =
+    `${API_BASE}/?action=${encodeURIComponent(action)}` +
+    `&unit=${encodeURIComponent(unit)}` +
+    `&avatar=${encodeURIComponent(avatar)}` +
+    `&t=${Date.now()}`;
+
+  if (type) {
+    url += `&type=${encodeURIComponent(type)}`;
+  }
+
+  showToast("Sending...");
+
+  fetch(url)
+    .then(() => showToast("Sent"))
+    .catch(() => showToast("Bridge failed"));
 }
 
 document.querySelectorAll(".nav button").forEach(btn => {
