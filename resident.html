@@ -455,30 +455,41 @@ function residentAction(action, type = "") {
   showToast(action + " clicked");
 
   if (!unit) {
-    showToast("No unit found");
+    showToast("No active unit");
     return;
   }
 
   if (!avatar) {
-    showToast("No avatar found");
+    showToast("No avatar");
     return;
   }
 
   let url =
-    `${API_BASE}/?action=${encodeURIComponent(action)}` +
-    `&unit=${encodeURIComponent(unit)}` +
-    `&avatar=${encodeURIComponent(avatar)}` +
-    `&t=${Date.now()}`;
+    API_BASE +
+    "/?action=" + encodeURIComponent(action) +
+    "&unit=" + encodeURIComponent(unit) +
+    "&avatar=" + encodeURIComponent(avatar);
 
-  if (type) {
-    url += `&type=${encodeURIComponent(type)}`;
+  if (type !== "") {
+    url += "&type=" + encodeURIComponent(type);
   }
 
-  showToast("Sending...");
+  url += "&nocache=" + Date.now();
 
-  fetch(url)
-    .then(() => showToast("Sent"))
-    .catch(() => showToast("Bridge failed"));
+  fetch(url, {
+    method: "GET",
+    cache: "no-store",
+    mode: "cors"
+  })
+  .then(response => response.json())
+  .then(data => {
+    showToast("Sent: " + data.action);
+    loadResident();
+  })
+  .catch(err => {
+    console.log("Resident action failed:", err);
+    showToast("Bridge failed");
+  });
 }
 
 document.querySelectorAll(".nav button").forEach(btn => {
