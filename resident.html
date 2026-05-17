@@ -575,13 +575,75 @@ function residentAction(action, type = "") {
   }
 }
 
+  async function loadMaintenance()
+{
+  try
+  {
+    const res =
+      await fetch(
+        API_BASE + "/maintenance"
+      );
+
+    const data =
+      await res.json();
+
+    const list =
+      document.getElementById(
+        "maintenanceList"
+      );
+
+    if (!list) return;
+
+    const unitTickets =
+      data.filter(
+        t => t.unit === residentData.unit
+      );
+
+    if (!unitTickets.length)
+    {
+      list.innerHTML =
+        `<div class="notice">
+          No maintenance requests yet.
+        </div>`;
+
+      return;
+    }
+
+    list.innerHTML = "";
+
+    unitTickets.forEach(ticket =>
+    {
+      const div =
+        document.createElement("div");
+
+      div.className = "notice";
+
+      div.innerHTML =
+        `<strong>${
+          ticket.type.toUpperCase()
+        }</strong><br>
+        Status: ${
+          ticket.status
+        }`;
+
+      list.appendChild(div);
+    });
+
+  }
+  catch(e)
+  {
+    console.log(e);
+  }
+}
+
 document.querySelectorAll(".nav button").forEach(btn => {
   btn.addEventListener("click", () => setPage(btn.dataset.page));
 });
 
 renderResident(residentData);
 loadResident();
-setInterval(loadResident, 8000);
+loadMaintenance();
+setInterval(loadMaintenance, 12000);
 </script>
 </body>
 </html>
