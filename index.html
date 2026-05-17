@@ -178,7 +178,41 @@
           </div>
         </section>
 
-        <section id="maintenance" class="page"><div class="coming"><div><h3>Maintenance</h3><p class="muted">Repair tickets, unit condition, and inspections.</p></div></div></section>
+        <section id="maintenance" class="page">
+  <div class="page-title">
+    <div>
+      <h2>Maintenance</h2>
+      <p>Live repair tickets submitted by residents.</p>
+    </div>
+    <div class="pill warn" id="maintenance-last-sync">Not loaded</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <label>Open Tickets</label>
+      <div class="stat" id="maintenance-open">--</div>
+      <div class="sub">Pending repair requests</div>
+    </div>
+
+    <div class="card">
+      <label>Latest Issue</label>
+      <div class="stat" id="maintenance-latest">--</div>
+      <div class="sub" id="maintenance-latest-sub">Waiting for activity</div>
+    </div>
+  </div>
+
+  <div class="list" id="maintenance-list">
+    <div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+      <div>Unit</div>
+      <div>Tenant</div>
+      <div>Issue</div>
+      <div>Status</div>
+    </div>
+    <div class="row" style="grid-template-columns:1fr;">
+      <div style="color:#999;">Loading maintenance tickets...</div>
+    </div>
+  </div>
+</section>
         <section id="admins" class="page"><div class="coming"><div><h3>Admin Access</h3><p class="muted">Add/remove managers without script editing.</p></div></div></section>
         <section id="reports" class="page"><div class="coming"><div><h3>Reports</h3><p class="muted">Occupancy, violations, collections, activity logs.</p></div></div></section>
         <section id="settings" class="page"><div class="coming"><div><h3>Settings</h3><p class="muted">RP presets, rent rules, utility behavior, branding.</p></div></div></section>
@@ -205,6 +239,7 @@
       if (pageId === 'units') loadUnits();
       if (pageId === 'payments') loadPayments();
       if (pageId === 'utilities') loadUtilities();
+      if (pageId === 'maintenance') loadMaintenance();
     }
 
     function showToast(message) {
