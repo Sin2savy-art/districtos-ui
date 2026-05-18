@@ -385,6 +385,49 @@ html, body {
 
 </section>
 
+    <section id="cotenants" class="page">
+
+  <div class="card">
+    <div class="label">Co-Tenant Access</div>
+
+    <div class="sub">
+      Add a permanent resident to your lease.
+    </div>
+
+    <input
+      id="coTenantUUID"
+      type="text"
+      placeholder="Paste avatar UUID..."
+      style="
+        width:100%;
+        margin-top:10px;
+        padding:10px;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,0.08);
+        background:#111318;
+        color:#fff;
+        font-size:12px;
+        outline:none;
+      "
+    />
+
+    <button class="action" onclick="addCoTenant()">
+      Add Co-Tenant
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="label">Current Co-Tenants</div>
+
+    <div id="coTenantList">
+      <div class="notice">
+        No co-tenants added.
+      </div>
+    </div>
+  </div>
+
+</section>
+
   </main>
 
   <nav class="nav">
@@ -757,6 +800,198 @@ async function loadGuestPasses()
 
           <button
             onclick="removeGuestPass('${g.id}')"
+            style="
+              background:rgba(255,42,22,0.14);
+              border:1px solid rgba(255,42,22,0.3);
+              color:#ff5b47;
+              border-radius:10px;
+              padding:6px 10px;
+              cursor:pointer;
+              font-size:11px;
+            "
+          >
+            Remove
+          </button>
+
+        </div>
+        `;
+
+      list.appendChild(div);
+    });
+
+  }
+  catch(e)
+  {
+    console.log(e);
+  }
+}
+
+async function addCoTenant()
+{
+  const input =
+    document.getElementById("coTenantUUID");
+
+  if (!input) return;
+
+  const coTenantKey =
+    input.value.trim();
+
+  if (!coTenantKey)
+  {
+    showToast("Enter co-tenant UUID");
+    return;
+  }
+
+  if (!residentData.unit)
+  {
+    showToast("No active lease");
+    return;
+  }
+
+  try
+  {
+    await fetch(
+      API_BASE + "/cotenants",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:
+          "unit=" +
+          encodeURIComponent(residentData.unit) +
+
+          "&tenant=" +
+          encodeURIComponent(
+            residentData.tenant || "Resident"
+          ) +
+
+          "&tenantKey=" +
+          encodeURIComponent(
+            residentData.tenantKey || RESIDENT_AVATAR
+          ) +
+
+          "&coTenantKey=" +
+          encodeURIComponent(coTenantKey)
+      }
+    );
+
+    input.value = "";
+
+    showToast("Co-tenant added");
+
+    loadCoTenants();
+  }
+  catch(e)
+  {
+    console.log(e);
+    showToast("Add failed");
+  }
+}
+
+async function removeCoTenant(id)
+{
+  try
+  {
+    await fetch(
+      API_BASE + "/cotenants/remove",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:
+          "id=" +
+          encodeURIComponent(id)
+      }
+    );
+
+    showToast("Co-tenant removed");
+
+    loadCoTenants();
+  }
+  catch(e)
+  {
+    console.log(e);
+    showToast("Remove failed");
+  }
+}
+
+async function loadCoTenants()
+{
+  if (!residentData.unit) return;
+
+  try
+  {
+    const res =
+      await fetch(
+        API_BASE +
+        "/cotenants?unit=" +
+        encodeURIComponent(
+          residentData.unit
+        ) +
+        "&t=" +
+        Date.now()
+      );
+
+    const data =
+      await res.json();
+
+    const list =
+      document.getElementById(
+        "coTenantList"
+      );
+
+    if (!list) return;
+
+    if (!data.length)
+    {
+      list.innerHTML =
+        `<div class="notice">
+          No co-tenants added.
+        </div>`;
+
+      return;
+    }
+
+    list.innerHTML = "";
+
+    data.forEach(c =>
+    {
+      const div =
+        document.createElement("div");
+
+      div.className = "notice";
+
+      div.innerHTML =
+        `
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:10px;
+        ">
+
+          <div>
+            <strong>Co-Tenant UUID</strong><br>
+
+            <span style="
+              color:#aaa;
+              font-size:11px;
+              word-break:break-all;
+            ">
+              ${c.coTenantKey}
+            </span>
+          </div>
+
+          <button
+            onclick="removeCoTenant('${c.id}')"
             style="
               background:rgba(255,42,22,0.14);
               border:1px solid rgba(255,42,22,0.3);
