@@ -525,9 +525,30 @@ async function loadResident() {
     const data = await res.json();
     if (!data.tenantKey && RESIDENT_AVATAR) data.tenantKey = RESIDENT_AVATAR;
     renderResident(data);
+    loadUtilityBalance();
+    loadNotices();
   } catch (e) {
     console.error("Resident fetch failed", e);
     renderResident(residentData);
+  }
+}
+
+async function loadUtilityBalance() {
+  if (!residentData.unit) return;
+
+  try {
+    const res = await fetch(
+      API_BASE + "/utilities?unit=" +
+      encodeURIComponent(residentData.unit) +
+      "&t=" + Date.now()
+    );
+
+    const data = await res.json();
+    const balance = data.utility?.balance || 0;
+
+    document.getElementById("utilityBalance").textContent = "L$" + balance;
+  } catch (e) {
+    console.log(e);
   }
 }
 
@@ -1099,6 +1120,8 @@ loadMaintenance();
 loadGuestPasses();
 loadCoTenants();
 loadNotices();
+loadUtilityBalance();
+setInterval(loadUtilityBalance, 12000);
 setInterval(loadCoTenants, 12000);
 setInterval(loadNotices, 12000);
 setInterval(loadMaintenance, 12000);
