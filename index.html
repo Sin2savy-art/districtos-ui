@@ -403,48 +403,89 @@
         });
     }
 
-    function loadMaintenance() {
-      fetch(SL_BRIDGE_URL + "/maintenance")
-        .then(r => r.json())
-        .then(data => {
-          var list = document.getElementById('maintenance-list');
-          var sync = document.getElementById('maintenance-last-sync');
-          var open = document.getElementById('maintenance-open');
-          var latest = document.getElementById('maintenance-latest');
-          var latestSub = document.getElementById('maintenance-latest-sub');
+    function updateMaintenanceTicket(id, status) {
+  fetch(SL_BRIDGE_URL + "/maintenance/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body:
+      "id=" + encodeURIComponent(id) +
+      "&status=" + encodeURIComponent(status)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function() {
+    showToast("Ticket updated: " + status);
+    loadMaintenance();
+  })
+  .catch(function() {
+    showToast("Ticket update failed");
+  });
+}
 
-          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Issue</div><div>Status</div></div>';
+function loadMaintenance() {
+  fetch(SL_BRIDGE_URL + "/maintenance?t=" + Date.now())
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var list = document.getElementById('maintenance-list');
+      var sync = document.getElementById('maintenance-last-sync');
+      var open = document.getElementById('maintenance-open');
+      var latest = document.getElementById('maintenance-latest');
+      var latestSub = document.getElementById('maintenance-latest-sub');
 
-          if (!data || data.length === 0) {
-            list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No maintenance tickets yet.</div></div>';
-            if (open) open.textContent = "0";
-            if (latest) latest.textContent = "--";
-            if (latestSub) latestSub.textContent = "Waiting for activity";
-            return;
-          }
+      if (!list) return;
 
-          var pending = data.filter(t => t.status === "Pending");
-          if (open) open.textContent = pending.length;
+      list.innerHTML =
+        '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr 1.4fr;">' +
+        '<div>Unit</div><div>Tenant</div><div>Issue</div><div>Status</div><div>Actions</div></div>';
 
-          var first = data[0];
-          if (latest) latest.textContent = first.type || "Issue";
-          if (latestSub) latestSub.textContent = (first.unit || "Unit") + " · " + (first.tenant || "Resident");
+      if (!data || data.length === 0) {
+        list.innerHTML +=
+          '<div class="row" style="grid-template-columns:1fr;">' +
+          '<div style="color:#999;">No maintenance tickets yet.</div></div>';
 
-          data.forEach(function(t) {
-            var statusClass = t.status === "Pending" ? "pill warn" : "pill";
-            list.innerHTML += '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>' + (t.unit || "--") + '</div><div>' + (t.tenant || "Resident") + '</div><div>' + (t.type || "general") + '</div><div><span class="' + statusClass + '">' + (t.status || "Pending") + '</span></div></div>';
-          });
+        if (open) open.textContent = "0";
+        if (latest) latest.textContent = "--";
+        if (latestSub) latestSub.textContent = "Waiting for activity";
+        return;
+      }
 
-          var now = new Date();
-          if (sync) sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        })
-        .catch(function() {
-          var list = document.getElementById('maintenance-list');
-          if (list) {
-            list.innerHTML = '<div class="row" style="grid-template-columns:1fr;"><div style="color:#f55;">Failed to load maintenance tickets.</div></div>';
-          }
-        });
-    }
+      var pending = data.filter(function(t) {
+        return t.status === "Pending" || t.status === "In Progress";
+      });
+
+      if (open) open.textContent = pending.length;
+
+      var first = data[0];
+      if (latest) latest.textContent = first.type || "Issue";
+      if (latestSub) latestSub.textContent = (first.unit || "Unit") + " · " + (first.tenant || "Resident");
+
+      data.forEach(function(t) {
+        var statusClass = t.status === "Completed" ? "pill" : "pill warn";
+
+        list.innerHTML +=
+          '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr 1.4fr;">' +
+          '<div>' + (t.unit || "--") + '</div>' +
+          '<div>' + (t.tenant || "Resident") + '</div>' +
+          '<div>' + (t.type || "general") + '</div>' +
+          '<div><span class="' + statusClass + '">' + (t.status || "Pending") + '</span></div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+          '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + t.id + '\',\'In Progress\')">Start</button>' +
+          '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + t.id + '\',\'Completed\')">Done</button>' +
+          '</div>' +
+          '</div>';
+      });
+
+      var now = new Date();
+      if (sync) sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    })
+    .catch(function() {
+      var list = document.getElementById('maintenance-list');
+      if (list) {
+        list.innerHTML =
+          '<div class="row" style="grid-template-columns:1fr;">' +
+          '<div style="color:#f55;">Failed to load maintenance tickets.</div></div>';
+      }
+    });
+}
 
     navButtons.forEach(function(btn) {
       btn.addEventListener('click', function() { setPage(btn.dataset.page); });
