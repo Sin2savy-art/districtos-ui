@@ -30,7 +30,6 @@
     .page-title h2 { margin: 0; font-size: 28px; }
     .page-title p { margin: 6px 0 0; color: #a7a7a7; font-size: 14px; }
     .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
     .card { min-height: 120px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025)); border-radius: 24px; padding: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.22); position: relative; overflow: hidden; }
     .card::after { content: ""; position: absolute; top: -40%; right: -40%; width: 90%; height: 90%; background: radial-gradient(circle, rgba(255,55,30,0.18), transparent 60%); pointer-events: none; }
     .card label { display: block; color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 12px; }
@@ -38,11 +37,8 @@
     .sub { color: #9c9c9c; font-size: 13px; margin-top: 7px; }
     .wide { grid-column: span 2; }
     .action-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 22px; }
-    .action-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
     .action { border: 1px solid rgba(255,70,45,0.35); background: linear-gradient(135deg, rgba(255,43,22,0.22), rgba(255,255,255,0.035)); color: #fff; border-radius: 22px; padding: 18px 16px; cursor: pointer; min-height: 92px; transition: 0.16s ease; text-align: left; }
     .action:hover { transform: translateY(-3px); box-shadow: 0 0 22px rgba(255,42,22,0.20); }
-    .action.blue { border-color: rgba(45,130,255,0.35); background: linear-gradient(135deg, rgba(22,80,255,0.22), rgba(255,255,255,0.035)); }
-    .action.blue:hover { box-shadow: 0 0 22px rgba(22,80,255,0.20); }
     .action strong { display: block; font-size: 15px; margin-bottom: 6px; }
     .action span { color: #c8c8c8; font-size: 12px; }
     .list { margin-top: 18px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
@@ -62,16 +58,14 @@
     .util-card { border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius: 20px; padding: 16px; margin-bottom: 12px; }
     .util-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .util-name { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #ff4a35; }
-    .util-actions { display: flex; gap: 8px; }
     .util-btn { padding: 5px 12px; border-radius: 999px; font-size: 11px; cursor: pointer; border: 1px solid; transition: 0.15s; }
     .util-btn.on { background: rgba(49,255,120,0.12); color: #5dff91; border-color: rgba(49,255,120,0.3); }
-    .util-btn.on:hover { background: rgba(49,255,120,0.25); }
     .util-btn.off { background: rgba(255,42,22,0.12); color: #ff5b47; border-color: rgba(255,42,22,0.3); }
-    .util-btn.off:hover { background: rgba(255,42,22,0.25); }
     .unit-section { margin-bottom: 24px; }
     .unit-section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #fff; display: flex; align-items: center; gap: 10px; }
   </style>
 </head>
+
 <body>
   <div class="tablet">
     <div class="topbar">
@@ -102,13 +96,12 @@
       </nav>
 
       <main class="content">
-
-        <!-- DASHBOARD -->
         <section id="dashboard" class="page active">
           <div class="page-title">
             <div><h2>Building Overview</h2><p>Smart housing network status and quick controls.</p></div>
             <div class="pill">Medium RP Preset</div>
           </div>
+
           <div class="grid">
             <div class="card"><label>Total Units</label><div class="stat" id="stat-total">--</div><div class="sub" id="stat-active">Loading...</div></div>
             <div class="card"><label>Occupancy</label><div class="stat" id="stat-occupancy">--%</div><div class="sub" id="stat-vacant">Loading...</div></div>
@@ -117,6 +110,7 @@
             <div class="card wide"><label>System Feed</label><div id="system-feed"><div class="sub" style="color:#999;">Loading...</div></div></div>
             <div class="card wide"><label>District Health</label><div class="stat" id="stat-health">--</div><div class="sub" id="stat-health-sub">Fetching...</div></div>
           </div>
+
           <div class="action-row">
             <button class="action" data-action="syncDoors"><strong>Sync All Doors</strong><span>Resend unit access data.</span></button>
             <button class="action" data-action="pairDoor"><strong>Pair New Door</strong><span>Add a new door to a unit.</span></button>
@@ -125,36 +119,24 @@
           </div>
         </section>
 
-        <!-- UNITS -->
         <section id="units" class="page">
           <div class="page-title">
             <div><h2>Units</h2><p>Apartment registry and lease status.</p></div>
             <div class="pill warn" id="units-last-sync">Not synced</div>
           </div>
-          <div class="list" id="units-list">
-            <div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>
-            <div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">Loading...</div></div>
-          </div>
-          <div class="action-row">
-            <button class="action" data-action="scanTerminals"><strong>Refresh Units</strong><span>Pull live data from terminals.</span></button>
-            <button class="action" data-action="autoAssign"><strong>Auto Number</strong><span>Reuse missing unit numbers.</span></button>
-            <button class="action" data-action="resetTenant"><strong>Reset Tenant</strong><span>Coming soon.</span></button>
-            <button class="action" data-action="lockUnit"><strong>Lock Unit</strong><span>Coming soon.</span></button>
-          </div>
+          <div class="list" id="units-list"></div>
         </section>
 
-        <!-- UTILITIES -->
         <section id="utilities" class="page">
           <div class="page-title">
             <div><h2>Utilities</h2><p>Smart meter status and service controls per unit.</p></div>
             <div class="pill warn" id="util-last-sync">Not synced</div>
           </div>
           <div id="utilities-content">
-            <div style="color:#999;text-align:center;padding:40px;">Loading utility data... Click Scan Terminals first.</div>
+            <div style="color:#999;text-align:center;padding:40px;">Loading utility data...</div>
           </div>
         </section>
 
-        <!-- DOORS -->
         <section id="doors" class="page">
           <div class="page-title"><div><h2>Door Network</h2><p>Pair, sync, and recover access devices.</p></div><div class="pill">Access Grid</div></div>
           <div class="action-row">
@@ -166,53 +148,28 @@
           <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Doors respond to Sync All from Dashboard.</p></div></div>
         </section>
 
-        <!-- PAYMENTS -->
         <section id="payments" class="page">
           <div class="page-title">
             <div><h2>Payments</h2><p>Rent payment history across all units.</p></div>
             <div class="pill warn" id="payments-last-sync">Not loaded</div>
           </div>
-          <div class="list" id="payments-list">
-            <div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Amount</div><div>Date</div></div>
-            <div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">Loading...</div></div>
-          </div>
+          <div class="list" id="payments-list"></div>
         </section>
 
         <section id="maintenance" class="page">
-  <div class="page-title">
-    <div>
-      <h2>Maintenance</h2>
-      <p>Live repair tickets submitted by residents.</p>
-    </div>
-    <div class="pill warn" id="maintenance-last-sync">Not loaded</div>
-  </div>
+          <div class="page-title">
+            <div><h2>Maintenance</h2><p>Live repair tickets submitted by residents.</p></div>
+            <div class="pill warn" id="maintenance-last-sync">Not loaded</div>
+          </div>
 
-  <div class="grid">
-    <div class="card">
-      <label>Open Tickets</label>
-      <div class="stat" id="maintenance-open">--</div>
-      <div class="sub">Pending repair requests</div>
-    </div>
+          <div class="grid">
+            <div class="card"><label>Open Tickets</label><div class="stat" id="maintenance-open">--</div><div class="sub">Pending repair requests</div></div>
+            <div class="card wide"><label>Latest Issue</label><div class="stat" id="maintenance-latest">--</div><div class="sub" id="maintenance-latest-sub">Waiting for activity</div></div>
+          </div>
 
-    <div class="card">
-      <label>Latest Issue</label>
-      <div class="stat" id="maintenance-latest">--</div>
-      <div class="sub" id="maintenance-latest-sub">Waiting for activity</div>
-    </div>
-  </div>
+          <div class="list" id="maintenance-list"></div>
+        </section>
 
-  <div class="list" id="maintenance-list">
-    <div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;">
-      <div>Unit</div>
-      <div>Tenant</div>
-      <div>Issue</div>
-      <div>Status</div>
-    </div>
-    <div class="row" style="grid-template-columns:1fr;">
-      <div style="color:#999;">Loading maintenance tickets...</div>
-    </div>
-  </div>
-</section>
         <section id="admins" class="page"><div class="coming"><div><h3>Admin Access</h3><p class="muted">Add/remove managers without script editing.</p></div></div></section>
         <section id="reports" class="page"><div class="coming"><div><h3>Reports</h3><p class="muted">Occupancy, violations, collections, activity logs.</p></div></div></section>
         <section id="settings" class="page"><div class="coming"><div><h3>Settings</h3><p class="muted">RP presets, rent rules, utility behavior, branding.</p></div></div></section>
@@ -220,10 +177,9 @@
         <div id="toast" class="toast">DistrictOS action sent.</div>
       </main>
     </div>
+
     <div class="scanline"></div>
   </div>
-
-  <iframe name="hidden_frame" style="display:none;"></iframe>
 
   <script>
     const pages = document.querySelectorAll('.page');
@@ -236,6 +192,7 @@
       navButtons.forEach(b => b.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
       document.querySelector('[data-page="' + pageId + '"]')?.classList.add('active');
+
       if (pageId === 'units') loadUnits();
       if (pageId === 'payments') loadPayments();
       if (pageId === 'utilities') loadUtilities();
@@ -251,30 +208,44 @@
     function sendDistrictCommand(action, extraParams) {
       showToast('DistrictOS: ' + action + ' sent');
       var url = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action);
+
       if (extraParams) {
         Object.keys(extraParams).forEach(function(k) {
           url += "&" + k + "=" + encodeURIComponent(extraParams[k]);
         });
       }
+
       var img = new Image();
       img.src = url + "&t=" + Date.now();
+
       if (action === 'pairDoor') setPage('doors');
       if (action === 'autoAssign') setPage('units');
+
       if (action === 'scanTerminals') {
-        setTimeout(function() { loadUnits(); loadUtilities(); }, 3000);
+        setTimeout(function() {
+          loadUnits();
+          loadUtilities();
+          loadMaintenance();
+        }, 3000);
       }
     }
 
     function toggleUtility(unit, type, state) {
       showToast('DistrictOS: ' + type + ' ' + state + ' for ' + unit);
+
       var img = new Image();
-      img.src = SL_BRIDGE_URL + 
+      img.src =
+        SL_BRIDGE_URL +
         "?action=toggleUtility" +
         "&unit=" + encodeURIComponent(unit) +
         "&type=" + encodeURIComponent(type) +
         "&state=" + encodeURIComponent(state) +
         "&t=" + Date.now();
-      setTimeout(function() { loadUnits(); loadUtilities(); }, 2000);
+
+      setTimeout(function() {
+        loadUnits();
+        loadUtilities();
+      }, 2000);
     }
 
     function getMeterColor(val) {
@@ -293,16 +264,16 @@
 
     function loadUtilities() {
       fetch(SL_BRIDGE_URL + "/units")
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          var units = data.filter(function(u) { return u.unit && u.unit !== "APT-TEST"; });
-          units.sort(function(a, b) { return a.unit.localeCompare(b.unit); });
+        .then(r => r.json())
+        .then(data => {
+          var units = data.filter(u => u.unit && u.unit !== "APT-TEST");
+          units.sort((a, b) => a.unit.localeCompare(b.unit));
 
           var container = document.getElementById('utilities-content');
           var sync = document.getElementById('util-last-sync');
 
           if (units.length === 0) {
-            container.innerHTML = '<div style="color:#999;text-align:center;padding:40px;">No units found. Click Scan Terminals on Dashboard.</div>';
+            container.innerHTML = '<div style="color:#999;text-align:center;padding:40px;">No units found. Click Scan Terminals.</div>';
             return;
           }
 
@@ -314,9 +285,7 @@
           units.forEach(function(u) {
             html += '<div class="unit-section">';
             html += '<div class="unit-section-title"><span>' + u.unit + '</span>';
-            if (u.tenant && u.tenant !== "Vacant") {
-              html += '<span style="color:#999;font-size:13px;font-weight:400;">· ' + u.tenant + '</span>';
-            }
+            if (u.tenant && u.tenant !== "Vacant") html += '<span style="color:#999;font-size:13px;font-weight:400;">· ' + u.tenant + '</span>';
             html += '</div>';
 
             utilTypes.forEach(function(type) {
@@ -362,41 +331,41 @@
 
     function loadUnits() {
       fetch(SL_BRIDGE_URL + "/units")
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          var units = data.filter(function(u) { return u.unit && u.unit !== "APT-TEST"; });
-          units.sort(function(a, b) { return a.unit.localeCompare(b.unit); });
+        .then(r => r.json())
+        .then(data => {
+          var units = data.filter(u => u.unit && u.unit !== "APT-TEST");
+          units.sort((a, b) => a.unit.localeCompare(b.unit));
 
           var list = document.getElementById('units-list');
           var sync = document.getElementById('units-last-sync');
-          if (list) {
-            list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>';
-            if (units.length === 0) {
-              list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No units found.</div></div>';
-            } else {
-              units.forEach(function(u) {
-                var sc = u.status === "Active" ? "pill" : u.status === "Expired" ? "pill bad" : "pill warn";
-                list.innerHTML += '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>' + u.unit + '</div><div>' + (u.tenant || "Vacant") + '</div><div><span class="' + sc + '">' + u.status + '</span></div><div>' + (u.lease || "--") + '</div></div>';
-              });
-            }
+
+          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>';
+
+          if (units.length === 0) {
+            list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No units found.</div></div>';
+          } else {
+            units.forEach(function(u) {
+              var sc = u.status === "Active" ? "pill" : u.status === "Expired" ? "pill bad" : "pill warn";
+              list.innerHTML += '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>' + u.unit + '</div><div>' + (u.tenant || "Vacant") + '</div><div><span class="' + sc + '">' + u.status + '</span></div><div>' + (u.lease || "--") + '</div></div>';
+            });
           }
 
           var now = new Date();
           if (sync) sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 
-          var total    = units.length;
-          var active   = units.filter(function(u) { return u.status === "Active"; }).length;
-          var vacant   = units.filter(function(u) { return u.status === "Vacant"; }).length;
-          var expired  = units.filter(function(u) { return u.status === "Expired"; }).length;
+          var total = units.length;
+          var active = units.filter(u => u.status === "Active").length;
+          var vacant = units.filter(u => u.status === "Vacant").length;
+          var expired = units.filter(u => u.status === "Expired").length;
           var occupancy = total > 0 ? Math.round((active / total) * 100) : 0;
 
           function el(id) { return document.getElementById(id); }
-          if (el('stat-total'))      el('stat-total').textContent      = total;
-          if (el('stat-occupancy'))  el('stat-occupancy').textContent  = occupancy + "%";
-          if (el('stat-active'))     el('stat-active').textContent     = active + " active leases";
-          if (el('stat-vacant'))     el('stat-vacant').textContent     = vacant + " units vacant";
-          if (el('stat-expired'))    el('stat-expired').textContent    = expired;
-          if (el('stat-health'))     el('stat-health').textContent     = expired === 0 ? "Stable" : "Warning";
+          if (el('stat-total')) el('stat-total').textContent = total;
+          if (el('stat-occupancy')) el('stat-occupancy').textContent = occupancy + "%";
+          if (el('stat-active')) el('stat-active').textContent = active + " active leases";
+          if (el('stat-vacant')) el('stat-vacant').textContent = vacant + " units vacant";
+          if (el('stat-expired')) el('stat-expired').textContent = expired;
+          if (el('stat-health')) el('stat-health').textContent = expired === 0 ? "Stable" : "Warning";
           if (el('stat-health-sub')) el('stat-health-sub').textContent = expired === 0 ? "All leases current." : expired + " lease(s) need attention.";
 
           var feed = document.getElementById('system-feed');
@@ -407,20 +376,15 @@
               feed.innerHTML += '<div class="sub" style="color:' + color + '">' + u.unit + ' — ' + u.status + (u.tenant && u.tenant !== "Vacant" ? ' · ' + u.tenant : '') + '</div>';
             });
           }
-        })
-        .catch(function() {
-          var list = document.getElementById('units-list');
-          if (list) list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#f55;">Failed to load units.</div></div>';
         });
     }
 
     function loadPayments() {
       fetch(SL_BRIDGE_URL + "/payments")
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
+        .then(r => r.json())
+        .then(data => {
           var list = document.getElementById('payments-list');
           var sync = document.getElementById('payments-last-sync');
-          if (!list) return;
 
           list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Amount</div><div>Date</div></div>';
 
@@ -436,10 +400,49 @@
 
           var now = new Date();
           if (sync) sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        });
+    }
+
+    function loadMaintenance() {
+      fetch(SL_BRIDGE_URL + "/maintenance")
+        .then(r => r.json())
+        .then(data => {
+          var list = document.getElementById('maintenance-list');
+          var sync = document.getElementById('maintenance-last-sync');
+          var open = document.getElementById('maintenance-open');
+          var latest = document.getElementById('maintenance-latest');
+          var latestSub = document.getElementById('maintenance-latest-sub');
+
+          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Issue</div><div>Status</div></div>';
+
+          if (!data || data.length === 0) {
+            list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No maintenance tickets yet.</div></div>';
+            if (open) open.textContent = "0";
+            if (latest) latest.textContent = "--";
+            if (latestSub) latestSub.textContent = "Waiting for activity";
+            return;
+          }
+
+          var pending = data.filter(t => t.status === "Pending");
+          if (open) open.textContent = pending.length;
+
+          var first = data[0];
+          if (latest) latest.textContent = first.type || "Issue";
+          if (latestSub) latestSub.textContent = (first.unit || "Unit") + " · " + (first.tenant || "Resident");
+
+          data.forEach(function(t) {
+            var statusClass = t.status === "Pending" ? "pill warn" : "pill";
+            list.innerHTML += '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>' + (t.unit || "--") + '</div><div>' + (t.tenant || "Resident") + '</div><div>' + (t.type || "general") + '</div><div><span class="' + statusClass + '">' + (t.status || "Pending") + '</span></div></div>';
+          });
+
+          var now = new Date();
+          if (sync) sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
         })
         .catch(function() {
-          var list = document.getElementById('payments-list');
-          if (list) list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#f55;">Failed to load payments.</div></div>';
+          var list = document.getElementById('maintenance-list');
+          if (list) {
+            list.innerHTML = '<div class="row" style="grid-template-columns:1fr;"><div style="color:#f55;">Failed to load maintenance tickets.</div></div>';
+          }
         });
     }
 
@@ -455,13 +458,18 @@
 
     function updateClock() {
       var now = new Date();
-      document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('clock').textContent =
+        now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
     updateClock();
     setInterval(updateClock, 1000);
+
     loadUnits();
+    loadMaintenance();
+
     setInterval(loadUnits, 30000);
+    setInterval(loadMaintenance, 12000);
   </script>
 </body>
 </html>
