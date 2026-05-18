@@ -317,40 +317,21 @@ html, body {
 
     <!-- Maintenance -->
 <section id="maintenance" class="page">
-
   <div class="card">
     <div class="label">Maintenance Request</div>
+    <div class="sub">Report an issue to management.</div>
 
-    <div class="sub">
-      Report an issue to management.
-    </div>
-
-    <button class="action"
-      onclick="submitMaintenance('plumbing')">
-      Plumbing Issue
-    </button>
-
-    <button class="action"
-      onclick="submitMaintenance('electric')">
-      Electrical Issue
-    </button>
-
-    <button class="action"
-      onclick="submitMaintenance('general')">
-      General Repair
-    </button>
+    <button class="action" onclick="submitMaintenance('plumbing')">Plumbing Issue</button>
+    <button class="action" onclick="submitMaintenance('electric')">Electrical Issue</button>
+    <button class="action" onclick="submitMaintenance('general')">General Repair</button>
   </div>
 
   <div class="card">
     <div class="label">Recent Requests</div>
-
     <div id="maintenanceList">
-      <div class="notice">
-        No maintenance requests yet.
-      </div>
+      <div class="notice">No maintenance requests yet.</div>
     </div>
   </div>
-
 </section>
     
 
@@ -520,121 +501,56 @@ function residentAction(action, type = "") {
   });
 }
 
-  async function submitMaintenance(type)
-{
-  if (!residentData.unit)
-  {
+  async function submitMaintenance(type) {
+  if (!residentData.unit) {
     showToast("No active unit");
     return;
   }
 
-  try
-  {
-    await fetch(
-      API_BASE + "/maintenance",
-      {
-        method: "POST",
+  try {
+    await fetch(API_BASE + "/maintenance", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body:
+        "unit=" + encodeURIComponent(residentData.unit) +
+        "&tenant=" + encodeURIComponent(residentData.tenant || "Resident") +
+        "&tenantKey=" + encodeURIComponent(residentData.tenantKey || RESIDENT_AVATAR) +
+        "&type=" + encodeURIComponent(type)
+    });
 
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
-
-        body:
-          "unit=" +
-          encodeURIComponent(residentData.unit) +
-
-          "&tenant=" +
-          encodeURIComponent(residentData.tenant) +
-
-          "&tenantKey=" +
-          encodeURIComponent(
-            residentData.tenantKey || RESIDENT_AVATAR
-          ) +
-
-          "&type=" +
-          encodeURIComponent(type)
-      }
-    );
-
-    residentAction(
-      "maintenanceRequest",
-      type
-    );
-
-    showToast(
-      "Maintenance request submitted"
-    );
-
+    residentAction("maintenanceRequest", type);
+    showToast("Maintenance submitted");
     loadMaintenance();
-
-  }
-  catch(e)
-  {
-    console.log(e);
+  } catch (e) {
     showToast("Maintenance failed");
   }
 }
 
-  async function loadMaintenance()
-{
-  try
-  {
-    const res =
-      await fetch(
-        API_BASE + "/maintenance"
-      );
+async function loadMaintenance() {
+  try {
+    const res = await fetch(API_BASE + "/maintenance?t=" + Date.now());
+    const data = await res.json();
 
-    const data =
-      await res.json();
-
-    const list =
-      document.getElementById(
-        "maintenanceList"
-      );
-
+    const list = document.getElementById("maintenanceList");
     if (!list) return;
 
-    const unitTickets =
-      data.filter(
-        t => t.unit === residentData.unit
-      );
+    const mine = data.filter(t => t.unit === residentData.unit);
 
-    if (!unitTickets.length)
-    {
-      list.innerHTML =
-        `<div class="notice">
-          No maintenance requests yet.
-        </div>`;
-
+    if (!mine.length) {
+      list.innerHTML = `<div class="notice">No maintenance requests yet.</div>`;
       return;
     }
 
     list.innerHTML = "";
 
-    unitTickets.forEach(ticket =>
-    {
-      const div =
-        document.createElement("div");
-
+    mine.forEach(t => {
+      const div = document.createElement("div");
       div.className = "notice";
-
       div.innerHTML =
-        `<strong>${
-          ticket.type.toUpperCase()
-        }</strong><br>
-        Status: ${
-          ticket.status
-        }`;
-
+        `<strong>${String(t.type || "general").toUpperCase()}</strong><br>Status: ${t.status || "Pending"}`;
       list.appendChild(div);
     });
-
-  }
-  catch(e)
-  {
-    console.log(e);
-  }
+  } catch (e) {}
 }
 
 document.querySelectorAll(".nav button").forEach(btn => {
