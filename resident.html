@@ -335,14 +335,55 @@ html, body {
 </section>
     
 
-    <!-- Guests -->
-    <section id="guests" class="page">
-      <div class="card">
-        <div class="label">Guest Access</div>
-        <div class="sub">Temporary visitor access for your unit.</div>
-        <button class="action" onclick="residentAction('createGuestPass')">Create Guest Pass</button>
+<!-- Guests -->
+<section id="guests" class="page">
+
+  <div class="card">
+    <div class="label">Guest Access</div>
+
+    <div class="sub">
+      Add temporary guests to your apartment.
+    </div>
+
+    <input
+      id="guestUUID"
+      type="text"
+      placeholder="Paste avatar UUID..."
+      style="
+        width:100%;
+        margin-top:10px;
+        padding:10px;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,0.08);
+        background:#111318;
+        color:#fff;
+        font-size:12px;
+        outline:none;
+      "
+    />
+
+    <button class="action" onclick="addGuestPass()">
+      Add Guest
+    </button>
+
+    <button class="action"
+      style="margin-top:8px;"
+      onclick="showToast('Co-tenant approvals coming soon')">
+      Add Co-Tenant
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="label">Active Guests</div>
+
+    <div id="guestList">
+      <div class="notice">
+        No active guest passes.
       </div>
-    </section>
+    </div>
+  </div>
+
+</section>
 
   </main>
 
@@ -553,6 +594,195 @@ async function loadMaintenance() {
   } catch (e) {}
 }
 
+async function addGuestPass()
+{
+  const input =
+    document.getElementById("guestUUID");
+
+  if (!input) return;
+
+  const guestKey =
+    input.value.trim();
+
+  if (!guestKey)
+  {
+    showToast("Enter guest UUID");
+    return;
+  }
+
+  if (!residentData.unit)
+  {
+    showToast("No active lease");
+    return;
+  }
+
+  try
+  {
+    await fetch(
+      API_BASE + "/guests",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:
+          "unit=" +
+          encodeURIComponent(residentData.unit) +
+
+          "&tenant=" +
+          encodeURIComponent(
+            residentData.tenant || "Resident"
+          ) +
+
+          "&tenantKey=" +
+          encodeURIComponent(
+            residentData.tenantKey || RESIDENT_AVATAR
+          ) +
+
+          "&guestKey=" +
+          encodeURIComponent(guestKey)
+      }
+    );
+
+    residentAction("createGuestPass");
+
+    input.value = "";
+
+    showToast("Guest added");
+
+    loadGuestPasses();
+  }
+  catch(e)
+  {
+    console.log(e);
+    showToast("Guest add failed");
+  }
+}
+
+async function removeGuestPass(id)
+{
+  try
+  {
+    await fetch(
+      API_BASE + "/guests/remove",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:
+          "id=" +
+          encodeURIComponent(id)
+      }
+    );
+
+    showToast("Guest removed");
+
+    loadGuestPasses();
+  }
+  catch(e)
+  {
+    console.log(e);
+    showToast("Remove failed");
+  }
+}
+
+async function loadGuestPasses()
+{
+  if (!residentData.unit) return;
+
+  try
+  {
+    const res =
+      await fetch(
+        API_BASE +
+        "/guests?unit=" +
+        encodeURIComponent(residentData.unit) +
+        "&t=" +
+        Date.now()
+      );
+
+    const data =
+      await res.json();
+
+    const list =
+      document.getElementById("guestList");
+
+    if (!list) return;
+
+    if (!data.length)
+    {
+      list.innerHTML =
+        `<div class="notice">
+          No active guest passes.
+        </div>`;
+
+      return;
+    }
+
+    list.innerHTML = "";
+
+    data.forEach(g =>
+    {
+      const div =
+        document.createElement("div");
+
+      div.className = "notice";
+
+      div.innerHTML =
+        `
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:10px;
+        ">
+
+          <div>
+            <strong>Guest UUID</strong><br>
+            <span style="
+              color:#aaa;
+              font-size:11px;
+              word-break:break-all;
+            ">
+              ${g.guestKey}
+            </span>
+          </div>
+
+          <button
+            onclick="removeGuestPass('${g.id}')"
+            style="
+              background:rgba(255,42,22,0.14);
+              border:1px solid rgba(255,42,22,0.3);
+              color:#ff5b47;
+              border-radius:10px;
+              padding:6px 10px;
+              cursor:pointer;
+              font-size:11px;
+            "
+          >
+            Remove
+          </button>
+
+        </div>
+        `;
+
+      list.appendChild(div);
+    });
+
+  }
+  catch(e)
+  {
+    console.log(e);
+  }
+}
+
 document.querySelectorAll(".nav button").forEach(btn => {
   btn.addEventListener("click", () => setPage(btn.dataset.page));
 });
@@ -560,6 +790,7 @@ document.querySelectorAll(".nav button").forEach(btn => {
 renderResident(residentData);
 loadResident();
 loadMaintenance();
+loadGuestPasses();
 setInterval(loadMaintenance, 12000);
 </script>
 </body>
