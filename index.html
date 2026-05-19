@@ -312,41 +312,23 @@
   }
 }
 
-async function generateUtilityBill(unit)
+function generateUtilityBill(unit)
 {
-  try
-  {
-    await fetch(
-      SL_BRIDGE_URL +
-      "/utilities/bill",
-      {
-        method: "POST",
+  showToast("Generating utility bill");
 
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
+  var img = new Image();
 
-        body:
-          "unit=" +
-          encodeURIComponent(unit)
-      }
-    );
+  img.src =
+    SL_BRIDGE_URL +
+    "/utilities/bill-get" +
+    "?unit=" +
+    encodeURIComponent(unit) +
+    "&t=" +
+    Date.now();
 
-    showToast(
-      "Utility bill generated"
-    );
-
+  setTimeout(function() {
     loadUtilities();
-  }
-  catch(e)
-  {
-    console.log(e);
-
-    showToast(
-      "Billing failed"
-    );
-  }
+  }, 1500);
 }
 
 async function addLateFee(unit)
