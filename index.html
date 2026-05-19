@@ -309,9 +309,99 @@
               html += '</div>';
             });
 
-            if (u.utilityBalance !== undefined && u.utilityBalance > 0) {
-              html += '<div style="color:#ffbe55;font-size:13px;margin-top:4px;">⚠ Balance due: L$' + u.utilityBalance + '</div>';
-            }
+        html += `
+        <div style="
+          margin-top:12px;
+          padding-top:12px;
+          border-top:1px solid rgba(255,255,255,0.06);
+        ">
+        
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:8px;
+          ">
+            <div style="font-size:13px;color:#ccc;">
+              Utility Billing
+            </div>
+        
+            <div class="${
+              (u.utilityBalance || 0) > 0
+                ? 'pill warn'
+                : 'pill'
+            }">
+              ${
+                (u.utilityBalance || 0) > 0
+                  ? 'UNPAID'
+                  : 'PAID'
+              }
+            </div>
+          </div>
+        
+          <div style="
+            color:#ffbe55;
+            font-size:13px;
+            margin-bottom:10px;
+          ">
+            Balance: L$${u.utilityBalance || 0}
+          </div>
+        
+          <div style="
+            display:flex;
+            gap:8px;
+            margin-bottom:8px;
+          ">
+        
+            <input
+              id="utilityCost_${u.unit}"
+              type="number"
+              placeholder="Utility Cost"
+              value="${u.utilityCost || 0}"
+              style="
+                flex:1;
+                background:#111318;
+                border:1px solid rgba(255,255,255,0.08);
+                border-radius:10px;
+                color:#fff;
+                padding:8px;
+                font-size:12px;
+              "
+            />
+        
+            <button
+              class="util-btn on"
+              onclick="setUtilityCost('${u.unit}')"
+            >
+              Save
+            </button>
+        
+          </div>
+        
+          <div style="
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+          ">
+        
+            <button
+              class="util-btn on"
+              onclick="generateUtilityBill('${u.unit}')"
+            >
+              Generate Bill
+            </button>
+        
+            <button
+              class="util-btn off"
+              onclick="addLateFee('${u.unit}')"
+            >
+              Late Fee
+            </button>
+        
+          </div>
+        
+        </div>
+        `;
 
             html += '</div>';
           });
