@@ -307,6 +307,12 @@ html, body {
       </div>
     </section>
 
+    <div class="sub">Smart meter billing</div>
+    
+<button class="action" onclick="payUtilityBill()">
+  Pay Utility Bill
+</button>
+    
     <!-- Mailbox -->
     <section id="mailbox" class="page">
       <div class="card">
@@ -549,6 +555,36 @@ async function loadUtilityBalance() {
     document.getElementById("utilityBalance").textContent = "L$" + balance;
   } catch (e) {
     console.log(e);
+  }
+}
+
+async function payUtilityBill() {
+  if (!residentData.unit) {
+    showToast("No active unit");
+    return;
+  }
+
+  try {
+    await fetch(API_BASE + "/utilities/pay", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body:
+        "unit=" +
+        encodeURIComponent(residentData.unit)
+    });
+
+    showToast("Utility bill paid");
+
+    loadUtilityBalance();
+    loadNotices();
+
+    residentAction("payUtilityBill");
+
+  } catch (e) {
+    console.log(e);
+    showToast("Payment failed");
   }
 }
 
