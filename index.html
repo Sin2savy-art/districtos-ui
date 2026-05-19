@@ -262,6 +262,140 @@
       return "◆";
     }
 
+    async function setUtilityCost(unit)
+{
+  const input =
+    document.getElementById(
+      "utilityCost_" + unit
+    );
+
+  if (!input) return;
+
+  const cost =
+    parseInt(input.value || "0");
+
+  try
+  {
+    await fetch(
+      SL_BRIDGE_URL +
+      "/utilities/set-cost",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:
+          "unit=" +
+          encodeURIComponent(unit) +
+
+          "&cost=" +
+          encodeURIComponent(cost)
+      }
+    );
+
+    showToast(
+      "Utility cost saved"
+    );
+
+    loadUtilities();
+  }
+  catch(e)
+  {
+    console.log(e);
+
+    showToast(
+      "Failed to save utility cost"
+    );
+  }
+}
+
+async function generateUtilityBill(unit)
+{
+  try
+  {
+    await fetch(
+      SL_BRIDGE_URL +
+      "/utilities/bill",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:
+          "unit=" +
+          encodeURIComponent(unit)
+      }
+    );
+
+    showToast(
+      "Utility bill generated"
+    );
+
+    loadUtilities();
+  }
+  catch(e)
+  {
+    console.log(e);
+
+    showToast(
+      "Billing failed"
+    );
+  }
+}
+
+async function addLateFee(unit)
+{
+  const amount =
+    prompt(
+      "Enter late fee amount:"
+    );
+
+  if (!amount) return;
+
+  try
+  {
+    await fetch(
+      SL_BRIDGE_URL +
+      "/utilities/late-fee",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:
+          "unit=" +
+          encodeURIComponent(unit) +
+
+          "&amount=" +
+          encodeURIComponent(amount)
+      }
+    );
+
+    showToast(
+      "Late fee added"
+    );
+
+    loadUtilities();
+  }
+  catch(e)
+  {
+    console.log(e);
+
+    showToast(
+      "Late fee failed"
+    );
+  }
+}
+
     function loadUtilities() {
       fetch(SL_BRIDGE_URL + "/units")
         .then(r => r.json())
