@@ -558,7 +558,7 @@ async function addLateFee(unit)
           var list = document.getElementById('units-list');
           var sync = document.getElementById('units-last-sync');
 
-          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>';
+          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Type</div><div>Amount</div><div>Date</div></div>';
 
           if (units.length === 0) {
             list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No units found.</div></div>';
@@ -613,7 +613,14 @@ async function addLateFee(unit)
             data.forEach(function(p) {
               var date = new Date(p.timestamp * 1000);
               var dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-              list.innerHTML += '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>' + p.unit + '</div><div>' + (p.tenant || "Unknown") + '</div><div style="color:#5dff91;">L$' + p.amount + '</div><div style="color:#999;font-size:12px;">' + dateStr + '</div></div>';
+              list.innerHTML +=
+              '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">' +
+              '<div>' + p.unit + '</div>' +
+              '<div>' + (p.tenant || "Unknown") + '</div>' +
+              '<div><span class="pill warn">' + (p.type || "rent") + '</span></div>' +
+              '<div style="color:#5dff91;">L$' + p.amount + '</div>' +
+              '<div style="color:#999;font-size:12px;">' + dateStr + '</div>' +
+              '</div>';
             });
           }
 
