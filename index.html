@@ -115,7 +115,10 @@
             <button class="action" data-action="syncDoors"><strong>Sync All Doors</strong><span>Resend unit access data.</span></button>
             <button class="action" data-action="pairDoor"><strong>Pair New Door</strong><span>Add a new door to a unit.</span></button>
             <button class="action" data-action="autoAssign"><strong>Auto Assign Units</strong><span>Sequential naming setup.</span></button>
-            <button class="action" data-action="scanTerminals"><strong>Scan Terminals</strong><span>Find active unit brains.</span></button>
+    <button class="action" data-action="scanNearby">
+  <strong>Scan Nearby</strong>
+    <span>Find terminals, doors, and mailboxes.</span>
+  </button>
           </div>
         </section>
 
@@ -221,6 +224,15 @@
       if (action === 'pairDoor') setPage('doors');
       if (action === 'autoAssign') setPage('units');
 
+      if (action === 'scanNearby') {
+        showToast('Scanning nearby DistrictOS objects...');
+        setTimeout(function() {
+          loadUnits();
+          loadUtilities();
+          loadMaintenance();
+        }, 3500);
+      }
+      
       if (action === 'scanTerminals') {
         setTimeout(function() {
           loadUnits();
