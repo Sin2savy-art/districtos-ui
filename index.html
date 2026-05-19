@@ -338,19 +338,19 @@ function generateUtilityBill(unit)
     "&t=" +
     Date.now();
 
-  var syncImg = new Image();
-
-  syncImg.src =
-    SL_BRIDGE_URL +
-    "?action=syncUtilityBill" +
-    "&unit=" +
-    encodeURIComponent(unit) +
-    "&t=" +
-    Date.now();
-
   setTimeout(function() {
+    var syncImg = new Image();
+
+    syncImg.src =
+      SL_BRIDGE_URL +
+      "?action=syncUtilityBill" +
+      "&unit=" +
+      encodeURIComponent(unit) +
+      "&t=" +
+      Date.now();
+
     loadUtilities();
-  }, 1500);
+  }, 1200);
 }
 
 async function addLateFee(unit)
