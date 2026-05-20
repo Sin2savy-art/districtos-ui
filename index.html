@@ -324,6 +324,69 @@
   }
 }
 
+  async function saveUtilitySettings(unit)
+{
+  const cost =
+    parseInt(
+      document.getElementById(
+        "utilityCost_" + unit
+      ).value || "0"
+    );
+
+  const cycle =
+    document.getElementById(
+      "utilityCycle_" + unit
+    ).value;
+
+  const allowCustom =
+    document.getElementById(
+      "utilityCustom_" + unit
+    ).checked ? 1 : 0;
+
+  try
+  {
+    await fetch(
+      SL_BRIDGE_URL +
+      "/utilities/set-settings",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:
+          "unit=" +
+          encodeURIComponent(unit) +
+
+          "&cost=" +
+          encodeURIComponent(cost) +
+
+          "&cycle=" +
+          encodeURIComponent(cycle) +
+
+          "&allowCustom=" +
+          encodeURIComponent(allowCustom)
+      }
+    );
+
+    showToast(
+      "Utility settings saved"
+    );
+
+    loadUtilities();
+  }
+  catch(e)
+  {
+    console.log(e);
+
+    showToast(
+      "Failed to save settings"
+    );
+  }
+}
+
 function generateUtilityBill(unit)
 {
   showToast("Generating utility bill");
@@ -490,57 +553,182 @@ async function addLateFee(unit)
             display:flex;
             gap:8px;
             margin-bottom:8px;
-          ">
-        
-            <input
-              id="utilityCost_${u.unit}"
-              type="number"
-              placeholder="Utility Cost"
-              value="${u.utilityCost || 0}"
-              style="
-                flex:1;
-                background:#111318;
-                border:1px solid rgba(255,255,255,0.08);
-                border-radius:10px;
-                color:#fff;
-                padding:8px;
-                font-size:12px;
-              "
-            />
-        
-            <button
-              class="util-btn on"
-              onclick="setUtilityCost('${u.unit}')"
-            >
-              Save
-            </button>
-        
-          </div>
-        
-          <div style="
-            display:flex;
-            gap:8px;
-            flex-wrap:wrap;
-          ">
-        
-            <button
-              class="util-btn on"
-              onclick="generateUtilityBill('${u.unit}')"
-            >
-              Generate Bill
-            </button>
-        
-            <button
-              class="util-btn off"
-              onclick="addLateFee('${u.unit}')"
-            >
-              Late Fee
-            </button>
-        
-          </div>
-        
-        </div>
-        `;
+          ">html += `
+<div style="
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,0.06);
+">
+
+  <div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+  ">
+    <div style="
+      font-size:13px;
+      font-weight:700;
+      color:#fff;
+      letter-spacing:0.5px;
+    ">
+      Utility Billing
+    </div>
+
+    <div class="${
+      (u.utilityBalance || 0) > 0
+        ? 'pill warn'
+        : 'pill'
+    }">
+      ${
+        (u.utilityBalance || 0) > 0
+          ? 'UNPAID'
+          : 'PAID'
+      }
+    </div>
+  </div>
+
+  <div style="
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:10px;
+  ">
+
+    <div>
+      <div style="
+        font-size:11px;
+        color:#888;
+        margin-bottom:4px;
+      ">
+        Utility Cost
+      </div>
+
+      <input
+        id="utilityCost_${u.unit}"
+        type="number"
+        value="${u.utilityCost || 0}"
+        style="
+          width:100%;
+          background:#111318;
+          border:1px solid rgba(255,255,255,0.08);
+          border-radius:10px;
+          color:#fff;
+          padding:9px;
+          font-size:12px;
+        "
+      />
+    </div>
+
+    <div>
+      <div style="
+        font-size:11px;
+        color:#888;
+        margin-bottom:4px;
+      ">
+        Billing Cycle
+      </div>
+
+      <select
+        id="utilityCycle_${u.unit}"
+        style="
+          width:100%;
+          background:#111318;
+          border:1px solid rgba(255,255,255,0.08);
+          border-radius:10px;
+          color:#fff;
+          padding:9px;
+          font-size:12px;
+        "
+      >
+        <option value="weekly"
+          ${(u.cycle || "weekly") === "weekly" ? "selected" : ""}
+        >
+          Weekly
+        </option>
+
+        <option value="monthly"
+          ${(u.cycle || "weekly") === "monthly" ? "selected" : ""}
+        >
+          Monthly
+        </option>
+      </select>
+    </div>
+
+  </div>
+
+  <div style="
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+    padding:10px;
+    border-radius:12px;
+    background:rgba(255,255,255,0.03);
+  ">
+
+    <div>
+      <div style="
+        font-size:12px;
+        color:#fff;
+        margin-bottom:2px;
+      ">
+        Allow Partial Payments
+      </div>
+
+      <div style="
+        font-size:11px;
+        color:#888;
+      ">
+        Residents can pay toward balance
+      </div>
+    </div>
+
+    <input
+      type="checkbox"
+      id="utilityCustom_${u.unit}"
+      ${(u.allowCustom ? "checked" : "")}
+    />
+  </div>
+
+  <div style="
+    color:#ffbe55;
+    font-size:13px;
+    margin-bottom:12px;
+  ">
+    Current Balance: L$${u.utilityBalance || 0}
+  </div>
+
+  <div style="
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  ">
+
+    <button
+      class="util-btn on"
+      onclick="saveUtilitySettings('${u.unit}')"
+    >
+      Save Settings
+    </button>
+
+    <button
+      class="util-btn on"
+      onclick="generateUtilityBill('${u.unit}')"
+    >
+      Generate Bill
+    </button>
+
+    <button
+      class="util-btn off"
+      onclick="addLateFee('${u.unit}')"
+    >
+      Add Late Fee
+    </button>
+
+  </div>
+</div>
+`;
 
             html += '</div>';
           });
