@@ -141,6 +141,11 @@
           <strong>Run Billing Cycle</strong>
           <span>Apply weekly/monthly utility charges.</span>
         </button>
+
+          <button class="action" onclick="sendUtilityWarnings()" style="margin-bottom:18px;">
+      <strong>Send Utility Warnings</strong>
+      <span>Notify residents with unpaid balances.</span>
+    </button>
           
         </section>
 
@@ -391,6 +396,21 @@ function runUtilityCycle()
         console.log(e);
         showToast("Late fee failed");
       }
+    }
+
+    function sendUtilityWarnings()
+    {
+      showToast("Sending utility warnings");
+    
+      fetch(SL_BRIDGE_URL + "/utilities/warnings?t=" + Date.now())
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          showToast("Warnings sent to " + data.created.length + " unit(s)");
+          loadUtilities();
+        })
+        .catch(function() {
+          showToast("Warning send failed");
+        });
     }
 
     async function loadUtilities() {
