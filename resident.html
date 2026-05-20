@@ -520,7 +520,6 @@ function renderResident(data) {
   const notices = data.notices || [];
   document.getElementById("latestNotice").textContent = notices[0] || "No notices yet.";
 
-document.getElementById("latestNotice").textContent = "Loading notices...";
 }
 
 async function loadResident() {
@@ -604,46 +603,55 @@ async function loadNotices() {
 
     if (!list) return;
 
-    if (!data.length) {
+    if (!data || !data.length) {
       latest.textContent = "No notices yet.";
       list.innerHTML = `<div class="notice">No notices yet.</div>`;
       return;
     }
 
-    latest.textContent = data[0].title + ": " + data[0].message;
+    latest.textContent =
+      (data[0].title || "DistrictOS Notice") +
+      ": " +
+      (data[0].message || "");
 
     list.innerHTML = "";
 
-data.forEach(n => {
-  const div = document.createElement("div");
-  div.className = "notice";
+    data.forEach(n => {
+      const date = n.timestamp
+        ? new Date(n.timestamp * 1000).toLocaleString()
+        : "";
 
-  div.innerHTML =
-    `<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
-      <div style="flex:1;">
-        <strong>${n.title || "DistrictOS Notice"}</strong><br>
-        <span>${n.message || ""}</span><br>
-        <span style="color:#888;font-size:10px;">${n.type || "general"}</span>
-      </div>
+      const div = document.createElement("div");
+      div.className = "notice";
 
-      <button
-        onclick="deleteNotice('${n.id}')"
-        style="
-          background:rgba(255,42,22,0.14);
-          border:1px solid rgba(255,42,22,0.3);
-          color:#ff5b47;
-          border-radius:10px;
-          padding:5px 8px;
-          cursor:pointer;
-          font-size:10px;
-        "
-      >
-        Delete
-      </button>
-    </div>`;
+      div.innerHTML =
+        `<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+          <div style="flex:1;">
+            <strong>${n.title || "DistrictOS Notice"}</strong><br>
+            <span>${n.message || ""}</span><br>
+            <span style="color:#888;font-size:10px;">
+              ${n.type || "general"} ${date ? "· " + date : ""}
+            </span>
+          </div>
 
-  list.appendChild(div);
-});
+          <button
+            onclick="deleteNotice('${n.id}')"
+            style="
+              background:rgba(255,42,22,0.14);
+              border:1px solid rgba(255,42,22,0.3);
+              color:#ff5b47;
+              border-radius:10px;
+              padding:5px 8px;
+              cursor:pointer;
+              font-size:10px;
+            "
+          >
+            Delete
+          </button>
+        </div>`;
+
+      list.appendChild(div);
+    });
 
   } catch (e) {
     console.log(e);
