@@ -331,20 +331,35 @@
       }, 1200);
     }
 
-    function runUtilityCycle()
-    {
-      showToast("Running utility billing cycle");
-    
-      fetch(SL_BRIDGE_URL + "/utilities/run-cycle?t=" + Date.now())
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          showToast("Billing cycle updated " + data.updated.length + " unit(s)");
-          loadUtilities();
-        })
-        .catch(function() {
-          showToast("Billing cycle failed");
-        });
-    }
+function runUtilityCycle()
+{
+  showToast("Running utility billing cycle");
+
+  fetch(SL_BRIDGE_URL + "/utilities/run-cycle?t=" + Date.now())
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      showToast("Billing cycle updated " + data.updated.length + " unit(s)");
+
+      data.updated.forEach(function(u) {
+        var img = new Image();
+
+        img.src =
+          SL_BRIDGE_URL +
+          "?action=syncUtilityBill" +
+          "&unit=" +
+          encodeURIComponent(u.unit) +
+          "&t=" +
+          Date.now();
+      });
+
+      setTimeout(function() {
+        loadUtilities();
+      }, 1500);
+    })
+    .catch(function() {
+      showToast("Billing cycle failed");
+    });
+}
 
     async function addLateFee(unit) {
       const amount = prompt("Enter late fee amount:");
