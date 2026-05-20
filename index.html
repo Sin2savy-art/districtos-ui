@@ -58,11 +58,13 @@
     .util-card { border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius: 20px; padding: 16px; margin-bottom: 12px; }
     .util-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .util-name { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #ff4a35; }
-    .util-btn { padding: 5px 12px; border-radius: 999px; font-size: 11px; cursor: pointer; border: 1px solid; transition: 0.15s; }
+    .util-btn { padding: 7px 12px; border-radius: 999px; font-size: 11px; cursor: pointer; border: 1px solid; transition: 0.15s; }
     .util-btn.on { background: rgba(49,255,120,0.12); color: #5dff91; border-color: rgba(49,255,120,0.3); }
     .util-btn.off { background: rgba(255,42,22,0.12); color: #ff5b47; border-color: rgba(255,42,22,0.3); }
     .unit-section { margin-bottom: 24px; }
     .unit-section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #fff; display: flex; align-items: center; gap: 10px; }
+    input[type="number"], select { outline: none; }
+    input[type="checkbox"] { transform: scale(1.25); accent-color: #ff4a35; }
   </style>
 </head>
 
@@ -114,11 +116,8 @@
           <div class="action-row">
             <button class="action" data-action="syncDoors"><strong>Sync All Doors</strong><span>Resend unit access data.</span></button>
             <button class="action" data-action="pairDoor"><strong>Pair New Door</strong><span>Add a new door to a unit.</span></button>
-            <button class="action" data-action="autoAssign"><strong>Auto Assign Units</strong><span>Sequential naming setup.</span></button>
-    <button class="action" data-action="scanNearby">
-  <strong>Scan Nearby</strong>
-    <span>Find terminals, doors, and mailboxes.</span>
-  </button>
+            <button class="action" data-action="autoAssign"><strong>Auto Assign Units</strong><span>Assign nearby unpaired objects.</span></button>
+            <button class="action" data-action="scanNearby"><strong>Scan Nearby</strong><span>Find terminals, doors, and mailboxes.</span></button>
           </div>
         </section>
 
@@ -145,15 +144,15 @@
           <div class="action-row">
             <button class="action" data-action="pairDoor"><strong>Pair Door</strong><span>Start one-click pairing.</span></button>
             <button class="action" data-action="syncDoors"><strong>Sync All</strong><span>Repair desynced doors.</span></button>
-            <button class="action" data-action="scanDoors"><strong>Scan Doors</strong><span>Coming soon.</span></button>
-            <button class="action" data-action="clearDoor"><strong>Clear Pair</strong><span>Coming soon.</span></button>
+            <button class="action" data-action="scanNearby"><strong>Scan Nearby</strong><span>Find nearby ecosystem objects.</span></button>
+            <button class="action" data-action="autoAssign"><strong>Auto Assign</strong><span>Assign unpaired objects to APT-101.</span></button>
           </div>
-          <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Doors respond to Sync All from Dashboard.</p></div></div>
+          <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Doors respond to Sync All and Auto Assign.</p></div></div>
         </section>
 
         <section id="payments" class="page">
           <div class="page-title">
-            <div><h2>Payments</h2><p>Rent payment history across all units.</p></div>
+            <div><h2>Payments</h2><p>Rent, utility, mailbox, and custom payment history.</p></div>
             <div class="pill warn" id="payments-last-sync">Not loaded</div>
           </div>
           <div class="list" id="payments-list"></div>
@@ -222,7 +221,6 @@
       img.src = url + "&t=" + Date.now();
 
       if (action === 'pairDoor') setPage('doors');
-      if (action === 'autoAssign') setPage('units');
 
       if (action === 'scanNearby') {
         showToast('Scanning nearby DistrictOS objects...');
@@ -232,7 +230,15 @@
           loadMaintenance();
         }, 3500);
       }
-      
+
+      if (action === 'autoAssign') {
+        showToast('Auto assign sent to nearby objects');
+        setTimeout(function() {
+          loadUnits();
+          loadUtilities();
+        }, 2500);
+      }
+
       if (action === 'scanTerminals') {
         setTimeout(function() {
           loadUnits();
@@ -274,480 +280,209 @@
       return "◆";
     }
 
-    async function setUtilityCost(unit)
-{
-  const input =
-    document.getElementById(
-      "utilityCost_" + unit
-    );
+    async function saveUtilitySettings(unit) {
+      const cost = parseInt(document.getElementById("utilityCost_" + unit).value || "0");
+      const cycle = document.getElementById("utilityCycle_" + unit).value;
+      const allowCustom = document.getElementById("utilityCustom_" + unit).checked ? 1 : 0;
 
-  if (!input) return;
+      try {
+        await fetch(SL_BRIDGE_URL + "/utilities/set-settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body:
+            "unit=" + encodeURIComponent(unit) +
+            "&cost=" + encodeURIComponent(cost) +
+            "&cycle=" + encodeURIComponent(cycle) +
+            "&allowCustom=" + encodeURIComponent(allowCustom)
+        });
 
-  const cost =
-    parseInt(input.value || "0");
-
-  try
-  {
-    await fetch(
-      SL_BRIDGE_URL +
-      "/utilities/set-cost",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
-
-        body:
-          "unit=" +
-          encodeURIComponent(unit) +
-
-          "&cost=" +
-          encodeURIComponent(cost)
+        showToast("Utility settings saved");
+        loadUtilities();
+      } catch(e) {
+        console.log(e);
+        showToast("Failed to save settings");
       }
-    );
+    }
 
-    showToast(
-      "Utility cost saved"
-    );
+    function generateUtilityBill(unit) {
+      showToast("Generating utility bill");
 
-    loadUtilities();
-  }
-  catch(e)
-  {
-    console.log(e);
+      var img = new Image();
+      img.src =
+        SL_BRIDGE_URL +
+        "/utilities/bill-get" +
+        "?unit=" + encodeURIComponent(unit) +
+        "&t=" + Date.now();
 
-    showToast(
-      "Failed to save utility cost"
-    );
-  }
-}
+      setTimeout(function() {
+        var syncImg = new Image();
+        syncImg.src =
+          SL_BRIDGE_URL +
+          "?action=syncUtilityBill" +
+          "&unit=" + encodeURIComponent(unit) +
+          "&t=" + Date.now();
 
-  async function saveUtilitySettings(unit)
-{
-  const cost =
-    parseInt(
-      document.getElementById(
-        "utilityCost_" + unit
-      ).value || "0"
-    );
+        loadUtilities();
+      }, 1200);
+    }
 
-  const cycle =
-    document.getElementById(
-      "utilityCycle_" + unit
-    ).value;
+    async function addLateFee(unit) {
+      const amount = prompt("Enter late fee amount:");
+      if (!amount) return;
 
-  const allowCustom =
-    document.getElementById(
-      "utilityCustom_" + unit
-    ).checked ? 1 : 0;
+      try {
+        await fetch(SL_BRIDGE_URL + "/utilities/late-fee", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body:
+            "unit=" + encodeURIComponent(unit) +
+            "&amount=" + encodeURIComponent(amount)
+        });
 
-  try
-  {
-    await fetch(
-      SL_BRIDGE_URL +
-      "/utilities/set-settings",
-      {
-        method: "POST",
+        setTimeout(function() {
+          var syncImg = new Image();
+          syncImg.src =
+            SL_BRIDGE_URL +
+            "?action=syncUtilityBill" +
+            "&unit=" + encodeURIComponent(unit) +
+            "&t=" + Date.now();
 
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
+          loadUtilities();
+        }, 800);
 
-        body:
-          "unit=" +
-          encodeURIComponent(unit) +
-
-          "&cost=" +
-          encodeURIComponent(cost) +
-
-          "&cycle=" +
-          encodeURIComponent(cycle) +
-
-          "&allowCustom=" +
-          encodeURIComponent(allowCustom)
+        showToast("Late fee added");
+      } catch(e) {
+        console.log(e);
+        showToast("Late fee failed");
       }
-    );
+    }
 
-    showToast(
-      "Utility settings saved"
-    );
+    async function loadUtilities() {
+      try {
+        const unitRes = await fetch(SL_BRIDGE_URL + "/units?t=" + Date.now());
+        let units = await unitRes.json();
+        units = units.filter(u => u.unit && u.unit !== "APT-TEST");
+        units.sort((a, b) => a.unit.localeCompare(b.unit));
 
-    loadUtilities();
-  }
-  catch(e)
-  {
-    console.log(e);
+        const container = document.getElementById('utilities-content');
+        const sync = document.getElementById('util-last-sync');
 
-    showToast(
-      "Failed to save settings"
-    );
-  }
-}
+        if (units.length === 0) {
+          container.innerHTML = '<div style="color:#999;text-align:center;padding:40px;">No units found. Click Scan Nearby.</div>';
+          return;
+        }
 
-function generateUtilityBill(unit)
-{
-  showToast("Generating utility bill");
+        const enriched = await Promise.all(units.map(async function(u) {
+          try {
+            const res = await fetch(SL_BRIDGE_URL + "/utilities?unit=" + encodeURIComponent(u.unit) + "&t=" + Date.now());
+            const util = await res.json();
+            const utility = util.utility || {};
 
-  var img = new Image();
+            u.utilityCost = utility.cost || utility.utilityCost || 0;
+            u.utilityBalance = utility.balance || u.utilityBalance || 0;
+            u.cycle = utility.cycle || "weekly";
+            u.allowCustom = !!utility.allowCustom;
+            u.utilityStatus = utility.status || ((u.utilityBalance || 0) > 0 ? "Unpaid" : "Paid");
+          } catch(e) {}
 
-  img.src =
-    SL_BRIDGE_URL +
-    "/utilities/bill-get" +
-    "?unit=" +
-    encodeURIComponent(unit) +
-    "&t=" +
-    Date.now();
+          return u;
+        }));
 
-  setTimeout(function() {
-    var syncImg = new Image();
+        const utilTypes = ["electric", "water", "internet", "gas"];
+        const meterKeys = { electric: "electricMeter", water: "waterMeter", internet: "internetMeter", gas: "gasMeter" };
+        let alerts = 0;
+        let html = "";
 
-    syncImg.src =
-      SL_BRIDGE_URL +
-      "?action=syncUtilityBill" +
-      "&unit=" +
-      encodeURIComponent(unit) +
-      "&t=" +
-      Date.now();
+        enriched.forEach(function(u) {
+          html += '<div class="unit-section">';
+          html += '<div class="unit-section-title"><span>' + u.unit + '</span>';
+          if (u.tenant && u.tenant !== "Vacant") html += '<span style="color:#999;font-size:13px;font-weight:400;">· ' + u.tenant + '</span>';
+          html += '</div>';
 
-    loadUtilities();
-  }, 1200);
-}
+          utilTypes.forEach(function(type) {
+            var active = u[type];
+            var meter = u[meterKeys[type]];
+            if (active === undefined) active = 1;
+            if (meter === undefined) meter = 100;
+            if (!active) alerts++;
 
-async function addLateFee(unit)
-{
-  const amount =
-    prompt(
-      "Enter late fee amount:"
-    );
+            var meterColor = getMeterColor(meter);
+            var statusLabel = active ? '<span class="pill" style="font-size:11px;">ON</span>' : '<span class="pill off" style="font-size:11px;">OFF</span>';
 
-  if (!amount) return;
-
-  try
-  {
-    await fetch(
-      SL_BRIDGE_URL +
-      "/utilities/late-fee",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
-
-        body:
-          "unit=" +
-          encodeURIComponent(unit) +
-
-          "&amount=" +
-          encodeURIComponent(amount)
-      }
-    );
-
-    showToast(
-      "Late fee added"
-    );
-
-    loadUtilities();
-  }
-  catch(e)
-  {
-    console.log(e);
-
-    showToast(
-      "Late fee failed"
-    );
-  }
-}
-
-    function loadUtilities() {
-      fetch(SL_BRIDGE_URL + "/units")
-        .then(r => r.json())
-        .then(data => {
-          var units = data.filter(u => u.unit && u.unit !== "APT-TEST");
-          units.sort((a, b) => a.unit.localeCompare(b.unit));
-
-          var container = document.getElementById('utilities-content');
-          var sync = document.getElementById('util-last-sync');
-
-          if (units.length === 0) {
-            container.innerHTML = '<div style="color:#999;text-align:center;padding:40px;">No units found. Click Scan Terminals.</div>';
-            return;
-          }
-
-          var utilTypes = ["electric", "water", "internet", "gas"];
-          var meterKeys = { electric: "electricMeter", water: "waterMeter", internet: "internetMeter", gas: "gasMeter" };
-          var alerts = 0;
-          var html = "";
-          var utilityData = {};
-
-          units.forEach(function(u) {
-            html += '<div class="unit-section">';
-            html += '<div class="unit-section-title"><span>' + u.unit + '</span>';
-            if (u.tenant && u.tenant !== "Vacant") html += '<span style="color:#999;font-size:13px;font-weight:400;">· ' + u.tenant + '</span>';
-            html += '</div>';
-
-            utilTypes.forEach(function(type) {
-              var active = u[type];
-              var meter = u[meterKeys[type]];
-              if (active === undefined) active = 1;
-              if (meter === undefined) meter = 100;
-              if (!active) alerts++;
-
-              var meterColor = getMeterColor(meter);
-              var statusLabel = active ? '<span class="pill" style="font-size:11px;">ON</span>' : '<span class="pill off" style="font-size:11px;">OFF</span>';
-
-              html += '<div class="util-card">';
-              html += '<div class="util-header">';
-              html += '<div class="util-name">' + utilIcon(type) + ' ' + type.charAt(0).toUpperCase() + type.slice(1) + '</div>';
-              html += '<div style="display:flex;align-items:center;gap:10px;">' + statusLabel;
-              html += '<button class="util-btn ' + (active ? 'off' : 'on') + '" onclick="toggleUtility(\'' + u.unit + '\',\'' + type + '\',\'' + (active ? 'off' : 'on') + '\')">' + (active ? 'Shut Off' : 'Restore') + '</button>';
-              html += '</div></div>';
-              html += '<div style="display:flex;justify-content:space-between;font-size:12px;color:#999;margin-bottom:4px;"><span>Meter</span><span style="color:' + meterColor + ';">' + meter + '%</span></div>';
-              html += '<div class="meter-bar"><div class="meter-fill" style="width:' + meter + '%;background:' + meterColor + ';"></div></div>';
-              html += '</div>';
-            });
-
-        html += `
-        <div style="
-          margin-top:12px;
-          padding-top:12px;
-          border-top:1px solid rgba(255,255,255,0.06);
-        ">
-        
-          <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:8px;
-          ">
-            <div style="font-size:13px;color:#ccc;">
-              Utility Billing
-            </div>
-        
-            <div class="${
-              (u.utilityBalance || 0) > 0
-                ? 'pill warn'
-                : 'pill'
-            }">
-              ${
-                (u.utilityBalance || 0) > 0
-                  ? 'UNPAID'
-                  : 'PAID'
-              }
-            </div>
-          </div>
-        
-          <div style="
-            color:#ffbe55;
-            font-size:13px;
-            margin-bottom:10px;
-          ">
-            Balance: L$${u.utilityBalance || 0}
-          </div>
-        
-          <div style="
-            display:flex;
-            gap:8px;
-            margin-bottom:8px;
-          ">html += `
-<div style="
-  margin-top:14px;
-  padding-top:14px;
-  border-top:1px solid rgba(255,255,255,0.06);
-">
-
-  <div style="
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:10px;
-  ">
-    <div style="
-      font-size:13px;
-      font-weight:700;
-      color:#fff;
-      letter-spacing:0.5px;
-    ">
-      Utility Billing
-    </div>
-
-    <div class="${
-      (u.utilityBalance || 0) > 0
-        ? 'pill warn'
-        : 'pill'
-    }">
-      ${
-        (u.utilityBalance || 0) > 0
-          ? 'UNPAID'
-          : 'PAID'
-      }
-    </div>
-  </div>
-
-  <div style="
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-bottom:10px;
-  ">
-
-    <div>
-      <div style="
-        font-size:11px;
-        color:#888;
-        margin-bottom:4px;
-      ">
-        Utility Cost
-      </div>
-
-      <input
-        id="utilityCost_${u.unit}"
-        type="number"
-        value="${u.utilityCost || 0}"
-        style="
-          width:100%;
-          background:#111318;
-          border:1px solid rgba(255,255,255,0.08);
-          border-radius:10px;
-          color:#fff;
-          padding:9px;
-          font-size:12px;
-        "
-      />
-    </div>
-
-    <div>
-      <div style="
-        font-size:11px;
-        color:#888;
-        margin-bottom:4px;
-      ">
-        Billing Cycle
-      </div>
-
-      <select
-        id="utilityCycle_${u.unit}"
-        style="
-          width:100%;
-          background:#111318;
-          border:1px solid rgba(255,255,255,0.08);
-          border-radius:10px;
-          color:#fff;
-          padding:9px;
-          font-size:12px;
-        "
-      >
-        <option value="weekly"
-          ${(u.cycle || "weekly") === "weekly" ? "selected" : ""}
-        >
-          Weekly
-        </option>
-
-        <option value="monthly"
-          ${(u.cycle || "weekly") === "monthly" ? "selected" : ""}
-        >
-          Monthly
-        </option>
-      </select>
-    </div>
-
-  </div>
-
-  <div style="
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:12px;
-    padding:10px;
-    border-radius:12px;
-    background:rgba(255,255,255,0.03);
-  ">
-
-    <div>
-      <div style="
-        font-size:12px;
-        color:#fff;
-        margin-bottom:2px;
-      ">
-        Allow Partial Payments
-      </div>
-
-      <div style="
-        font-size:11px;
-        color:#888;
-      ">
-        Residents can pay toward balance
-      </div>
-    </div>
-
-    <input
-      type="checkbox"
-      id="utilityCustom_${u.unit}"
-      ${(u.allowCustom ? "checked" : "")}
-    />
-  </div>
-
-  <div style="
-    color:#ffbe55;
-    font-size:13px;
-    margin-bottom:12px;
-  ">
-    Current Balance: L$${u.utilityBalance || 0}
-  </div>
-
-  <div style="
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-  ">
-
-    <button
-      class="util-btn on"
-      onclick="saveUtilitySettings('${u.unit}')"
-    >
-      Save Settings
-    </button>
-
-    <button
-      class="util-btn on"
-      onclick="generateUtilityBill('${u.unit}')"
-    >
-      Generate Bill
-    </button>
-
-    <button
-      class="util-btn off"
-      onclick="addLateFee('${u.unit}')"
-    >
-      Add Late Fee
-    </button>
-
-  </div>
-</div>
-`;
-
+            html += '<div class="util-card">';
+            html += '<div class="util-header">';
+            html += '<div class="util-name">' + utilIcon(type) + ' ' + type.charAt(0).toUpperCase() + type.slice(1) + '</div>';
+            html += '<div style="display:flex;align-items:center;gap:10px;">' + statusLabel;
+            html += '<button class="util-btn ' + (active ? 'off' : 'on') + '" onclick="toggleUtility(\'' + u.unit + '\',\'' + type + '\',\'' + (active ? 'off' : 'on') + '\')">' + (active ? 'Shut Off' : 'Restore') + '</button>';
+            html += '</div></div>';
+            html += '<div style="display:flex;justify-content:space-between;font-size:12px;color:#999;margin-bottom:4px;"><span>Meter</span><span style="color:' + meterColor + ';">' + meter + '%</span></div>';
+            html += '<div class="meter-bar"><div class="meter-fill" style="width:' + meter + '%;background:' + meterColor + ';"></div></div>';
             html += '</div>';
           });
 
-          container.innerHTML = html;
+          html += `
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.5px;">Utility Billing</div>
+                <div class="${(u.utilityBalance || 0) > 0 ? 'pill warn' : 'pill'}">
+                  ${(u.utilityBalance || 0) > 0 ? 'UNPAID' : 'PAID'}
+                </div>
+              </div>
 
-          var now = new Date();
-          if (sync) sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div>
+                  <div style="font-size:11px;color:#888;margin-bottom:4px;">Utility Cost</div>
+                  <input id="utilityCost_${u.unit}" type="number" value="${u.utilityCost || 0}" style="width:100%;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;padding:9px;font-size:12px;" />
+                </div>
 
-          var utilEl = document.getElementById('stat-util-alerts');
-          if (utilEl) utilEl.textContent = alerts;
-        })
-        .catch(function() {
-          document.getElementById('utilities-content').innerHTML = '<div style="color:#f55;text-align:center;padding:40px;">Failed to load utility data.</div>';
+                <div>
+                  <div style="font-size:11px;color:#888;margin-bottom:4px;">Billing Cycle</div>
+                  <select id="utilityCycle_${u.unit}" style="width:100%;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;padding:9px;font-size:12px;">
+                    <option value="weekly" ${(u.cycle || "weekly") === "weekly" ? "selected" : ""}>Weekly</option>
+                    <option value="monthly" ${(u.cycle || "weekly") === "monthly" ? "selected" : ""}>Monthly</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:10px;border-radius:12px;background:rgba(255,255,255,0.03);">
+                <div>
+                  <div style="font-size:12px;color:#fff;margin-bottom:2px;">Allow Partial Payments</div>
+                  <div style="font-size:11px;color:#888;">Residents can pay toward balance</div>
+                </div>
+
+                <input type="checkbox" id="utilityCustom_${u.unit}" ${u.allowCustom ? "checked" : ""} />
+              </div>
+
+              <div style="color:#ffbe55;font-size:13px;margin-bottom:12px;">
+                Current Balance: L$${u.utilityBalance || 0}
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <button class="util-btn on" onclick="saveUtilitySettings('${u.unit}')">Save Settings</button>
+                <button class="util-btn on" onclick="generateUtilityBill('${u.unit}')">Generate Bill</button>
+                <button class="util-btn off" onclick="addLateFee('${u.unit}')">Add Late Fee</button>
+              </div>
+            </div>
+          `;
+
+          html += '</div>';
         });
+
+        container.innerHTML = html;
+
+        const now = new Date();
+        if (sync) sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+        const utilEl = document.getElementById('stat-util-alerts');
+        if (utilEl) utilEl.textContent = alerts;
+      } catch(e) {
+        console.log(e);
+        document.getElementById('utilities-content').innerHTML = '<div style="color:#f55;text-align:center;padding:40px;">Failed to load utility data.</div>';
+      }
     }
 
     function loadUnits() {
-      fetch(SL_BRIDGE_URL + "/units")
+      fetch(SL_BRIDGE_URL + "/units?t=" + Date.now())
         .then(r => r.json())
         .then(data => {
           var units = data.filter(u => u.unit && u.unit !== "APT-TEST");
@@ -756,7 +491,7 @@ async function addLateFee(unit)
           var list = document.getElementById('units-list');
           var sync = document.getElementById('units-last-sync');
 
-          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Type</div><div>Amount</div><div>Date</div></div>';
+          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>';
 
           if (units.length === 0) {
             list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No units found.</div></div>';
@@ -797,13 +532,13 @@ async function addLateFee(unit)
     }
 
     function loadPayments() {
-      fetch(SL_BRIDGE_URL + "/payments")
+      fetch(SL_BRIDGE_URL + "/payments?t=" + Date.now())
         .then(r => r.json())
         .then(data => {
           var list = document.getElementById('payments-list');
           var sync = document.getElementById('payments-last-sync');
 
-          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Amount</div><div>Date</div></div>';
+          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Type</div><div>Amount</div><div>Date</div></div>';
 
           if (data.length === 0) {
             list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No payments recorded yet.</div></div>';
@@ -812,13 +547,13 @@ async function addLateFee(unit)
               var date = new Date(p.timestamp * 1000);
               var dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
               list.innerHTML +=
-              '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">' +
-              '<div>' + p.unit + '</div>' +
-              '<div>' + (p.tenant || "Unknown") + '</div>' +
-              '<div><span class="pill warn">' + (p.type || "rent") + '</span></div>' +
-              '<div style="color:#5dff91;">L$' + p.amount + '</div>' +
-              '<div style="color:#999;font-size:12px;">' + dateStr + '</div>' +
-              '</div>';
+                '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">' +
+                '<div>' + p.unit + '</div>' +
+                '<div>' + (p.tenant || "Unknown") + '</div>' +
+                '<div><span class="pill warn">' + (p.type || "rent") + '</span></div>' +
+                '<div style="color:#5dff91;">L$' + p.amount + '</div>' +
+                '<div style="color:#999;font-size:12px;">' + dateStr + '</div>' +
+                '</div>';
             });
           }
 
@@ -828,88 +563,83 @@ async function addLateFee(unit)
     }
 
     function updateMaintenanceTicket(id, status) {
-  fetch(SL_BRIDGE_URL + "/maintenance/update", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body:
-      "id=" + encodeURIComponent(id) +
-      "&status=" + encodeURIComponent(status)
-  })
-  .then(function(r) { return r.json(); })
-  .then(function() {
-    showToast("Ticket updated: " + status);
-    loadMaintenance();
-  })
-  .catch(function() {
-    showToast("Ticket update failed");
-  });
-}
-
-function loadMaintenance() {
-  fetch(SL_BRIDGE_URL + "/maintenance?t=" + Date.now())
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var list = document.getElementById('maintenance-list');
-      var sync = document.getElementById('maintenance-last-sync');
-      var open = document.getElementById('maintenance-open');
-      var latest = document.getElementById('maintenance-latest');
-      var latestSub = document.getElementById('maintenance-latest-sub');
-
-      if (!list) return;
-
-      list.innerHTML =
-        '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr 1.4fr;">' +
-        '<div>Unit</div><div>Tenant</div><div>Issue</div><div>Status</div><div>Actions</div></div>';
-
-      if (!data || data.length === 0) {
-        list.innerHTML +=
-          '<div class="row" style="grid-template-columns:1fr;">' +
-          '<div style="color:#999;">No maintenance tickets yet.</div></div>';
-
-        if (open) open.textContent = "0";
-        if (latest) latest.textContent = "--";
-        if (latestSub) latestSub.textContent = "Waiting for activity";
-        return;
-      }
-
-      var pending = data.filter(function(t) {
-        return t.status === "Pending" || t.status === "In Progress";
+      fetch(SL_BRIDGE_URL + "/maintenance/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body:
+          "id=" + encodeURIComponent(id) +
+          "&status=" + encodeURIComponent(status)
+      })
+      .then(function(r) { return r.json(); })
+      .then(function() {
+        showToast("Ticket updated: " + status);
+        loadMaintenance();
+      })
+      .catch(function() {
+        showToast("Ticket update failed");
       });
+    }
 
-      if (open) open.textContent = pending.length;
+    function loadMaintenance() {
+      fetch(SL_BRIDGE_URL + "/maintenance?t=" + Date.now())
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var list = document.getElementById('maintenance-list');
+          var sync = document.getElementById('maintenance-last-sync');
+          var open = document.getElementById('maintenance-open');
+          var latest = document.getElementById('maintenance-latest');
+          var latestSub = document.getElementById('maintenance-latest-sub');
 
-      var first = data[0];
-      if (latest) latest.textContent = first.type || "Issue";
-      if (latestSub) latestSub.textContent = (first.unit || "Unit") + " · " + (first.tenant || "Resident");
+          if (!list) return;
 
-      data.forEach(function(t) {
-        var statusClass = t.status === "Completed" ? "pill" : "pill warn";
+          list.innerHTML =
+            '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr 1.4fr;">' +
+            '<div>Unit</div><div>Tenant</div><div>Issue</div><div>Status</div><div>Actions</div></div>';
 
-        list.innerHTML +=
-          '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr 1.4fr;">' +
-          '<div>' + (t.unit || "--") + '</div>' +
-          '<div>' + (t.tenant || "Resident") + '</div>' +
-          '<div>' + (t.type || "general") + '</div>' +
-          '<div><span class="' + statusClass + '">' + (t.status || "Pending") + '</span></div>' +
-          '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-          '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + t.id + '\',\'In Progress\')">Start</button>' +
-          '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + t.id + '\',\'Completed\')">Done</button>' +
-          '</div>' +
-          '</div>';
-      });
+          if (!data || data.length === 0) {
+            list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No maintenance tickets yet.</div></div>';
+            if (open) open.textContent = "0";
+            if (latest) latest.textContent = "--";
+            if (latestSub) latestSub.textContent = "Waiting for activity";
+            return;
+          }
 
-      var now = new Date();
-      if (sync) sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    })
-    .catch(function() {
-      var list = document.getElementById('maintenance-list');
-      if (list) {
-        list.innerHTML =
-          '<div class="row" style="grid-template-columns:1fr;">' +
-          '<div style="color:#f55;">Failed to load maintenance tickets.</div></div>';
-      }
-    });
-}
+          var pending = data.filter(function(t) {
+            return t.status === "Pending" || t.status === "In Progress";
+          });
+
+          if (open) open.textContent = pending.length;
+
+          var first = data[0];
+          if (latest) latest.textContent = first.type || "Issue";
+          if (latestSub) latestSub.textContent = (first.unit || "Unit") + " · " + (first.tenant || "Resident");
+
+          data.forEach(function(t) {
+            var statusClass = t.status === "Completed" ? "pill" : "pill warn";
+
+            list.innerHTML +=
+              '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr 1.4fr;">' +
+              '<div>' + (t.unit || "--") + '</div>' +
+              '<div>' + (t.tenant || "Resident") + '</div>' +
+              '<div>' + (t.type || "general") + '</div>' +
+              '<div><span class="' + statusClass + '">' + (t.status || "Pending") + '</span></div>' +
+              '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+              '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + t.id + '\',\'In Progress\')">Start</button>' +
+              '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + t.id + '\',\'Completed\')">Done</button>' +
+              '</div>' +
+              '</div>';
+          });
+
+          var now = new Date();
+          if (sync) sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        })
+        .catch(function() {
+          var list = document.getElementById('maintenance-list');
+          if (list) {
+            list.innerHTML = '<div class="row" style="grid-template-columns:1fr;"><div style="color:#f55;">Failed to load maintenance tickets.</div></div>';
+          }
+        });
+    }
 
     navButtons.forEach(function(btn) {
       btn.addEventListener('click', function() { setPage(btn.dataset.page); });
