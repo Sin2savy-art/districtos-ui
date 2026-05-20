@@ -139,6 +139,11 @@
           </div>
         </section>
 
+        <button class="action" onclick="runUtilityCycle()" style="margin-bottom:18px;">
+          <strong>Run Billing Cycle</strong>
+          <span>Apply weekly/monthly utility charges.</span>
+        </button>
+
         <section id="doors" class="page">
           <div class="page-title"><div><h2>Door Network</h2><p>Pair, sync, and recover access devices.</p></div><div class="pill">Access Grid</div></div>
           <div class="action-row">
@@ -324,6 +329,21 @@
 
         loadUtilities();
       }, 1200);
+    }
+
+    function runUtilityCycle()
+    {
+      showToast("Running utility billing cycle");
+    
+      fetch(SL_BRIDGE_URL + "/utilities/run-cycle?t=" + Date.now())
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          showToast("Billing cycle updated " + data.updated.length + " unit(s)");
+          loadUtilities();
+        })
+        .catch(function() {
+          showToast("Billing cycle failed");
+        });
     }
 
     async function addLateFee(unit) {
