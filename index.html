@@ -126,6 +126,12 @@
             <div><h2>Units</h2><p>Apartment registry and lease status.</p></div>
             <div class="pill warn" id="units-last-sync">Not synced</div>
           </div>
+
+          <button class="action" onclick="sendLeaseWarnings()" style="margin-bottom:18px;">
+            <strong>Send Lease Warnings</strong>
+            <span>Notify residents with expired or ending leases.</span>
+          </button>
+          
           <div class="list" id="units-list"></div>
         </section>
 
@@ -410,6 +416,21 @@ function runUtilityCycle()
         })
         .catch(function() {
           showToast("Warning send failed");
+        });
+    }
+
+    function sendLeaseWarnings()
+    {
+      showToast("Sending lease warnings");
+    
+      fetch(SL_BRIDGE_URL + "/lease/warnings?t=" + Date.now())
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          showToast("Lease warnings sent to " + data.created.length + " unit(s)");
+          loadUnits();
+        })
+        .catch(function() {
+          showToast("Lease warning send failed");
         });
     }
 
