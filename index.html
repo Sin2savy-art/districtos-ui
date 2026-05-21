@@ -143,6 +143,12 @@
           <div id="utilities-content">
             <div style="color:#999;text-align:center;padding:40px;">Loading utility data...</div>
           </div>
+
+            <button class="action" onclick="runUtilityShutoff()" style="margin-bottom:18px;">
+          <strong>Run Utility Shutoff</strong>
+          <span>Disable utilities for overdue balances.</span>
+        </button>
+          
                   <button class="action" onclick="runUtilityCycle()" style="margin-bottom:18px;">
           <strong>Run Billing Cycle</strong>
           <span>Apply weekly/monthly utility charges.</span>
@@ -556,6 +562,34 @@ function runUtilityCycle()
         console.log(e);
         document.getElementById('utilities-content').innerHTML = '<div style="color:#f55;text-align:center;padding:40px;">Failed to load utility data.</div>';
       }
+    }
+
+    function runUtilityShutoff()
+    {
+      showToast("Checking overdue utility shutoffs");
+    
+      fetch(SL_BRIDGE_URL + "/utilities/shutoff?t=" + Date.now())
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          showToast("Utilities shut off for " + data.shutoffs.length + " unit(s)");
+    
+          data.shutoffs.forEach(function(unit) {
+            var img = new Image();
+    
+            img.src =
+              SL_BRIDGE_URL +
+              "?action=syncUtilityBill" +
+              "&unit=" +
+              encodeURIComponent(unit) +
+              "&t=" +
+              Date.now();
+          });
+    
+          loadUtilities();
+        })
+        .catch(function() {
+          showToast("Utility shutoff check failed");
+        });
     }
 
     function loadUnits() {
