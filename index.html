@@ -34,7 +34,7 @@
     .card::after { content: ""; position: absolute; top: -40%; right: -40%; width: 90%; height: 90%; background: radial-gradient(circle, rgba(255,55,30,0.18), transparent 60%); pointer-events: none; }
     .card label { display: block; color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 12px; }
     .stat { font-size: 31px; font-weight: 900; }
-    .sub { color: #9c9c9c; font-size: 13px; margin-top: 7px; }
+    .sub { color: #9c9c9c; font-size: 13px; margin-top: 7px; line-height: 1.45; }
     .wide { grid-column: span 2; }
     .action-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 22px; }
     .action { border: 1px solid rgba(255,70,45,0.35); background: linear-gradient(135deg, rgba(255,43,22,0.22), rgba(255,255,255,0.035)); color: #fff; border-radius: 22px; padding: 18px 16px; cursor: pointer; min-height: 92px; transition: 0.16s ease; text-align: left; }
@@ -51,7 +51,7 @@
     .toast { position: absolute; right: 3.2%; bottom: 4%; min-width: 280px; background: rgba(10,10,12,0.92); border: 1px solid rgba(255,70,45,0.38); border-radius: 18px; padding: 14px 18px; box-shadow: 0 0 28px rgba(255,42,22,0.16); transform: translateY(130%); opacity: 0; transition: 0.22s ease; color: #fff; font-size: 14px; z-index: 100; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .muted { color: #999; }
-    .coming { height: 55vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08); border-radius: 30px; background: rgba(255,255,255,0.035); text-align: center; }
+    .coming { min-height: 38vh; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.08); border-radius: 30px; background: rgba(255,255,255,0.035); text-align: center; }
     .coming h3 { font-size: 32px; margin: 0 0 10px; }
     .meter-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; margin-top: 8px; overflow: hidden; }
     .meter-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
@@ -81,9 +81,7 @@
       <div class="status">
         <div><span class="dot"></span>GRID ONLINE</div>
         <div id="clock">--:--</div>
-        <div id="selected-unit-display" class="pill warn">
-          No Unit Selected
-        </div>
+        <div id="selected-unit-display" class="pill warn">No Unit Selected</div>
       </div>
     </div>
 
@@ -103,7 +101,10 @@
       <main class="content">
         <section id="dashboard" class="page active">
           <div class="page-title">
-            <div><h2>Building Overview</h2><p>Smart housing network status and quick controls.</p></div>
+            <div>
+              <h2>Building Overview</h2>
+              <p>Smart housing network status and selected-unit controls.</p>
+            </div>
             <div class="pill">Medium RP Preset</div>
           </div>
 
@@ -115,36 +116,29 @@
             <div class="card wide"><label>System Feed</label><div id="system-feed"><div class="sub" style="color:#999;">Loading...</div></div></div>
             <div class="card wide"><label>District Health</label><div class="stat" id="stat-health">--</div><div class="sub" id="stat-health-sub">Fetching...</div></div>
             <div class="card wide"><label>Selected Unit</label><div class="stat" id="selected-unit-card">None</div><div class="sub" id="selected-unit-sub">Click a unit in the Units tab.</div></div>
-            <div class="card wide">
-              <label>Last Action</label>
-              <div class="stat" id="last-action-card">Idle</div>
-              <div class="sub" id="last-action-sub">
-                No recent landlord actions.
-              </div>
-            </div>
-
+            <div class="card wide"><label>Last Action</label><div class="stat" id="last-action-card">Idle</div><div class="sub" id="last-action-sub">No recent landlord actions.</div></div>
           </div>
 
           <div class="action-row">
-              <button class="action" data-action="syncDoors">
-                <strong>Sync Selected Unit</strong>
-                <span>Push selected unit data to doors and mailboxes.</span>
-              </button>
-              
-              <button class="action" data-action="autoAssign">
-                <strong>Auto Assign Objects</strong>
-                <span>Bind nearby unpaired objects to selected unit.</span>
-              </button>
-              
-              <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
-                <strong>Lock Unit</strong>
-                <span>Disable resident access for selected unit.</span>
-              </button>
-              
-              <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
-                <strong>Unlock Unit</strong>
-                <span>Restore resident access for selected unit.</span>
-              </button>
+            <button class="action" data-action="syncDoors">
+              <strong>Sync Unit</strong>
+              <span>Push access and mailbox data.</span>
+            </button>
+
+            <button class="action" data-action="autoAssign">
+              <strong>Auto Assign</strong>
+              <span>Bind nearby objects to selected unit.</span>
+            </button>
+
+            <button class="action" id="dynamic-lock-btn" onclick="toggleSelectedLock()">
+              <strong id="dynamic-lock-title">Lock Unit</strong>
+              <span id="dynamic-lock-sub">Disable selected unit access.</span>
+            </button>
+
+            <button class="action" onclick="resetSelectedTenant()">
+              <strong>Clear Lease</strong>
+              <span>Reset tenant and access.</span>
+            </button>
           </div>
         </section>
 
@@ -154,86 +148,64 @@
             <div class="pill warn" id="units-last-sync">Not synced</div>
           </div>
 
-          <button class="action" onclick="sendLeaseWarnings()" style="margin-bottom:18px;">
-            <strong>Send Lease Warnings</strong>
-            <span>Notify residents with expired or ending leases.</span>
-          </button>
+          <div class="action-row" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 18px;">
+            <button class="action" onclick="sendLeaseWarnings()">
+              <strong>Send Lease Warnings</strong>
+              <span>Notify residents with expired or ending leases.</span>
+            </button>
 
-          <button class="action" onclick="resetSelectedTenant()" style="margin-bottom:18px;">
-            <strong>Reset Selected Tenant</strong>
-            <span>Clear lease/access for the selected unit.</span>
-          </button>
-          
+            <button class="action" onclick="resetSelectedTenant()">
+              <strong>Clear Selected Lease</strong>
+              <span>Reset tenant and access for the selected unit.</span>
+            </button>
+          </div>
+
           <div class="list" id="units-list"></div>
         </section>
 
         <section id="utilities" class="page">
           <div class="page-title">
-            <div><h2>Utilities</h2><p>Smart meter status and service controls per unit.</p></div>
+            <div><h2>Utilities</h2><p>Smart meter status and billing controls per unit.</p></div>
             <div class="pill warn" id="util-last-sync">Not synced</div>
           </div>
+
+          <div class="action-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 18px;">
+            <button class="action" onclick="runUtilityCycle()">
+              <strong>Generate Utility Charges</strong>
+              <span>Apply weekly/monthly utility charges.</span>
+            </button>
+
+            <button class="action" onclick="sendUtilityWarnings()">
+              <strong>Send Payment Warnings</strong>
+              <span>Notify residents with unpaid balances.</span>
+            </button>
+
+            <button class="action" onclick="runUtilityShutoff()">
+              <strong>Enforce Utility Shutoff</strong>
+              <span>Disable utilities for overdue balances.</span>
+            </button>
+          </div>
+
           <div id="utilities-content">
             <div style="color:#999;text-align:center;padding:40px;">Loading utility data...</div>
           </div>
-
-            <button class="action" onclick="runUtilityShutoff()" style="margin-bottom:18px;">
-          <strong>Enforce Utility Shutoff</strong>
-          <span>Disable utilities for overdue balances.</span>
-        </button>
-          
-                  <button class="action" onclick="runUtilityCycle()" style="margin-bottom:18px;">
-          <strong>Generate Utility Charges</strong>
-          <span>Apply weekly/monthly utility charges.</span>
-        </button>
-
-          <button class="action" onclick="sendUtilityWarnings()" style="margin-bottom:18px;">
-      <strong>Send Payment Warnings</strong>
-      <span>Notify residents with unpaid balances.</span>
-    </button>
-          
         </section>
 
-
         <section id="doors" class="page">
-          <div class="page-title"><div><h2>Door Network</h2><p>Pair, sync, and recover access devices.</p></div><div class="pill">Access Grid</div></div>
-          <div class="action-row">
-                  <div class="action-row">
-                    <button class="action" data-action="syncDoors">
-                      <strong>Sync Selected Unit</strong>
-                      <span>Repair selected unit door/mailbox sync.</span>
-                    </button>
-                  
-                    <button class="action" data-action="autoAssign">
-                      <strong>Auto Assign Objects</strong>
-                      <span>Bind unpaired objects to selected unit.</span>
-                    </button>
-                  
-                    <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
-                      <strong>Lock Unit</strong>
-                      <span>Disable selected unit access.</span>
-                    </button>
-                  
-                    <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
-                      <strong>Unlock Unit</strong>
-                      <span>Restore selected unit access.</span>
-                    </button>
-                  </div>
-            <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
-              <strong>Lock Unit</strong>
-              <span>Disable resident access for selected unit.</span>
-            </button>
-            
-            <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
-              <strong>Unlock Unit</strong>
-              <span>Restore resident access.</span>
-            </button>
-            
-            <button class="action" onclick="resetSelectedTenant()">
-              <strong>Clear Selected Lease</strong>
-              <span>Reset tenant and access for selected unit.</span>
-            </button>
+          <div class="page-title">
+            <div>
+              <h2>Door Network</h2>
+              <p>Door devices receive commands from the selected-unit dashboard controls.</p>
+            </div>
+            <div class="pill">Access Grid</div>
           </div>
-          <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Doors respond to Sync All and Auto Assign.</p></div></div>
+
+          <div class="coming">
+            <div>
+              <h3>Door Control Ready</h3>
+              <p class="muted">Use Dashboard → Sync Unit or Auto Assign to manage selected-unit doors and mailboxes.</p>
+            </div>
+          </div>
         </section>
 
         <section id="payments" class="page">
@@ -258,187 +230,66 @@
           <div class="list" id="maintenance-list"></div>
         </section>
 
-    <section id="admins" class="page">
-      <div class="page-title">
-        <div>
-          <h2>Admins</h2>
-          <p>DistrictOS management delegation and ecosystem control.</p>
-        </div>
-    
-        <div class="pill">Management</div>
-      </div>
-    
-      <div class="grid">
-    
-        <div class="card">
-          <label>Primary Owner</label>
-          <div class="stat">ONLINE</div>
-          <div class="sub">Root ecosystem controller</div>
-        </div>
-    
-        <div class="card">
-          <label>Assistant Managers</label>
-          <div class="stat">0</div>
-          <div class="sub">Delegation system coming next</div>
-        </div>
-    
-        <div class="card">
-          <label>Door Network</label>
-          <div class="stat">SYNCED</div>
-          <div class="sub">Access grid operational</div>
-        </div>
-    
-        <div class="card">
-          <label>Mailbox Grid</label>
-          <div class="stat">ONLINE</div>
-          <div class="sub">Resident payment network active</div>
-        </div>
-    
-        <div class="card wide">
-          <label>Delegation System</label>
-          <div class="stat">PLANNED</div>
-          <div class="sub">
-            Future update will allow landlord assistants,
-            maintenance staff, and leasing agents with limited permissions.
-          </div>
-        </div>
-    
-      </div>
-    
-      <div class="action-row">
-    
-        <button
-          class="action"
-          onclick="sendDistrictCommand('scanNearby');"
-        >
-          <strong>Rescan Ecosystem</strong>
-          <span>
-            Recheck nearby terminals, doors, and mailboxes.
-          </span>
-        </button>
-    
-        <button
-          class="action"
-          onclick="loadUnits(); loadUtilities();"
-        >
-          <strong>Refresh Management Data</strong>
-          <span>
-            Reload ecosystem status and occupancy.
-          </span>
-        </button>
-    
-      </div>
-    </section>
-
-        
-        <section id="reports" class="page">
+        <section id="admins" class="page">
           <div class="page-title">
-            <div>
-              <h2>Reports</h2>
-              <p>DistrictOS live building analytics and collection overview.</p>
-            </div>
-        
-            <div class="pill">Analytics</div>
+            <div><h2>Admins</h2><p>DistrictOS management delegation and ecosystem control.</p></div>
+            <div class="pill">Management</div>
           </div>
-        
+
           <div class="grid">
-        
-            <div class="card">
-              <label>Total Units</label>
-              <div class="stat" id="report-total-units">--</div>
-              <div class="sub">Registered in ecosystem</div>
-            </div>
-        
-            <div class="card">
-              <label>Occupied</label>
-              <div class="stat" id="report-occupied">--</div>
-              <div class="sub">Currently leased</div>
-            </div>
-        
-            <div class="card">
-              <label>Vacant</label>
-              <div class="stat" id="report-vacant">--</div>
-              <div class="sub">Available units</div>
-            </div>
-        
-            <div class="card">
-              <label>Expired</label>
-              <div class="stat" id="report-expired">--</div>
-              <div class="sub">Leases needing review</div>
-            </div>
-        
-            <div class="card wide">
-              <label>Collection Status</label>
-              <div class="stat" id="report-collections">--</div>
-              <div class="sub" id="report-collections-sub">
-                Waiting for payment sync
-              </div>
-            </div>
-        
-            <div class="card wide">
-              <label>Utility Exposure</label>
-              <div class="stat" id="report-utility">--</div>
-              <div class="sub">
-                Outstanding utility balances
-              </div>
-            </div>
-        
+            <div class="card"><label>Primary Owner</label><div class="stat">ONLINE</div><div class="sub">Root ecosystem controller</div></div>
+            <div class="card"><label>Assistant Managers</label><div class="stat">0</div><div class="sub">Delegation system coming next</div></div>
+            <div class="card"><label>Door Network</label><div class="stat">SYNCED</div><div class="sub">Access grid operational</div></div>
+            <div class="card"><label>Mailbox Grid</label><div class="stat">ONLINE</div><div class="sub">Resident payment network active</div></div>
+            <div class="card wide"><label>Delegation System</label><div class="stat">PLANNED</div><div class="sub">Future update will allow assistants, maintenance staff, and leasing agents with limited permissions.</div></div>
           </div>
         </section>
-        
+
+        <section id="reports" class="page">
+          <div class="page-title">
+            <div><h2>Reports</h2><p>DistrictOS live building analytics and collection overview.</p></div>
+            <div class="pill">Analytics</div>
+          </div>
+
+          <div class="grid">
+            <div class="card"><label>Total Units</label><div class="stat" id="report-total-units">--</div><div class="sub">Registered in ecosystem</div></div>
+            <div class="card"><label>Occupied</label><div class="stat" id="report-occupied">--</div><div class="sub">Currently leased</div></div>
+            <div class="card"><label>Vacant</label><div class="stat" id="report-vacant">--</div><div class="sub">Available units</div></div>
+            <div class="card"><label>Expired</label><div class="stat" id="report-expired">--</div><div class="sub">Leases needing review</div></div>
+            <div class="card wide"><label>Collection Status</label><div class="stat" id="report-collections">--</div><div class="sub" id="report-collections-sub">Waiting for payment sync</div></div>
+            <div class="card wide"><label>Utility Exposure</label><div class="stat" id="report-utility">--</div><div class="sub">Outstanding utility balances</div></div>
+          </div>
+        </section>
+
         <section id="settings" class="page">
-              <div class="page-title">
-                <div>
-                  <h2>Settings</h2>
-                  <p>DistrictOS system tools and recovery actions.</p>
-                </div>
-            
-                <div class="pill">Hub Tools</div>
-              </div>
-            
-              <div class="action-row">
-            
-                <div class="action-row">
+          <div class="page-title">
+            <div><h2>Settings</h2><p>DistrictOS recovery and tablet memory tools.</p></div>
+            <div class="pill">Hub Tools</div>
+          </div>
 
-  <button
-    class="action"
-    onclick="
-      localStorage.removeItem('districtos_selected_unit');
-      location.reload();
-    "
-  >
-    <strong>Clear Selected Unit</strong>
-    <span>
-      Reset selected-unit memory.
-    </span>
-  </button>
+          <div class="action-row" style="grid-template-columns: repeat(2, 1fr);">
+            <button class="action" onclick="clearSelectedUnit()">
+              <strong>Clear Selected Unit</strong>
+              <span>Reset selected-unit memory.</span>
+            </button>
 
-  <button
-    class="action"
-    onclick="sendDistrictCommand('scanNearby');"
-  >
-    <strong>Recovery Scan</strong>
-    <span>
-      Search for nearby DistrictOS objects.
-    </span>
-  </button>
+            <button class="action" onclick="sendDistrictCommand('scanNearby');">
+              <strong>Recovery Scan</strong>
+              <span>Search for nearby DistrictOS objects.</span>
+            </button>
+          </div>
 
-</div>
-
-                <div class="list" id="scan-results">
-  <div class="row header" style="grid-template-columns:1fr 1fr 1fr;">
-    <div>Object</div>
-    <div>Unit</div>
-    <div>Status</div>
-  </div>
-
-  <div class="row" style="grid-template-columns:1fr;">
-    <div style="color:#999;">Run Scan Nearby Objects to view ecosystem devices.</div>
-  </div>
-</div>
-
-  </div>
-</section>
+          <div class="list" id="scan-results">
+            <div class="row header" style="grid-template-columns:1fr 1fr 1fr;">
+              <div>Object</div>
+              <div>Unit</div>
+              <div>Status</div>
+            </div>
+            <div class="row" style="grid-template-columns:1fr;">
+              <div style="color:#999;">Run Recovery Scan to view ecosystem devices in local chat.</div>
+            </div>
+          </div>
+        </section>
 
         <div id="toast" class="toast">DistrictOS action sent.</div>
       </main>
@@ -455,32 +306,47 @@
 
     let selectedUnit = "";
 
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function jsString(value) {
+      return String(value ?? "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
+
     function setPage(pageId) {
       pages.forEach(p => p.classList.remove('active'));
       navButtons.forEach(b => b.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
-      document.querySelector('[data-page="' + pageId + '"]')?.classList.add('active');
+
+      const page = document.getElementById(pageId);
+      if (page) page.classList.add('active');
+
+      const nav = document.querySelector('[data-page="' + pageId + '"]');
+      if (nav) nav.classList.add('active');
 
       if (pageId === 'units') loadUnits();
       if (pageId === 'payments') loadPayments();
       if (pageId === 'utilities') loadUtilities();
       if (pageId === 'maintenance') loadMaintenance();
+      if (pageId === 'reports') { loadUnits(); loadUtilities(); loadPayments(); }
     }
 
     function showToast(message) {
       toast.textContent = message;
-    
-      document.getElementById(
-        "last-action-card"
-      ).textContent = message;
-    
-      document.getElementById(
-        "last-action-sub"
-      ).textContent =
-        new Date().toLocaleTimeString();
-    
+
+      const actionCard = document.getElementById("last-action-card");
+      const actionSub = document.getElementById("last-action-sub");
+
+      if (actionCard) actionCard.textContent = message;
+      if (actionSub) actionSub.textContent = new Date().toLocaleTimeString();
+
       toast.classList.add('show');
-    
+
       setTimeout(function() {
         toast.classList.remove('show');
       }, 1800);
@@ -488,27 +354,44 @@
 
     function selectTabletUnit(unit) {
       selectedUnit = unit;
-    
+      localStorage.setItem("districtos_selected_unit", unit);
+
       document.getElementById("selected-unit-display").textContent =
         "Selected: " + unit;
-    
+
       document.getElementById("selected-unit-card").textContent =
         unit;
-    
+
       document.getElementById("selected-unit-sub").textContent =
         "Actions will apply to " + unit;
-    
-      showToast("Selected unit: " + unit);
 
-      localStorage.setItem("districtos_selected_unit", unit);
+      showToast("Selected unit: " + unit);
+      loadUnits();
+    }
+
+    function clearSelectedUnit() {
+      localStorage.removeItem("districtos_selected_unit");
+      selectedUnit = "";
+
+      document.getElementById("selected-unit-display").textContent =
+        "No Unit Selected";
+
+      document.getElementById("selected-unit-card").textContent =
+        "None";
+
+      document.getElementById("selected-unit-sub").textContent =
+        "Click a unit in the Units tab.";
+
+      showToast("Selected unit cleared");
+      loadUnits();
     }
 
     function updateSelectedUnitDetails(unitData) {
       if (!unitData) return;
-    
+
       document.getElementById("selected-unit-card").textContent =
         unitData.unit || "None";
-    
+
       let statusText =
         "Tenant: " +
         (unitData.tenant || "Vacant") +
@@ -518,92 +401,64 @@
         (unitData.lease || "--") +
         " • Utilities: L$" +
         (unitData.utilityBalance || 0);
-      
-      if (
-        unitData.locked == "1" ||
-        unitData.locked === 1
-      ) {
+
+      if (unitData.locked == "1" || unitData.locked === 1) {
         statusText += " • LOCKED";
       }
-    
-      document.getElementById(
-        "selected-unit-sub"
-      ).textContent = statusText;
-      
+
+      document.getElementById("selected-unit-sub").textContent = statusText;
+
       updateDynamicLockButton(unitData);
     }
 
-    function toggleSelectedLock() {
-    if (!requireSelectedUnit())
-      return;
-  
-    const isLocked =
-      document
-        .getElementById(
-          "dynamic-lock-title"
-        )
-        .textContent
-        .includes("Unlock");
-  
-    if (isLocked) {
-      unlockSelectedUnit();
-    }
-    else {
-      lockSelectedUnit();
-    }
-  }
-
     function updateDynamicLockButton(unitData) {
-    const title =
-      document.getElementById(
-        "dynamic-lock-title"
-      );
-  
-    const sub =
-      document.getElementById(
-        "dynamic-lock-sub"
-      );
-  
-    if (!title || !sub || !unitData)
-      return;
-  
-    if (
-      unitData.locked == "1" ||
-      unitData.locked === 1
-    ) {
-      title.textContent =
-        "Unlock Unit";
-  
-      sub.textContent =
-        "Restore resident access.";
+      const title = document.getElementById("dynamic-lock-title");
+      const sub = document.getElementById("dynamic-lock-sub");
+
+      if (!title || !sub || !unitData) return;
+
+      if (unitData.locked == "1" || unitData.locked === 1) {
+        title.textContent = "Unlock Unit";
+        sub.textContent = "Restore resident access.";
+      } else {
+        title.textContent = "Lock Unit";
+        sub.textContent = "Disable selected unit access.";
+      }
     }
-    else {
-      title.textContent =
-        "Lock Unit";
-  
-      sub.textContent =
-        "Disable selected unit access.";
+
+    function toggleSelectedLock() {
+      if (!requireSelectedUnit()) return;
+
+      const title = document.getElementById("dynamic-lock-title");
+      const isLocked = title && title.textContent.includes("Unlock");
+
+      if (isLocked) {
+        unlockSelectedUnit();
+      } else {
+        lockSelectedUnit();
+      }
     }
-  }
+
+    function requireSelectedUnit() {
+      if (!selectedUnit) {
+        showToast("Select a unit first");
+        setPage("units");
+        return false;
+      }
+
+      return true;
+    }
 
     function sendDistrictCommand(action, extraParams) {
-      showToast('DistrictOS: ' + action + ' sent');
       var url = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action);
 
-      if (
-        (action === "syncDoors" || action === "autoAssign" || action === "pairDoor") &&
-        !selectedUnit
-      ) {
+      if ((action === "syncDoors" || action === "autoAssign" || action === "pairDoor") && !selectedUnit) {
         showToast("Select a unit first");
         setPage("units");
         return;
       }
-      
-      if (
-        action === "syncDoors" ||
-        action === "autoAssign" ||
-        action === "pairDoor"
-      ) {
+
+      if (action === "syncDoors" || action === "autoAssign" || action === "pairDoor") {
         url += "&unit=" + encodeURIComponent(selectedUnit);
       }
 
@@ -616,10 +471,9 @@
       var img = new Image();
       img.src = url + "&t=" + Date.now();
 
-      if (action === 'pairDoor') setPage('doors');
+      showToast('DistrictOS: ' + action + ' sent');
 
       if (action === 'scanNearby') {
-        showToast('Scanning nearby DistrictOS objects...');
         setTimeout(function() {
           loadUnits();
           loadUtilities();
@@ -628,69 +482,37 @@
       }
 
       if (action === 'autoAssign') {
-        showToast('Auto assign sent to nearby objects');
         setTimeout(function() {
           loadUnits();
           loadUtilities();
         }, 2500);
       }
-
-      if (action === 'scanTerminals') {
-        setTimeout(function() {
-          loadUnits();
-          loadUtilities();
-          loadMaintenance();
-        }, 3000);
-      }
-    }
-
-    function requireSelectedUnit() {
-      if (!selectedUnit) {
-        showToast("Select a unit first");
-        setPage("units");
-        return false;
-      }
-    
-      return true;
     }
 
     function refreshSelectedUnit() {
-    setTimeout(function() {
-      loadUnits();
-      loadUtilities();
-    }, 1200);
-  }
-    
+      setTimeout(function() {
+        loadUnits();
+        loadUtilities();
+      }, 1200);
+    }
+
     function lockSelectedUnit() {
       if (!requireSelectedUnit()) return;
-    
-        sendDistrictCommand("lockUnit", {
-        unit: selectedUnit
-      });
-      
+      sendDistrictCommand("lockUnit", { unit: selectedUnit });
       refreshSelectedUnit();
     }
-    
+
     function unlockSelectedUnit() {
       if (!requireSelectedUnit()) return;
-    
-      sendDistrictCommand("unlockUnit", {
-        unit: selectedUnit
-      });
-
+      sendDistrictCommand("unlockUnit", { unit: selectedUnit });
       refreshSelectedUnit();
     }
-    
+
     function resetSelectedTenant() {
       if (!requireSelectedUnit()) return;
-    
-      if (!confirm("Reset tenant for " + selectedUnit + "?"))
-        return;
-    
-      sendDistrictCommand("resetTenant", {
-        unit: selectedUnit
-      });
+      if (!confirm("Clear lease for " + selectedUnit + "?")) return;
 
+      sendDistrictCommand("resetTenant", { unit: selectedUnit });
       refreshSelectedUnit();
     }
 
@@ -772,35 +594,33 @@
       }, 1200);
     }
 
-function runUtilityCycle()
-{
-  showToast("Running utility billing cycle");
+    function runUtilityCycle() {
+      showToast("Generating utility charges");
 
-  fetch(SL_BRIDGE_URL + "/utilities/run-cycle?t=" + Date.now())
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      showToast("Billing cycle updated " + data.updated.length + " unit(s)");
+      fetch(SL_BRIDGE_URL + "/utilities/run-cycle?t=" + Date.now())
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          showToast("Charges generated for " + data.updated.length + " unit(s)");
 
-      data.updated.forEach(function(u) {
-        var img = new Image();
+          data.updated.forEach(function(u) {
+            var img = new Image();
+            img.src =
+              SL_BRIDGE_URL +
+              "?action=syncUtilityBill" +
+              "&unit=" +
+              encodeURIComponent(u.unit) +
+              "&t=" +
+              Date.now();
+          });
 
-        img.src =
-          SL_BRIDGE_URL +
-          "?action=syncUtilityBill" +
-          "&unit=" +
-          encodeURIComponent(u.unit) +
-          "&t=" +
-          Date.now();
-      });
-
-      setTimeout(function() {
-        loadUtilities();
-      }, 1500);
-    })
-    .catch(function() {
-      showToast("Billing cycle failed");
-    });
-}
+          setTimeout(function() {
+            loadUtilities();
+          }, 1500);
+        })
+        .catch(function() {
+          showToast("Charge generation failed");
+        });
+    }
 
     async function addLateFee(unit) {
       const amount = prompt("Enter late fee amount:");
@@ -833,10 +653,9 @@ function runUtilityCycle()
       }
     }
 
-    function sendUtilityWarnings()
-    {
-      showToast("Sending utility warnings");
-    
+    function sendUtilityWarnings() {
+      showToast("Sending payment warnings");
+
       fetch(SL_BRIDGE_URL + "/utilities/warnings?t=" + Date.now())
         .then(function(r) { return r.json(); })
         .then(function(data) {
@@ -848,10 +667,9 @@ function runUtilityCycle()
         });
     }
 
-    function sendLeaseWarnings()
-    {
+    function sendLeaseWarnings() {
       showToast("Sending lease warnings");
-    
+
       fetch(SL_BRIDGE_URL + "/lease/warnings?t=" + Date.now())
         .then(function(r) { return r.json(); })
         .then(function(data) {
@@ -874,7 +692,7 @@ function runUtilityCycle()
         const sync = document.getElementById('util-last-sync');
 
         if (units.length === 0) {
-          container.innerHTML = '<div style="color:#999;text-align:center;padding:40px;">No units found. Click Scan Nearby.</div>';
+          container.innerHTML = '<div style="color:#999;text-align:center;padding:40px;">No units found. Select Recovery Scan if objects need repair.</div>';
           return;
         }
 
@@ -901,8 +719,8 @@ function runUtilityCycle()
 
         enriched.forEach(function(u) {
           html += '<div class="unit-section">';
-          html += '<div class="unit-section-title"><span>' + u.unit + '</span>';
-          if (u.tenant && u.tenant !== "Vacant") html += '<span style="color:#999;font-size:13px;font-weight:400;">· ' + u.tenant + '</span>';
+          html += '<div class="unit-section-title"><span>' + escapeHtml(u.unit) + '</span>';
+          if (u.tenant && u.tenant !== "Vacant") html += '<span style="color:#999;font-size:13px;font-weight:400;">· ' + escapeHtml(u.tenant) + '</span>';
           html += '</div>';
 
           utilTypes.forEach(function(type) {
@@ -919,7 +737,7 @@ function runUtilityCycle()
             html += '<div class="util-header">';
             html += '<div class="util-name">' + utilIcon(type) + ' ' + type.charAt(0).toUpperCase() + type.slice(1) + '</div>';
             html += '<div style="display:flex;align-items:center;gap:10px;">' + statusLabel;
-            html += '<button class="util-btn ' + (active ? 'off' : 'on') + '" onclick="toggleUtility(\'' + u.unit + '\',\'' + type + '\',\'' + (active ? 'off' : 'on') + '\')">' + (active ? 'Shut Off' : 'Restore') + '</button>';
+            html += '<button class="util-btn ' + (active ? 'off' : 'on') + '" onclick="toggleUtility(\'' + jsString(u.unit) + '\',\'' + type + '\',\'' + (active ? 'off' : 'on') + '\')">' + (active ? 'Shut Off' : 'Restore') + '</button>';
             html += '</div></div>';
             html += '<div style="display:flex;justify-content:space-between;font-size:12px;color:#999;margin-bottom:4px;"><span>Meter</span><span style="color:' + meterColor + ';">' + meter + '%</span></div>';
             html += '<div class="meter-bar"><div class="meter-fill" style="width:' + meter + '%;background:' + meterColor + ';"></div></div>';
@@ -938,12 +756,12 @@ function runUtilityCycle()
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
                 <div>
                   <div style="font-size:11px;color:#888;margin-bottom:4px;">Utility Cost</div>
-                  <input id="utilityCost_${u.unit}" type="number" value="${u.utilityCost || 0}" style="width:100%;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;padding:9px;font-size:12px;" />
+                  <input id="utilityCost_${escapeHtml(u.unit)}" type="number" value="${u.utilityCost || 0}" style="width:100%;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;padding:9px;font-size:12px;" />
                 </div>
 
                 <div>
                   <div style="font-size:11px;color:#888;margin-bottom:4px;">Billing Cycle</div>
-                  <select id="utilityCycle_${u.unit}" style="width:100%;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;padding:9px;font-size:12px;">
+                  <select id="utilityCycle_${escapeHtml(u.unit)}" style="width:100%;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;padding:9px;font-size:12px;">
                     <option value="weekly" ${(u.cycle || "weekly") === "weekly" ? "selected" : ""}>Weekly</option>
                     <option value="monthly" ${(u.cycle || "weekly") === "monthly" ? "selected" : ""}>Monthly</option>
                   </select>
@@ -956,7 +774,7 @@ function runUtilityCycle()
                   <div style="font-size:11px;color:#888;">Residents can pay toward balance</div>
                 </div>
 
-                <input type="checkbox" id="utilityCustom_${u.unit}" ${u.allowCustom ? "checked" : ""} />
+                <input type="checkbox" id="utilityCustom_${escapeHtml(u.unit)}" ${u.allowCustom ? "checked" : ""} />
               </div>
 
               <div style="color:#ffbe55;font-size:13px;margin-bottom:12px;">
@@ -964,9 +782,9 @@ function runUtilityCycle()
               </div>
 
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <button class="util-btn on" onclick="saveUtilitySettings('${u.unit}')">Save Settings</button>
-                <button class="util-btn on" onclick="generateUtilityBill('${u.unit}')">Generate Bill</button>
-                <button class="util-btn off" onclick="addLateFee('${u.unit}')">Add Late Fee</button>
+                <button class="util-btn on" onclick="saveUtilitySettings('${jsString(u.unit)}')">Save Settings</button>
+                <button class="util-btn on" onclick="generateUtilityBill('${jsString(u.unit)}')">Generate Bill</button>
+                <button class="util-btn off" onclick="addLateFee('${jsString(u.unit)}')">Add Late Fee</button>
               </div>
             </div>
           `;
@@ -983,40 +801,29 @@ function runUtilityCycle()
         if (utilEl) utilEl.textContent = alerts;
 
         let totalExposure = 0;
-
         enriched.forEach(function(u) {
           totalExposure += (u.utilityBalance || 0);
         });
-        
-        const utilityReport =
-          document.getElementById(
-            'report-utility'
-          );
-        
-        if (utilityReport) {
-          utilityReport.textContent =
-            "L$" + totalExposure;
-        }
-        
+
+        const utilityReport = document.getElementById('report-utility');
+        if (utilityReport) utilityReport.textContent = "L$" + totalExposure;
+
       } catch(e) {
         console.log(e);
         document.getElementById('utilities-content').innerHTML = '<div style="color:#f55;text-align:center;padding:40px;">Failed to load utility data.</div>';
       }
     }
 
-    function runUtilityShutoff()
-    {
+    function runUtilityShutoff() {
       showToast("Checking overdue utility shutoffs");
-    
+
       fetch(SL_BRIDGE_URL + "/utilities/shutoff?t=" + Date.now())
         .then(function(r) { return r.json(); })
         .then(function(data) {
           showToast("Utilities shut off for " + data.shutoffs.length + " unit(s)");
-    
+
           data.shutoffs.forEach(function(unit) {
-          
             var img = new Image();
-          
             img.src =
               SL_BRIDGE_URL +
               "?action=syncUtilityBill" +
@@ -1024,9 +831,8 @@ function runUtilityCycle()
               encodeURIComponent(unit) +
               "&t=" +
               Date.now();
-          
+
             var stateImg = new Image();
-          
             stateImg.src =
               SL_BRIDGE_URL +
               "?action=syncUtilityState" +
@@ -1035,7 +841,7 @@ function runUtilityCycle()
               "&t=" +
               Date.now();
           });
-    
+
           loadUtilities();
         })
         .catch(function() {
@@ -1060,17 +866,23 @@ function runUtilityCycle()
           } else {
             units.forEach(function(u) {
               var sc = u.status === "Active" ? "pill" : u.status === "Expired" ? "pill bad" : "pill warn";
-            
+
               if (u.unit === selectedUnit) {
                 updateSelectedUnitDetails(u);
               }
-            
+
               list.innerHTML +=
-                '<div class="row" onclick="selectTabletUnit(\'' + u.unit + '\')" style="' + 'grid-template-columns:1fr 1fr 1fr 1fr;' + 'cursor:pointer;' + (u.unit === selectedUnit   ? 'background:linear-gradient(135deg, rgba(255,70,45,0.16), rgba(255,120,60,0.05));border-left:4px solid #ff4a35;box-shadow:inset 0 0 18px rgba(255,70,45,0.10);'   : 'background:rgba(255,255,255,0.01);') + '">' +
-                '<div>' + u.unit + '</div>' +
-                '<div>' + (u.tenant || "Vacant") + '</div>' +
-                '<div><span class="' + sc + '">' + u.status + '</span></div>' +
-                '<div>' + (u.lease || "--") + '</div>' +
+                '<div class="row" onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')" style="' +
+                'grid-template-columns:1fr 1fr 1fr 1fr;' +
+                'cursor:pointer;' +
+                (u.unit === selectedUnit
+                  ? 'background:linear-gradient(135deg, rgba(255,70,45,0.16), rgba(255,120,60,0.05));border-left:4px solid #ff4a35;box-shadow:inset 0 0 18px rgba(255,70,45,0.10);'
+                  : 'background:rgba(255,255,255,0.01);') +
+                '">' +
+                '<div>' + escapeHtml(u.unit) + '</div>' +
+                '<div>' + escapeHtml(u.tenant || "Vacant") + '</div>' +
+                '<div><span class="' + sc + '">' + escapeHtml(u.status || "Vacant") + '</span></div>' +
+                '<div>' + escapeHtml(u.lease || "--") + '</div>' +
                 '</div>';
             });
           }
@@ -1085,6 +897,7 @@ function runUtilityCycle()
           var occupancy = total > 0 ? Math.round((active / total) * 100) : 0;
 
           function el(id) { return document.getElementById(id); }
+
           if (el('stat-total')) el('stat-total').textContent = total;
           if (el('stat-occupancy')) el('stat-occupancy').textContent = occupancy + "%";
           if (el('stat-active')) el('stat-active').textContent = active + " active leases";
@@ -1092,24 +905,18 @@ function runUtilityCycle()
           if (el('stat-expired')) el('stat-expired').textContent = expired;
           if (el('stat-health')) el('stat-health').textContent = expired === 0 ? "Stable" : "Warning";
           if (el('stat-health-sub')) el('stat-health-sub').textContent = expired === 0 ? "All leases current." : expired + " lease(s) need attention.";
-          if (el('report-total-units'))
-            el('report-total-units').textContent = total;
-          
-          if (el('report-occupied'))
-            el('report-occupied').textContent = active;
-          
-          if (el('report-vacant'))
-            el('report-vacant').textContent = vacant;
-          
-          if (el('report-expired'))
-            el('report-expired').textContent = expired;
+
+          if (el('report-total-units')) el('report-total-units').textContent = total;
+          if (el('report-occupied')) el('report-occupied').textContent = active;
+          if (el('report-vacant')) el('report-vacant').textContent = vacant;
+          if (el('report-expired')) el('report-expired').textContent = expired;
 
           var feed = document.getElementById('system-feed');
           if (feed) {
             feed.innerHTML = "";
             units.slice(0, 6).forEach(function(u) {
               var color = u.status === "Active" ? "#5dff91" : u.status === "Expired" ? "#ff5b47" : "#ffbe55";
-              feed.innerHTML += '<div class="sub" style="color:' + color + '">' + u.unit + ' — ' + u.status + (u.tenant && u.tenant !== "Vacant" ? ' · ' + u.tenant : '') + '</div>';
+              feed.innerHTML += '<div class="sub" style="color:' + color + '">' + escapeHtml(u.unit) + ' — ' + escapeHtml(u.status || "Vacant") + (u.tenant && u.tenant !== "Vacant" ? ' · ' + escapeHtml(u.tenant) : '') + '</div>';
             });
           }
         });
@@ -1127,18 +934,28 @@ function runUtilityCycle()
           if (data.length === 0) {
             list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No payments recorded yet.</div></div>';
           } else {
+            let totalCollected = 0;
+
             data.forEach(function(p) {
+              totalCollected += parseInt(p.amount || 0);
+
               var date = new Date(p.timestamp * 1000);
               var dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
               list.innerHTML +=
                 '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">' +
-                '<div>' + p.unit + '</div>' +
-                '<div>' + (p.tenant || "Unknown") + '</div>' +
-                '<div><span class="pill warn">' + (p.type || "rent") + '</span></div>' +
-                '<div style="color:#5dff91;">L$' + p.amount + '</div>' +
+                '<div>' + escapeHtml(p.unit || "--") + '</div>' +
+                '<div>' + escapeHtml(p.tenant || "Unknown") + '</div>' +
+                '<div><span class="pill warn">' + escapeHtml(p.type || "rent") + '</span></div>' +
+                '<div style="color:#5dff91;">L$' + escapeHtml(p.amount || 0) + '</div>' +
                 '<div style="color:#999;font-size:12px;">' + dateStr + '</div>' +
                 '</div>';
             });
+
+            const collections = document.getElementById('report-collections');
+            const collectionsSub = document.getElementById('report-collections-sub');
+            if (collections) collections.textContent = "L$" + totalCollected;
+            if (collectionsSub) collectionsSub.textContent = data.length + " recorded payment(s)";
           }
 
           var now = new Date();
@@ -1203,13 +1020,13 @@ function runUtilityCycle()
 
             list.innerHTML +=
               '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr 1.4fr;">' +
-              '<div>' + (t.unit || "--") + '</div>' +
-              '<div>' + (t.tenant || "Resident") + '</div>' +
-              '<div>' + (t.type || "general") + '</div>' +
-              '<div><span class="' + statusClass + '">' + (t.status || "Pending") + '</span></div>' +
+              '<div>' + escapeHtml(t.unit || "--") + '</div>' +
+              '<div>' + escapeHtml(t.tenant || "Resident") + '</div>' +
+              '<div>' + escapeHtml(t.type || "general") + '</div>' +
+              '<div><span class="' + statusClass + '">' + escapeHtml(t.status || "Pending") + '</span></div>' +
               '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-              '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + t.id + '\',\'In Progress\')">Start</button>' +
-              '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + t.id + '\',\'Completed\')">Done</button>' +
+              '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + jsString(t.id) + '\',\'In Progress\')">Start</button>' +
+              '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + jsString(t.id) + '\',\'Completed\')">Done</button>' +
               '</div>' +
               '</div>';
           });
@@ -1226,7 +1043,9 @@ function runUtilityCycle()
     }
 
     navButtons.forEach(function(btn) {
-      btn.addEventListener('click', function() { setPage(btn.dataset.page); });
+      btn.addEventListener('click', function() {
+        setPage(btn.dataset.page);
+      });
     });
 
     document.querySelectorAll('[data-action]').forEach(function(btn) {
@@ -1244,27 +1063,17 @@ function runUtilityCycle()
     updateClock();
     setInterval(updateClock, 1000);
 
-    const savedUnit =
-    localStorage.getItem(
-      "districtos_selected_unit"
-    );
-  
-  if (savedUnit) {
-    selectedUnit = savedUnit;
-  
-    document.getElementById(
-      "selected-unit-display"
-    ).textContent =
-      "Selected: " + savedUnit;
-  
-    document.getElementById(
-      "selected-unit-card"
-    ).textContent =
-      savedUnit;
-  }
+    const savedUnit = localStorage.getItem("districtos_selected_unit");
+
+    if (savedUnit) {
+      selectedUnit = savedUnit;
+      document.getElementById("selected-unit-display").textContent = "Selected: " + savedUnit;
+      document.getElementById("selected-unit-card").textContent = savedUnit;
+    }
 
     loadUnits();
     loadMaintenance();
+    loadUtilities();
 
     setInterval(loadUnits, 30000);
     setInterval(loadMaintenance, 12000);
