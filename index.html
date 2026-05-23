@@ -172,6 +172,20 @@
             <button class="action" data-action="syncDoors"><strong>Sync All</strong><span>Repair desynced doors.</span></button>
             <button class="action" data-action="scanNearby"><strong>Scan Nearby</strong><span>Find nearby ecosystem objects.</span></button>
             <button class="action" data-action="autoAssign"><strong>Auto Assign</strong><span>Assign unpaired objects to selected unit.</span></button>
+            <button class="action" onclick="lockSelectedUnit()">
+              <strong>Lock Unit</strong>
+              <span>Disable resident access for selected unit.</span>
+            </button>
+            
+            <button class="action" onclick="unlockSelectedUnit()">
+              <strong>Unlock Unit</strong>
+              <span>Restore resident access.</span>
+            </button>
+            
+            <button class="action" onclick="resetSelectedTenant()">
+              <strong>Reset Tenant</strong>
+              <span>Clear resident lease and access.</span>
+            </button>
           </div>
           <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Doors respond to Sync All and Auto Assign.</p></div></div>
         </section>
@@ -302,6 +316,43 @@
           loadMaintenance();
         }, 3000);
       }
+    }
+
+    function requireSelectedUnit() {
+      if (!selectedUnit) {
+        showToast("Select a unit first");
+        setPage("units");
+        return false;
+      }
+    
+      return true;
+    }
+    
+    function lockSelectedUnit() {
+      if (!requireSelectedUnit()) return;
+    
+      sendDistrictCommand("lockUnit", {
+        unit: selectedUnit
+      });
+    }
+    
+    function unlockSelectedUnit() {
+      if (!requireSelectedUnit()) return;
+    
+      sendDistrictCommand("unlockUnit", {
+        unit: selectedUnit
+      });
+    }
+    
+    function resetSelectedTenant() {
+      if (!requireSelectedUnit()) return;
+    
+      if (!confirm("Reset tenant for " + selectedUnit + "?"))
+        return;
+    
+      sendDistrictCommand("resetTenant", {
+        unit: selectedUnit
+      });
     }
 
     function toggleUtility(unit, type, state) {
