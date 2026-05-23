@@ -573,41 +573,49 @@
     }
 
     function generateUtilityBill(unit) {
-      showToast("Generating utility bill for " + unit);
-    
-      fetch(
+  showToast("Generating utility bill for " + unit);
+
+  fetch(
+    SL_BRIDGE_URL +
+    "/utilities/bill-get?unit=" +
+    encodeURIComponent(unit) +
+    "&t=" +
+    Date.now()
+  )
+    .then(function(r) {
+      return r.json();
+    })
+    .then(function(data) {
+      showToast("Utility bill generated");
+
+      var syncImg = new Image();
+      syncImg.src =
         SL_BRIDGE_URL +
-        "/utilities/bill-get?unit=" +
+        "?action=syncUtilityBill" +
+        "&unit=" +
         encodeURIComponent(unit) +
         "&t=" +
-        Date.now()
-      )
-        .then(function(r) {
-          return r.json();
-        })
-        .then(function(data) {
-          showToast("Utility bill generated");
-    
-          var syncImg = new Image();
-    
-          syncImg.src =
-            SL_BRIDGE_URL +
-            "?action=syncUtilityBill" +
-            "&unit=" +
-            encodeURIComponent(unit) +
-            "&t=" +
-            Date.now();
-    
-          setTimeout(function() {
-            loadUtilities();
-            loadUnits();
-          }, 1500);
-        })
-        .catch(function(e) {
-          console.log(e);
-          showToast("Utility bill failed");
-        });
-    }
+        Date.now();
+
+      setTimeout(function() {
+        var syncImg2 = new Image();
+        syncImg2.src =
+          SL_BRIDGE_URL +
+          "?action=syncUtilityBill" +
+          "&unit=" +
+          encodeURIComponent(unit) +
+          "&t=" +
+          Date.now();
+
+        loadUtilities();
+        loadUnits();
+      }, 1500);
+    })
+    .catch(function(e) {
+      console.log(e);
+      showToast("Utility bill failed");
+    });
+}
 
     function runUtilityCycle() {
       showToast("Generating utility charges");
