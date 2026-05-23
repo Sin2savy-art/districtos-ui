@@ -216,7 +216,59 @@
 
         <section id="admins" class="page"><div class="coming"><div><h3>Admin Access</h3><p class="muted">Add/remove managers without script editing.</p></div></div></section>
         <section id="reports" class="page"><div class="coming"><div><h3>Reports</h3><p class="muted">Occupancy, violations, collections, activity logs.</p></div></div></section>
-        <section id="settings" class="page"><div class="coming"><div><h3>Settings</h3><p class="muted">RP presets, rent rules, utility behavior, branding.</p></div></div></section>
+        
+        <section id="settings" class="page">
+              <div class="page-title">
+                <div>
+                  <h2>Settings</h2>
+                  <p>DistrictOS system tools and recovery actions.</p>
+                </div>
+            
+                <div class="pill">Hub Tools</div>
+              </div>
+            
+              <div class="action-row">
+            
+                <button
+                  class="action"
+                  onclick="
+                    loadUnits();
+                    loadUtilities();
+                    loadMaintenance();
+                    showToast('System refreshed');
+                  "
+                >
+                  <strong>Refresh Data</strong>
+                  <span>
+                    Reload units, utilities, and tickets.
+                  </span>
+                </button>
+            
+                <button
+                  class="action"
+                  onclick="
+                    localStorage.removeItem('districtos_selected_unit');
+                    location.reload();
+                  "
+                >
+                  <strong>Clear Selected Unit</strong>
+                  <span>
+                    Reset tablet selected-unit memory.
+                  </span>
+                </button>
+            
+                <button
+                  class="action"
+                  onclick="sendDistrictCommand('scanNearby');"
+                >
+                  <strong>Scan Nearby Objects</strong>
+                  <span>
+              Find doors, mailboxes, and hubs.
+            </span>
+          </button>
+
+  </div>
+</section>
 
         <div id="toast" class="toast">DistrictOS action sent.</div>
       </main>
