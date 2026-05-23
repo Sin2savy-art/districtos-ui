@@ -126,10 +126,25 @@
           </div>
 
           <div class="action-row">
-            <button class="action" data-action="syncDoors"><strong>Sync Selected Unit</strong><span>Resend selected unit data.</span></button>
-            <button class="action" data-action="pairDoor"><strong>Legacy Pair</strong><span>Add a new door to a unit.</span></button>
-            <button class="action" data-action="autoAssign"><strong>Auto Assign Units</strong><span>Assign nearby unpaired objects.</span></button>
-            <button class="action" data-action="scanNearby"><strong>Scan Nearby</strong><span>Find terminals, doors, and mailboxes.</span></button>
+              <button class="action" data-action="syncDoors">
+                <strong>Sync Selected Unit</strong>
+                <span>Push selected unit data to doors and mailboxes.</span>
+              </button>
+              
+              <button class="action" data-action="autoAssign">
+                <strong>Auto Assign Objects</strong>
+                <span>Bind nearby unpaired objects to selected unit.</span>
+              </button>
+              
+              <button class="action" onclick="lockSelectedUnit()">
+                <strong>Lock Unit</strong>
+                <span>Disable resident access for selected unit.</span>
+              </button>
+              
+              <button class="action" onclick="unlockSelectedUnit()">
+                <strong>Unlock Unit</strong>
+                <span>Restore resident access for selected unit.</span>
+              </button>
           </div>
         </section>
 
