@@ -393,43 +393,32 @@
             
               <div class="action-row">
             
-                <button
-                  class="action"
-                  onclick="
-                    loadUnits();
-                    loadUtilities();
-                    loadMaintenance();
-                    showToast('System refreshed');
-                  "
-                >
-                  <strong>Refresh Data</strong>
-                  <span>
-                    Reload units, utilities, and tickets.
-                  </span>
-                </button>
-            
-                <button
-                  class="action"
-                  onclick="
-                    localStorage.removeItem('districtos_selected_unit');
-                    location.reload();
-                  "
-                >
-                  <strong>Clear Selected Unit</strong>
-                  <span>
-                    Reset tablet selected-unit memory.
-                  </span>
-                </button>
-            
-                <button
-                  class="action"
-                  onclick="sendDistrictCommand('scanNearby');"
-                >
-                  <strong>Scan Nearby Objects</strong>
-                  <span>
-              Find doors, mailboxes, and hubs.
-            </span>
-          </button>
+                <div class="action-row">
+
+  <button
+    class="action"
+    onclick="
+      localStorage.removeItem('districtos_selected_unit');
+      location.reload();
+    "
+  >
+    <strong>Clear Selected Unit</strong>
+    <span>
+      Reset selected-unit memory.
+    </span>
+  </button>
+
+  <button
+    class="action"
+    onclick="sendDistrictCommand('scanNearby');"
+  >
+    <strong>Recovery Scan</strong>
+    <span>
+      Search for nearby DistrictOS objects.
+    </span>
+  </button>
+
+</div>
 
                 <div class="list" id="scan-results">
   <div class="row header" style="grid-template-columns:1fr 1fr 1fr;">
