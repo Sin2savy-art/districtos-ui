@@ -114,6 +114,8 @@
             <div class="card"><label>Utility Alerts</label><div class="stat" id="stat-util-alerts">--</div><div class="sub">Services offline</div></div>
             <div class="card wide"><label>System Feed</label><div id="system-feed"><div class="sub" style="color:#999;">Loading...</div></div></div>
             <div class="card wide"><label>District Health</label><div class="stat" id="stat-health">--</div><div class="sub" id="stat-health-sub">Fetching...</div></div>
+            <div class="card wide"><label>Selected Unit</label><div class="stat" id="selected-unit-card">None</div><div class="sub" id="selected-unit-sub">Click a unit in the Units tab.</div></div>
+
           </div>
 
           <div class="action-row">
@@ -252,10 +254,14 @@
     function selectTabletUnit(unit) {
       selectedUnit = unit;
     
-      document.getElementById(
-        "selected-unit-display"
-      ).textContent =
+      document.getElementById("selected-unit-display").textContent =
         "Selected: " + unit;
+    
+      document.getElementById("selected-unit-card").textContent =
+        unit;
+    
+      document.getElementById("selected-unit-sub").textContent =
+        "Actions will apply to " + unit;
     
       showToast("Selected unit: " + unit);
     }
