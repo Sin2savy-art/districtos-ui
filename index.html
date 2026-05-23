@@ -221,7 +221,79 @@
           <div class="list" id="maintenance-list"></div>
         </section>
 
-        <section id="admins" class="page"><div class="coming"><div><h3>Admin Access</h3><p class="muted">Add/remove managers without script editing.</p></div></div></section>
+    <section id="admins" class="page">
+      <div class="page-title">
+        <div>
+          <h2>Admins</h2>
+          <p>DistrictOS management delegation and ecosystem control.</p>
+        </div>
+    
+        <div class="pill">Management</div>
+      </div>
+    
+      <div class="grid">
+    
+        <div class="card">
+          <label>Primary Owner</label>
+          <div class="stat">ONLINE</div>
+          <div class="sub">Root ecosystem controller</div>
+        </div>
+    
+        <div class="card">
+          <label>Assistant Managers</label>
+          <div class="stat">0</div>
+          <div class="sub">Delegation system coming next</div>
+        </div>
+    
+        <div class="card">
+          <label>Door Network</label>
+          <div class="stat">SYNCED</div>
+          <div class="sub">Access grid operational</div>
+        </div>
+    
+        <div class="card">
+          <label>Mailbox Grid</label>
+          <div class="stat">ONLINE</div>
+          <div class="sub">Resident payment network active</div>
+        </div>
+    
+        <div class="card wide">
+          <label>Delegation System</label>
+          <div class="stat">PLANNED</div>
+          <div class="sub">
+            Future update will allow landlord assistants,
+            maintenance staff, and leasing agents with limited permissions.
+          </div>
+        </div>
+    
+      </div>
+    
+      <div class="action-row">
+    
+        <button
+          class="action"
+          onclick="sendDistrictCommand('scanNearby');"
+        >
+          <strong>Rescan Ecosystem</strong>
+          <span>
+            Recheck nearby terminals, doors, and mailboxes.
+          </span>
+        </button>
+    
+        <button
+          class="action"
+          onclick="loadUnits(); loadUtilities();"
+        >
+          <strong>Refresh Management Data</strong>
+          <span>
+            Reload ecosystem status and occupancy.
+          </span>
+        </button>
+    
+      </div>
+    </section>
+
+        
         <section id="reports" class="page">
           <div class="page-title">
             <div>
