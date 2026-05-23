@@ -81,6 +81,9 @@
       <div class="status">
         <div><span class="dot"></span>GRID ONLINE</div>
         <div id="clock">--:--</div>
+        <div id="selected-unit-display" class="pill warn">
+          No Unit Selected
+        </div>
       </div>
     </div>
 
@@ -233,9 +236,15 @@
     }
 
     function selectTabletUnit(unit) {
-    selectedUnit = unit;
-    showToast("Selected unit: " + unit);
-  }
+      selectedUnit = unit;
+    
+      document.getElementById(
+        "selected-unit-display"
+      ).textContent =
+        "Selected: " + unit;
+    
+      showToast("Selected unit: " + unit);
+    }
 
     function sendDistrictCommand(action, extraParams) {
       showToast('DistrictOS: ' + action + ' sent');
