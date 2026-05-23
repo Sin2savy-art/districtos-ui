@@ -264,6 +264,8 @@
         "Actions will apply to " + unit;
     
       showToast("Selected unit: " + unit);
+
+      localStorage.setItem("districtos_selected_unit", unit);
     }
 
     function updateSelectedUnitDetails(unitData) {
@@ -917,6 +919,25 @@ function runUtilityCycle()
 
     updateClock();
     setInterval(updateClock, 1000);
+
+    const savedUnit =
+    localStorage.getItem(
+      "districtos_selected_unit"
+    );
+  
+  if (savedUnit) {
+    selectedUnit = savedUnit;
+  
+    document.getElementById(
+      "selected-unit-display"
+    ).textContent =
+      "Selected: " + savedUnit;
+  
+    document.getElementById(
+      "selected-unit-card"
+    ).textContent =
+      savedUnit;
+  }
 
     loadUnits();
     loadMaintenance();
