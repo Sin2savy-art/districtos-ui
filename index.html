@@ -510,14 +510,20 @@
         unitData.unit || "None";
     
       let statusText =
+        "Tenant: " +
         (unitData.tenant || "Vacant") +
-        " • " +
-        (unitData.status || "Unknown");
-    
-      if (unitData.utilityBalance !== undefined) {
-        statusText +=
-          " • Utilities: L$" +
-          unitData.utilityBalance;
+        " • Status: " +
+        (unitData.status || "Unknown") +
+        " • Lease: " +
+        (unitData.lease || "--") +
+        " • Utilities: L$" +
+        (unitData.utilityBalance || 0);
+      
+      if (
+        unitData.locked == "1" ||
+        unitData.locked === 1
+      ) {
+        statusText += " • LOCKED";
       }
     
       document.getElementById(
