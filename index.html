@@ -115,6 +115,13 @@
             <div class="card wide"><label>System Feed</label><div id="system-feed"><div class="sub" style="color:#999;">Loading...</div></div></div>
             <div class="card wide"><label>District Health</label><div class="stat" id="stat-health">--</div><div class="sub" id="stat-health-sub">Fetching...</div></div>
             <div class="card wide"><label>Selected Unit</label><div class="stat" id="selected-unit-card">None</div><div class="sub" id="selected-unit-sub">Click a unit in the Units tab.</div></div>
+            <div class="card wide">
+              <label>Last Action</label>
+              <div class="stat" id="last-action-card">Idle</div>
+              <div class="sub" id="last-action-sub">
+                No recent landlord actions.
+              </div>
+            </div>
 
           </div>
 
@@ -299,8 +306,21 @@
 
     function showToast(message) {
       toast.textContent = message;
+    
+      document.getElementById(
+        "last-action-card"
+      ).textContent = message;
+    
+      document.getElementById(
+        "last-action-sub"
+      ).textContent =
+        new Date().toLocaleTimeString();
+    
       toast.classList.add('show');
-      setTimeout(function() { toast.classList.remove('show'); }, 1800);
+    
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 1800);
     }
 
     function selectTabletUnit(unit) {
