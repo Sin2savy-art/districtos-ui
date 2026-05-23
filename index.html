@@ -1060,7 +1060,7 @@ function runUtilityCycle()
               }
             
               list.innerHTML +=
-                '<div class="row" onclick="selectTabletUnit(\'' + u.unit + '\')" style="' + 'grid-template-columns:1fr 1fr 1fr 1fr;' + 'cursor:pointer;' + (u.unit === selectedUnit   ? 'background:rgba(255,70,45,0.12);border-left:3px solid #ff4a35;'   : '') + '">' +
+                '<div class="row" onclick="selectTabletUnit(\'' + u.unit + '\')" style="' + 'grid-template-columns:1fr 1fr 1fr 1fr;' + 'cursor:pointer;' + (u.unit === selectedUnit   ? 'background:linear-gradient(135deg, rgba(255,70,45,0.16), rgba(255,120,60,0.05));border-left:4px solid #ff4a35;box-shadow:inset 0 0 18px rgba(255,70,45,0.10);'   : 'background:rgba(255,255,255,0.01);') + '">' +
                 '<div>' + u.unit + '</div>' +
                 '<div>' + (u.tenant || "Vacant") + '</div>' +
                 '<div><span class="' + sc + '">' + u.status + '</span></div>' +
