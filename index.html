@@ -192,10 +192,27 @@
         <section id="doors" class="page">
           <div class="page-title"><div><h2>Door Network</h2><p>Pair, sync, and recover access devices.</p></div><div class="pill">Access Grid</div></div>
           <div class="action-row">
-            <button class="action" data-action="pairDoor"><strong>Legacy Pair</strong><span>Use only for older doors.</span></button>
-            <button class="action" data-action="syncDoors"><strong>Sync Selected</strong><span>Repair desynced doors.</span></button>
-            <button class="action" data-action="scanNearby"><strong>Scan Nearby</strong><span>Find nearby ecosystem objects.</span></button>
-            <button class="action" data-action="autoAssign"><strong>Auto Assign</strong><span>Assign unpaired objects to selected unit.</span></button>
+                  <div class="action-row">
+                    <button class="action" data-action="syncDoors">
+                      <strong>Sync Selected Unit</strong>
+                      <span>Repair selected unit door/mailbox sync.</span>
+                    </button>
+                  
+                    <button class="action" data-action="autoAssign">
+                      <strong>Auto Assign Objects</strong>
+                      <span>Bind unpaired objects to selected unit.</span>
+                    </button>
+                  
+                    <button class="action" onclick="lockSelectedUnit()">
+                      <strong>Lock Unit</strong>
+                      <span>Disable selected unit access.</span>
+                    </button>
+                  
+                    <button class="action" onclick="unlockSelectedUnit()">
+                      <strong>Unlock Unit</strong>
+                      <span>Restore selected unit access.</span>
+                    </button>
+                  </div>
             <button class="action" onclick="lockSelectedUnit()">
               <strong>Lock Unit</strong>
               <span>Disable resident access for selected unit.</span>
