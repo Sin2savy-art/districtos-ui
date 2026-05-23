@@ -168,7 +168,7 @@
             <button class="action" data-action="pairDoor"><strong>Pair Door</strong><span>Start one-click pairing.</span></button>
             <button class="action" data-action="syncDoors"><strong>Sync All</strong><span>Repair desynced doors.</span></button>
             <button class="action" data-action="scanNearby"><strong>Scan Nearby</strong><span>Find nearby ecosystem objects.</span></button>
-            <button class="action" data-action="autoAssign"><strong>Auto Assign</strong><span>Assign unpaired objects to APT-101.</span></button>
+            <button class="action" data-action="autoAssign"><strong>Auto Assign</strong><span>Assign unpaired objects to selected unit.</span></button>
           </div>
           <div class="coming"><div><h3>Door Control Ready</h3><p class="muted">Doors respond to Sync All and Auto Assign.</p></div></div>
         </section>
@@ -240,6 +240,23 @@
     function sendDistrictCommand(action, extraParams) {
       showToast('DistrictOS: ' + action + ' sent');
       var url = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action);
+
+      if (
+        (action === "syncDoors" || action === "autoAssign" || action === "pairDoor") &&
+        !selectedUnit
+      ) {
+        showToast("Select a unit first");
+        setPage("units");
+        return;
+      }
+      
+      if (
+        action === "syncDoors" ||
+        action === "autoAssign" ||
+        action === "pairDoor"
+      ) {
+        url += "&unit=" + encodeURIComponent(selectedUnit);
+      }
 
       if (extraParams) {
         Object.keys(extraParams).forEach(function(k) {
