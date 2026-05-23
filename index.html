@@ -222,7 +222,60 @@
         </section>
 
         <section id="admins" class="page"><div class="coming"><div><h3>Admin Access</h3><p class="muted">Add/remove managers without script editing.</p></div></div></section>
-        <section id="reports" class="page"><div class="coming"><div><h3>Reports</h3><p class="muted">Occupancy, violations, collections, activity logs.</p></div></div></section>
+        <section id="reports" class="page">
+          <div class="page-title">
+            <div>
+              <h2>Reports</h2>
+              <p>DistrictOS live building analytics and collection overview.</p>
+            </div>
+        
+            <div class="pill">Analytics</div>
+          </div>
+        
+          <div class="grid">
+        
+            <div class="card">
+              <label>Total Units</label>
+              <div class="stat" id="report-total-units">--</div>
+              <div class="sub">Registered in ecosystem</div>
+            </div>
+        
+            <div class="card">
+              <label>Occupied</label>
+              <div class="stat" id="report-occupied">--</div>
+              <div class="sub">Currently leased</div>
+            </div>
+        
+            <div class="card">
+              <label>Vacant</label>
+              <div class="stat" id="report-vacant">--</div>
+              <div class="sub">Available units</div>
+            </div>
+        
+            <div class="card">
+              <label>Expired</label>
+              <div class="stat" id="report-expired">--</div>
+              <div class="sub">Leases needing review</div>
+            </div>
+        
+            <div class="card wide">
+              <label>Collection Status</label>
+              <div class="stat" id="report-collections">--</div>
+              <div class="sub" id="report-collections-sub">
+                Waiting for payment sync
+              </div>
+            </div>
+        
+            <div class="card wide">
+              <label>Utility Exposure</label>
+              <div class="stat" id="report-utility">--</div>
+              <div class="sub">
+                Outstanding utility balances
+              </div>
+            </div>
+        
+          </div>
+        </section>
         
         <section id="settings" class="page">
               <div class="page-title">
@@ -757,6 +810,23 @@ function runUtilityCycle()
 
         const utilEl = document.getElementById('stat-util-alerts');
         if (utilEl) utilEl.textContent = alerts;
+
+        let totalExposure = 0;
+
+        enriched.forEach(function(u) {
+          totalExposure += (u.utilityBalance || 0);
+        });
+        
+        const utilityReport =
+          document.getElementById(
+            'report-utility'
+          );
+        
+        if (utilityReport) {
+          utilityReport.textContent =
+            "L$" + totalExposure;
+        }
+        
       } catch(e) {
         console.log(e);
         document.getElementById('utilities-content').innerHTML = '<div style="color:#f55;text-align:center;padding:40px;">Failed to load utility data.</div>';
@@ -851,6 +921,17 @@ function runUtilityCycle()
           if (el('stat-expired')) el('stat-expired').textContent = expired;
           if (el('stat-health')) el('stat-health').textContent = expired === 0 ? "Stable" : "Warning";
           if (el('stat-health-sub')) el('stat-health-sub').textContent = expired === 0 ? "All leases current." : expired + " lease(s) need attention.";
+          if (el('report-total-units'))
+            el('report-total-units').textContent = total;
+          
+          if (el('report-occupied'))
+            el('report-occupied').textContent = active;
+          
+          if (el('report-vacant'))
+            el('report-vacant').textContent = vacant;
+          
+          if (el('report-expired'))
+            el('report-expired').textContent = expired;
 
           var feed = document.getElementById('system-feed');
           if (feed) {
