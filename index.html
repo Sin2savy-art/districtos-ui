@@ -136,12 +136,12 @@
                 <span>Bind nearby unpaired objects to selected unit.</span>
               </button>
               
-              <button class="action" onclick="lockSelectedUnit()">
+              <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
                 <strong>Lock Unit</strong>
                 <span>Disable resident access for selected unit.</span>
               </button>
               
-              <button class="action" onclick="unlockSelectedUnit()">
+              <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
                 <strong>Unlock Unit</strong>
                 <span>Restore resident access for selected unit.</span>
               </button>
@@ -208,22 +208,22 @@
                       <span>Bind unpaired objects to selected unit.</span>
                     </button>
                   
-                    <button class="action" onclick="lockSelectedUnit()">
+                    <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
                       <strong>Lock Unit</strong>
                       <span>Disable selected unit access.</span>
                     </button>
                   
-                    <button class="action" onclick="unlockSelectedUnit()">
+                    <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
                       <strong>Unlock Unit</strong>
                       <span>Restore selected unit access.</span>
                     </button>
                   </div>
-            <button class="action" onclick="lockSelectedUnit()">
+            <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
               <strong>Lock Unit</strong>
               <span>Disable resident access for selected unit.</span>
             </button>
             
-            <button class="action" onclick="unlockSelectedUnit()">
+            <button   class="action"   id="dynamic-lock-btn"   onclick="toggleSelectedLock()" >   <strong id="dynamic-lock-title">     Lock Unit   </strong>    <span id="dynamic-lock-sub">     Disable selected unit access.   </span> </button>
               <strong>Unlock Unit</strong>
               <span>Restore resident access.</span>
             </button>
@@ -523,7 +523,62 @@
       document.getElementById(
         "selected-unit-sub"
       ).textContent = statusText;
+      
+      updateDynamicLockButton(unitData);
     }
+
+    function toggleSelectedLock() {
+    if (!requireSelectedUnit())
+      return;
+  
+    const isLocked =
+      document
+        .getElementById(
+          "dynamic-lock-title"
+        )
+        .textContent
+        .includes("Unlock");
+  
+    if (isLocked) {
+      unlockSelectedUnit();
+    }
+    else {
+      lockSelectedUnit();
+    }
+  }
+
+    function updateDynamicLockButton(unitData) {
+    const title =
+      document.getElementById(
+        "dynamic-lock-title"
+      );
+  
+    const sub =
+      document.getElementById(
+        "dynamic-lock-sub"
+      );
+  
+    if (!title || !sub || !unitData)
+      return;
+  
+    if (
+      unitData.locked == "1" ||
+      unitData.locked === 1
+    ) {
+      title.textContent =
+        "Unlock Unit";
+  
+      sub.textContent =
+        "Restore resident access.";
+    }
+    else {
+      title.textContent =
+        "Lock Unit";
+  
+      sub.textContent =
+        "Disable selected unit access.";
+    }
+  }
 
     function sendDistrictCommand(action, extraParams) {
       showToast('DistrictOS: ' + action + ' sent');
