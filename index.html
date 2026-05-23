@@ -266,6 +266,28 @@
       showToast("Selected unit: " + unit);
     }
 
+    function updateSelectedUnitDetails(unitData) {
+      if (!unitData) return;
+    
+      document.getElementById("selected-unit-card").textContent =
+        unitData.unit || "None";
+    
+      let statusText =
+        (unitData.tenant || "Vacant") +
+        " • " +
+        (unitData.status || "Unknown");
+    
+      if (unitData.utilityBalance !== undefined) {
+        statusText +=
+          " • Utilities: L$" +
+          unitData.utilityBalance;
+      }
+    
+      document.getElementById(
+        "selected-unit-sub"
+      ).textContent = statusText;
+    }
+
     function sendDistrictCommand(action, extraParams) {
       showToast('DistrictOS: ' + action + ' sent');
       var url = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action);
@@ -723,13 +745,18 @@ function runUtilityCycle()
           } else {
             units.forEach(function(u) {
               var sc = u.status === "Active" ? "pill" : u.status === "Expired" ? "pill bad" : "pill warn";
+            
+              if (u.unit === selectedUnit) {
+                updateSelectedUnitDetails(u);
+              }
+            
               list.innerHTML +=
-  '<div class="row" onclick="selectTabletUnit(\'' + u.unit + '\')" style="grid-template-columns:1fr 1fr 1fr 1fr;cursor:pointer;">' +
-  '<div>' + u.unit + '</div>' +
-  '<div>' + (u.tenant || "Vacant") + '</div>' +
-  '<div><span class="' + sc + '">' + u.status + '</span></div>' +
-  '<div>' + (u.lease || "--") + '</div>' +
-  '</div>';
+                '<div class="row" onclick="selectTabletUnit(\'' + u.unit + '\')" style="grid-template-columns:1fr 1fr 1fr 1fr;cursor:pointer;">' +
+                '<div>' + u.unit + '</div>' +
+                '<div>' + (u.tenant || "Vacant") + '</div>' +
+                '<div><span class="' + sc + '">' + u.status + '</span></div>' +
+                '<div>' + (u.lease || "--") + '</div>' +
+                '</div>';
             });
           }
 
