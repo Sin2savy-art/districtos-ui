@@ -212,6 +212,8 @@
     const toast = document.getElementById('toast');
     const SL_BRIDGE_URL = "https://districtos-bridge.districtos.workers.dev";
 
+    let selectedUnit = "";
+
     function setPage(pageId) {
       pages.forEach(p => p.classList.remove('active'));
       navButtons.forEach(b => b.classList.remove('active'));
@@ -229,6 +231,11 @@
       toast.classList.add('show');
       setTimeout(function() { toast.classList.remove('show'); }, 1800);
     }
+
+    function selectTabletUnit(unit) {
+    selectedUnit = unit;
+    showToast("Selected unit: " + unit);
+  }
 
     function sendDistrictCommand(action, extraParams) {
       showToast('DistrictOS: ' + action + ' sent');
@@ -620,7 +627,13 @@ function runUtilityCycle()
           } else {
             units.forEach(function(u) {
               var sc = u.status === "Active" ? "pill" : u.status === "Expired" ? "pill bad" : "pill warn";
-              list.innerHTML += '<div class="row" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>' + u.unit + '</div><div>' + (u.tenant || "Vacant") + '</div><div><span class="' + sc + '">' + u.status + '</span></div><div>' + (u.lease || "--") + '</div></div>';
+              list.innerHTML +=
+  '<div class="row" onclick="selectTabletUnit(\'' + u.unit + '\')" style="grid-template-columns:1fr 1fr 1fr 1fr;cursor:pointer;">' +
+  '<div>' + u.unit + '</div>' +
+  '<div>' + (u.tenant || "Vacant") + '</div>' +
+  '<div><span class="' + sc + '">' + u.status + '</span></div>' +
+  '<div>' + (u.lease || "--") + '</div>' +
+  '</div>';
             });
           }
 
