@@ -327,13 +327,22 @@
     
       return true;
     }
+
+    function refreshSelectedUnit() {
+    setTimeout(function() {
+      loadUnits();
+      loadUtilities();
+    }, 1200);
+  }
     
     function lockSelectedUnit() {
       if (!requireSelectedUnit()) return;
     
-      sendDistrictCommand("lockUnit", {
+        sendDistrictCommand("lockUnit", {
         unit: selectedUnit
       });
+      
+      refreshSelectedUnit();
     }
     
     function unlockSelectedUnit() {
@@ -342,6 +351,8 @@
       sendDistrictCommand("unlockUnit", {
         unit: selectedUnit
       });
+
+      refreshSelectedUnit();
     }
     
     function resetSelectedTenant() {
@@ -353,6 +364,8 @@
       sendDistrictCommand("resetTenant", {
         unit: selectedUnit
       });
+
+      refreshSelectedUnit();
     }
 
     function toggleUtility(unit, type, state) {
