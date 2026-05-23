@@ -573,25 +573,40 @@
     }
 
     function generateUtilityBill(unit) {
-      showToast("Generating utility bill");
-
-      var img = new Image();
-      img.src =
+      showToast("Generating utility bill for " + unit);
+    
+      fetch(
         SL_BRIDGE_URL +
-        "/utilities/bill-get" +
-        "?unit=" + encodeURIComponent(unit) +
-        "&t=" + Date.now();
-
-      setTimeout(function() {
-        var syncImg = new Image();
-        syncImg.src =
-          SL_BRIDGE_URL +
-          "?action=syncUtilityBill" +
-          "&unit=" + encodeURIComponent(unit) +
-          "&t=" + Date.now();
-
-        loadUtilities();
-      }, 1200);
+        "/utilities/bill-get?unit=" +
+        encodeURIComponent(unit) +
+        "&t=" +
+        Date.now()
+      )
+        .then(function(r) {
+          return r.json();
+        })
+        .then(function(data) {
+          showToast("Utility bill generated");
+    
+          var syncImg = new Image();
+    
+          syncImg.src =
+            SL_BRIDGE_URL +
+            "?action=syncUtilityBill" +
+            "&unit=" +
+            encodeURIComponent(unit) +
+            "&t=" +
+            Date.now();
+    
+          setTimeout(function() {
+            loadUtilities();
+            loadUnits();
+          }, 1500);
+        })
+        .catch(function(e) {
+          console.log(e);
+          showToast("Utility bill failed");
+        });
     }
 
     function runUtilityCycle() {
