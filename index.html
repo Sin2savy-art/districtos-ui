@@ -728,13 +728,18 @@
         const unitRes = await fetch(SL_BRIDGE_URL + "/units?t=" + Date.now());
         let units = await unitRes.json();
         units = units.filter(u => u.unit && u.unit !== "APT-TEST");
+        if (selectedUnit) {
+          units = units.filter(function(u) {
+            return u.unit === selectedUnit;
+          });
+        }
         units.sort((a, b) => a.unit.localeCompare(b.unit));
 
         const container = document.getElementById('utilities-content');
         const sync = document.getElementById('util-last-sync');
 
         if (units.length === 0) {
-          container.innerHTML = '<div style="color:#999;text-align:center;padding:40px;">No units found. Select Recovery Scan if objects need repair.</div>';
+          container.innerHTML = '<div style="color:#999;text-align:center;padding:40px;">Select a unit from the Units tab first.</div>';
           return;
         }
 
