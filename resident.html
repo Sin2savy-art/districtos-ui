@@ -635,6 +635,11 @@ function selectResidentProperty(unit)
 {
   selectedResidentUnit = unit;
 
+  localStorage.setItem(
+  "districtos_resident_unit",
+  unit
+);
+
   const found =
     residentProperties.find(
       p => p.unit === unit
@@ -656,7 +661,14 @@ function selectResidentProperty(unit)
   loadMaintenance();
   loadGuestPasses();
   loadCoTenants();
+
+  selectedResidentUnit =
+  localStorage.getItem(
+    "districtos_resident_unit"
+  ) || "";
+  
   loadResidentProperties();
+  
 
   showToast(
     "Selected: " + unit
