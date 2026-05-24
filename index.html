@@ -882,7 +882,9 @@
           var list = document.getElementById('units-list');
           var sync = document.getElementById('units-last-sync');
 
-          list.innerHTML = '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr;"><div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div></div>';
+          list.innerHTML =
+          '<div class="row header" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">' +
+          '<div>Unit</div><div>Tenant</div><div>Status</div><div>Lease</div><div>Manage</div></div>';
 
           if (units.length === 0) {
             list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No units found.</div></div>';
@@ -894,19 +896,20 @@
                 updateSelectedUnitDetails(u);
               }
 
-              list.innerHTML +=
-                '<div class="row" onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')" style="' +
-                'grid-template-columns:1fr 1fr 1fr 1fr;' +
-                'cursor:pointer;' +
-                (u.unit === selectedUnit
-                  ? 'background:linear-gradient(135deg, rgba(255,70,45,0.16), rgba(255,120,60,0.05));border-left:4px solid #ff4a35;box-shadow:inset 0 0 18px rgba(255,70,45,0.10);'
-                  : 'background:rgba(255,255,255,0.01);') +
-                '">' +
-                '<div>' + escapeHtml(u.unit) + '</div>' +
-                '<div>' + escapeHtml(u.tenant || "Vacant") + '</div>' +
-                '<div><span class="' + sc + '">' + escapeHtml(u.status || "Vacant") + '</span></div>' +
-                '<div>' + escapeHtml(u.lease || "--") + '</div>' +
-                '</div>';
+            list.innerHTML +=
+              '<div class="row" style="' +
+              'grid-template-columns:1fr 1fr 1fr 1fr 1fr;' +
+              'cursor:pointer;' +
+              (u.unit === selectedUnit
+                ? 'background:linear-gradient(135deg, rgba(255,70,45,0.16), rgba(255,120,60,0.05));border-left:4px solid #ff4a35;box-shadow:inset 0 0 18px rgba(255,70,45,0.10);'
+                : 'background:rgba(255,255,255,0.01);') +
+              '">' +
+              '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' + escapeHtml(u.unit) + '</div>' +
+              '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' + escapeHtml(u.tenant || "Vacant") + '</div>' +
+              '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')"><span class="' + sc + '">' + escapeHtml(u.status || "Vacant") + '</span></div>' +
+              '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' + escapeHtml(u.lease || "--") + '</div>' +
+              '<div><button class="util-btn off" onclick="deleteUnit(\'' + jsString(u.unit) + '\')">Delete</button></div>' +
+              '</div>';
             });
           }
 
@@ -944,6 +947,39 @@
           }
         });
     }
+
+    function deleteUnit(unit) {
+    if (!confirm("Delete unit " + unit + "? This cannot be undone."))
+      return;
+  
+    fetch(SL_BRIDGE_URL + "/units/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "unit=" + encodeURIComponent(unit)
+    })
+      .then(function(r) {
+        return r.json();
+      })
+      .then(function() {
+        if (selectedUnit === unit) {
+          selectedUnit = "";
+          localStorage.removeItem("districtos_selected_unit");
+          document.getElementById("selected-unit-display").textContent =
+            "No Unit Selected";
+          document.getElementById("selected-unit-card").textContent =
+            "None";
+          document.getElementById("selected-unit-sub").textContent =
+            "Click a unit in the Units tab.";
+        }
+  
+        showToast("Unit deleted: " + unit);
+        loadUnits();
+        loadUtilities();
+      })
+      .catch(function() {
+        showToast("Delete failed");
+      });
+  }
 
     function loadPayments() {
       fetch(SL_BRIDGE_URL + "/payments?t=" + Date.now())
