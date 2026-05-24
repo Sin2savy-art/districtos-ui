@@ -148,6 +148,16 @@
             <div class="pill warn" id="units-last-sync">Not synced</div>
           </div>
 
+          <div class="card wide" style="margin-bottom:18px;">
+        <label>Selected Unit Rent</label>
+        <input
+          id="selectedRentInput"
+          type="number"
+          placeholder="Enter rent amount"
+          style="width:100%;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;padding:12px;font-size:14px;"
+        />
+      </div>
+
           <div class="action-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 18px;">
             <button class="action" onclick="sendLeaseWarnings()">
               <strong>Send Lease Warnings</strong>
@@ -546,60 +556,37 @@
       }, 1200);
     }
 
-    function setSelectedRent() {
-    if (!requireSelectedUnit()) return;
-  
-    const amount =
-      prompt(
-        "Set rent for " + selectedUnit + ":"
-      );
-  
-    if (!amount) return;
-  
-    const rent = parseInt(amount);
-  
-    if (!rent || rent <= 0) {
-      showToast("Invalid rent amount");
-      return;
-    }
-  
-    fetch(SL_BRIDGE_URL + "/unit/set-rent", {
-      method: "POST",
-      headers: {
-        "Content-Type":
-          "application/x-www-form-urlencoded"
-      },
-      body:
-        "unit=" +
-        encodeURIComponent(selectedUnit) +
-        "&rent=" +
-        encodeURIComponent(rent)
-    })
-    .then(function(r) {
-      return r.json();
-    })
-    .then(function() {
-  
-      showToast(
-        "Rent updated: L$" + rent
-      );
-  
-      sendDistrictCommand(
-        "syncUnitRent",
-        {
-          unit: selectedUnit,
-          rent: rent
-        }
-      );
-  
-      loadUnits();
-      loadUtilities();
-  
-    })
-    .catch(function() {
-      showToast("Rent update failed");
-    });
+function setSelectedRent() {
+  if (!requireSelectedUnit()) return;
+
+  const input = document.getElementById("selectedRentInput");
+  const rent = parseInt(input.value || "0");
+
+  if (!rent || rent <= 0) {
+    showToast("Enter rent amount");
+    return;
   }
+
+  fetch(SL_BRIDGE_URL + "/unit/set-rent", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body:
+      "unit=" + encodeURIComponent(selectedUnit) +
+      "&rent=" + encodeURIComponent(rent)
+  })
+  .then(r => r.json())
+  .then(function() {
+    showToast("Rent updated: L$" + rent);
+
+    sendDistrictCommand("syncUnitRent", {
+      unit: selectedUnit,
+      rent: rent
+    });
+
+    loadUnits();
+    loadUtilities();
+  });
+}
 
     function toggleUtility(unit, type, state) {
       showToast('DistrictOS: ' + type + ' ' + state + ' for ' + unit);
