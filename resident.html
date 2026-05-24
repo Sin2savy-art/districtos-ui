@@ -683,6 +683,19 @@ function selectResidentProperty(unit)
   ) || "";
   
   loadResidentProperties();
+
+  setPage("home");
+
+  const content =
+    document.querySelector(".content");
+  
+  if (content)
+  {
+    content.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
   
 
   showToast(
