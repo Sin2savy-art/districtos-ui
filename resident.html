@@ -654,6 +654,18 @@ function selectResidentProperty(unit)
   residentData.utilityBalance =
     found.utilityBalance;
 
+  document.getElementById("maintenanceList").innerHTML =
+  '<div class="notice">Loading...</div>';
+
+  document.getElementById("guestList").innerHTML =
+    '<div class="notice">Loading...</div>';
+  
+  document.getElementById("coTenantList").innerHTML =
+    '<div class="notice">Loading...</div>';
+  
+  document.getElementById("noticesList").innerHTML =
+    '<div class="notice">Loading...</div>';
+
   renderResident(residentData);
   
   loadUtilityBalance();
@@ -1312,17 +1324,17 @@ document.querySelectorAll(".nav button").forEach(btn => {
 });
 
 renderResident(residentData);
+
 loadResidentProperties();
-loadResident();
-loadMaintenance();
-loadGuestPasses();
-loadCoTenants();
-loadNotices();
-loadUtilityBalance();
-setInterval(loadUtilityBalance, 12000);
-setInterval(loadCoTenants, 12000);
-setInterval(loadNotices, 12000);
-setInterval(loadMaintenance, 12000);
+
+setInterval(function() {
+  loadUtilityBalance();
+  loadNotices();
+  loadMaintenance();
+  loadGuestPasses();
+  loadCoTenants();
+}, 12000);
+
 </script>
 </body>
 </html>
