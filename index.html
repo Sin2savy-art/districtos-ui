@@ -105,7 +105,9 @@
               <h2>Building Overview</h2>
               <p>Smart housing network status and selected-unit controls.</p>
             </div>
-            <div class="pill">Medium RP Preset</div>
+            <div class="pill" id="community-pill">
+                DistrictOS
+              </div>
           </div>
 
           <div class="grid">
@@ -300,6 +302,34 @@
           <div class="page-title">
             <div><h2>Settings</h2><p>DistrictOS recovery and tablet memory tools.</p></div>
             <div class="pill">Hub Tools</div>
+          </div>
+
+          <div class="card wide" style="margin-bottom:18px;">
+
+            <label>Community / Sim Name</label>
+          
+            <input
+              id="communityNameInput"
+              placeholder="Enter community or sim name"
+              style="
+                width:100%;
+                margin-bottom:12px;
+                background:#111318;
+                border:1px solid rgba(255,255,255,0.08);
+                border-radius:12px;
+                color:#fff;
+                padding:12px;
+              "
+            />
+          
+            <button
+              class="action"
+              onclick="saveCommunityName()"
+            >
+              <strong>Save Branding</strong>
+              <span>Update DistrictOS community branding.</span>
+            </button>
+          
           </div>
 
           <div class="action-row" style="grid-template-columns: repeat(2, 1fr);">
@@ -1339,6 +1369,88 @@ function setSelectedRent() {
     });
   }
 
+    function loadCommunityName() {
+      fetch(
+      SL_BRIDGE_URL +
+      "/settings/community?t=" +
+      Date.now()
+    )
+    .then(r => r.json())
+    .then(function(data) {
+  
+      const name =
+        data.communityName ||
+        "DistrictOS";
+  
+      const pill =
+        document.getElementById(
+          "community-pill"
+        );
+  
+      if (pill)
+      {
+        pill.textContent = name;
+      }
+  
+      const input =
+        document.getElementById(
+          "communityNameInput"
+        );
+  
+      if (input)
+      {
+        input.value = name;
+      }
+    });
+  }
+  
+    function saveCommunityName() {
+    
+      if (!isRootOwner)
+      {
+        showToast(
+          "Owner only"
+        );
+        return;
+      }
+    
+      const input =
+        document.getElementById(
+          "communityNameInput"
+        );
+    
+      if (!input) return;
+    
+      fetch(
+        SL_BRIDGE_URL +
+        "/settings/community/save",
+        {
+          method:"POST",
+    
+          headers:{
+            "Content-Type":
+            "application/x-www-form-urlencoded"
+          },
+    
+          body:
+            "name=" +
+            encodeURIComponent(
+              input.value || "DistrictOS"
+            )
+        }
+      )
+      .then(r => r.json())
+      .then(function() {
+    
+        showToast(
+          "Community branding updated"
+        );
+    
+        loadCommunityName();
+    
+      });
+    }
+
     navButtons.forEach(function(btn) {
       btn.addEventListener('click', function() {
         setPage(btn.dataset.page);
@@ -1371,6 +1483,7 @@ function setSelectedRent() {
     loadUnits();
     loadMaintenance();
     loadUtilities();
+    loadCommunityName();
 
     setInterval(loadUnits, 30000);
     setInterval(loadMaintenance, 12000);
