@@ -557,6 +557,28 @@ async function loadResidentProperties()
 
     residentProperties = data || [];
 
+    if (selectedResidentUnit) {
+    const fresh =
+      residentProperties.find(
+        p => p.unit === selectedResidentUnit
+      );
+  
+    if (fresh) {
+      residentData.rent =
+        fresh.rent ||
+        fresh.rentPrice ||
+        fresh.price ||
+        0;
+  
+      residentData.lease = fresh.lease;
+      residentData.status = fresh.status;
+      residentData.utilityBalance =
+        fresh.utilityBalance || 0;
+  
+      renderResident(residentData);
+    }
+  }
+
     const list =
       document.getElementById(
         "resident-properties"
@@ -651,7 +673,11 @@ function selectResidentProperty(unit)
   if (!found) return;
 
   residentData.unit = found.unit;
-  residentData.rent = found.rent;
+  residentData.rent =
+  found.rent ||
+  found.rentPrice ||
+  found.price ||
+  0;
   residentData.lease = found.lease;
   residentData.status = found.status;
   residentData.utilityBalance =
