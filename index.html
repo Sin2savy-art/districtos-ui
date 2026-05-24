@@ -514,6 +514,23 @@
 
       sendDistrictCommand("resetTenant", { unit: selectedUnit });
       refreshSelectedUnit();
+
+        setTimeout(function() {
+        loadUnits();
+        loadUtilities();
+      
+        if (selectedUnit) {
+          fetch(
+            SL_BRIDGE_URL +
+            "/unit?unit=" +
+            encodeURIComponent(selectedUnit)
+          )
+          .then(r => r.json())
+          .then(function(data) {
+            updateSelectedUnitDetails(data);
+          });
+        }
+      }, 1200);
     }
 
     function toggleUtility(unit, type, state) {
