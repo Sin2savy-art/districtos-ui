@@ -237,6 +237,15 @@ html, body {
 
     <!-- Home -->
     <section id="home" class="page active">
+              <div class="card">
+          <div class="label">My Properties</div>
+        
+          <div id="resident-properties">
+            <div class="sub">
+              Loading properties...
+            </div>
+          </div>
+        </div>
       <div class="card">
         <div class="label">Current Unit</div>
         <div class="big" id="homeUnit">Loading…</div>
@@ -453,6 +462,9 @@ const URL_PARAMS = new URLSearchParams(window.location.search);
 const RESIDENT_AVATAR =
   URL_PARAMS.get("avatar") || URL_PARAMS.get("key") || URL_PARAMS.get("id") || "";
 
+  let residentProperties = [];
+  let selectedResidentUnit = "";
+
 let residentData = {
   ok: false, unit: "", tenant: "Resident", tenantKey: RESIDENT_AVATAR,
   lease: "--", rent: 0, status: "No active lease",
@@ -520,6 +532,136 @@ function renderResident(data) {
   const notices = data.notices || [];
   document.getElementById("latestNotice").textContent = notices[0] || "No notices yet.";
 
+}
+
+async function loadResidentProperties()
+{
+  if (!RESIDENT_AVATAR)
+    return;
+
+  try
+  {
+    const res =
+      await fetch(
+        API_BASE +
+        "/resident/properties?avatar=" +
+        encodeURIComponent(
+          RESIDENT_AVATAR
+        ) +
+        "&t=" +
+        Date.now()
+      );
+
+    const data =
+      await res.json();
+
+    residentProperties = data || [];
+
+    const list =
+      document.getElementById(
+        "resident-properties"
+      );
+
+    if (!list) return;
+
+    if (!residentProperties.length)
+    {
+      list.innerHTML =
+        '<div class="sub">No active properties.</div>';
+
+      return;
+    }
+
+    list.innerHTML = "";
+
+    residentProperties.forEach(function(p)
+    {
+      const active =
+        selectedResidentUnit === p.unit;
+
+      list.innerHTML +=
+        '<div class="card" ' +
+        'style="margin-top:8px;cursor:pointer;' +
+        (active
+          ? 'border:1px solid rgba(255,74,53,0.45);'
+          : '') +
+        '" onclick="selectResidentProperty(\'' +
+        p.unit +
+        '\')">' +
+
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+
+        '<strong>' +
+        p.unit +
+        '</strong>' +
+
+        '<span class="' +
+        (p.status === "Active"
+          ? 'pill'
+          : 'pill bad') +
+        '">' +
+        p.status +
+        '</span>' +
+
+        '</div>' +
+
+        '<div class="sub">' +
+        'Rent: L$' +
+        p.rent +
+        ' • Utilities: L$' +
+        p.utilityBalance +
+        '</div>' +
+
+        '</div>';
+    });
+
+    if (
+      !selectedResidentUnit &&
+      residentProperties.length
+    )
+    {
+      selectResidentProperty(
+        residentProperties[0].unit
+      );
+    }
+  }
+  catch(e)
+  {
+    console.log(e);
+  }
+}
+
+function selectResidentProperty(unit)
+{
+  selectedResidentUnit = unit;
+
+  const found =
+    residentProperties.find(
+      p => p.unit === unit
+    );
+
+  if (!found) return;
+
+  residentData.unit = found.unit;
+  residentData.rent = found.rent;
+  residentData.lease = found.lease;
+  residentData.status = found.status;
+  residentData.utilityBalance =
+    found.utilityBalance;
+
+  renderResident(residentData);
+  loadResidentProperties();
+  loadResident();
+  loadUtilityBalance();
+  loadNotices();
+  loadMaintenance();
+  loadGuestPasses();
+  loadCoTenants();
+  loadResidentProperties();
+
+  showToast(
+    "Selected: " + unit
+  );
 }
 
 async function loadResident() {
@@ -694,6 +836,7 @@ function residentAction(action, type = "") {
   .then(response => response.json())
   .then(data => {
     showToast("Sent: " + data.action);
+    loadResidentProperties();
     loadResident();
   })
   .catch(err => {
@@ -1158,6 +1301,7 @@ document.querySelectorAll(".nav button").forEach(btn => {
 });
 
 renderResident(residentData);
+loadResidentProperties();
 loadResident();
 loadMaintenance();
 loadGuestPasses();
