@@ -285,7 +285,7 @@ html, body {
         <div class="label">Rent Amount</div>
         <div class="big" id="leaseRent">L$0</div>
         <div class="sub">Pay before expiration to keep access active.</div>
-        <button class="action" onclick="residentAction('payRent')">Pay Rent</button>
+        <button class="action" onclick="residentAction('payRent')">Pay Rent for Selected Property</button>
       </div>
     </section>
 
@@ -869,7 +869,7 @@ function residentAction(action, type = "") {
   const unit = residentData.unit || "";
   const avatar = RESIDENT_AVATAR || residentData.tenantKey || "";
 
-  showToast(action + " clicked");
+  showToast(action + " for " + unit);
 
   if (!unit) {
     showToast("No active unit");
