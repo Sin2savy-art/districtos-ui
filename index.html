@@ -341,6 +341,9 @@
 
     let selectedUnit = "";
 
+    let currentAdmin = null;
+    let isRootOwner = true;
+
     let pendingDeleteUnit = "";
 
     function escapeHtml(value) {
@@ -493,8 +496,28 @@
 
     function generateBillForSelectedUnit() {
     if (!requireSelectedUnit()) return;
+    if (!requirePermission("utilities")) return;
     generateUtilityBill(selectedUnit);
   }
+
+    function hasPermission(permission) {
+      if (isRootOwner) return true;
+      if (!currentAdmin) return false;
+      return currentAdmin[permission] === true;
+    }
+    
+    function denyAccess() {
+      showToast("Access denied");
+    }
+    
+    function requirePermission(permission) {
+      if (!hasPermission(permission)) {
+        denyAccess();
+        return false;
+      }
+    
+      return true;
+    }
 
     function sendDistrictCommand(action, extraParams) {
       var url = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action);
@@ -545,18 +568,21 @@
 
     function lockSelectedUnit() {
       if (!requireSelectedUnit()) return;
+      if (!requirePermission("doors")) return;
       sendDistrictCommand("lockUnit", { unit: selectedUnit });
       refreshSelectedUnit();
     }
 
     function unlockSelectedUnit() {
       if (!requireSelectedUnit()) return;
+      if (!requirePermission("doors")) return;
       sendDistrictCommand("unlockUnit", { unit: selectedUnit });
       refreshSelectedUnit();
     }
 
     function resetSelectedTenant() {
       if (!requireSelectedUnit()) return;
+      if (!requirePermission("units")) return;
       showToast("Clearing lease for " + selectedUnit);
 
       sendDistrictCommand("resetTenant", { unit: selectedUnit });
@@ -582,6 +608,7 @@
 
 function setSelectedRent() {
   if (!requireSelectedUnit()) return;
+  if (!requirePermission("rent")) return;
 
   const input = document.getElementById("selectedRentInput");
   const rent = parseInt(input.value || "0");
@@ -1077,6 +1104,9 @@ function setSelectedRent() {
     }
 
    function deleteUnit(unit) {
+
+    if (!requirePermission("deleteUnits")) return;
+     
     if (pendingDeleteUnit !== unit) {
       pendingDeleteUnit = unit;
       showToast("Tap Delete again to confirm: " + unit);
