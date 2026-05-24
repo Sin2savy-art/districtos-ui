@@ -830,8 +830,30 @@
         let html = "";
 
         enriched.forEach(function(u) {
-          html += '<div class="unit-section">';
-          html += '<div class="unit-section-title"><span>' + escapeHtml(u.unit) + '</span>';
+          html +=
+          '<div class="unit-section" style="' +
+          'border:1px solid rgba(255,255,255,0.08);' +
+          'border-radius:24px;' +
+          'padding:18px;' +
+          'background:linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));' +
+          'box-shadow:0 12px 30px rgba(0,0,0,0.22);' +
+          '">';
+          
+          html +=
+          '<div class="unit-section-title" style="justify-content:space-between;">' +
+        
+          '<div style="display:flex;align-items:center;gap:10px;">' +
+          '<span style="font-size:20px;">' +
+          escapeHtml(u.unit) +
+          '</span>' +
+        
+          (
+            u.utilityBalance > 0
+              ? '<span class="pill warn">Balance Due</span>'
+              : '<span class="pill">Paid</span>'
+          ) +
+        
+          '</div>';
           if (u.tenant && u.tenant !== "Vacant") html += '<span style="color:#999;font-size:13px;font-weight:400;">· ' + escapeHtml(u.tenant) + '</span>';
           html += '</div>';
 
@@ -845,7 +867,12 @@
             var meterColor = getMeterColor(meter);
             var statusLabel = active ? '<span class="pill" style="font-size:11px;">ON</span>' : '<span class="pill off" style="font-size:11px;">OFF</span>';
 
-            html += '<div class="util-card">';
+            html +=
+            '<div class="util-card" style="' +
+            'background:rgba(255,255,255,0.03);' +
+            'border-radius:18px;' +
+            'padding:14px;' +
+            '">';
             html += '<div class="util-header">';
             html += '<div class="util-name">' + utilIcon(type) + ' ' + type.charAt(0).toUpperCase() + type.slice(1) + '</div>';
             html += '<div style="display:flex;align-items:center;gap:10px;">' + statusLabel;
