@@ -282,6 +282,101 @@
   <div id="admins-list" class="grid"></div>
 </section>
 
+        <div class="nav-btn" data-page="notecards">
+          <span class="icon">✦</span>
+          Notecards
+        </div>
+
+            <section id="notecards" class="page">
+    
+      <div class="page-title">
+        <div>
+          <h2>DistrictOS Notecards</h2>
+          <p>Generate branded community documents.</p>
+        </div>
+    
+        <div class="pill">
+          Branding Active
+        </div>
+      </div>
+    
+      <div class="grid">
+    
+        <div class="card wide">
+    
+          <label>Template</label>
+    
+          <select
+            id="notecardType"
+            style="
+              width:100%;
+              margin-bottom:14px;
+              background:#111318;
+              border:1px solid rgba(255,255,255,0.08);
+              border-radius:12px;
+              color:#fff;
+              padding:12px;
+            "
+          >
+            <option value="resident_welcome">
+              Resident Welcome
+            </option>
+    
+            <option value="owner_setup">
+              Owner Setup Guide
+            </option>
+    
+            <option value="admin_handbook">
+              Admin Handbook
+            </option>
+    
+            <option value="utility_policy">
+              Utility Policy
+            </option>
+    
+            <option value="lease_rules">
+              Lease Rules
+            </option>
+          </select>
+    
+          <button
+            class="action"
+            onclick="generateNotecard()"
+          >
+            <strong>Generate Notecard</strong>
+            <span>Create branded DistrictOS text.</span>
+          </button>
+    
+        </div>
+    
+        <div class="card wide">
+    
+          <label>Generated Output</label>
+    
+          <textarea
+            id="notecardOutput"
+            readonly
+            style="
+              width:100%;
+              height:420px;
+              resize:none;
+              background:#111318;
+              border:1px solid rgba(255,255,255,0.08);
+              border-radius:16px;
+              color:#fff;
+              padding:16px;
+              font-family:monospace;
+              font-size:13px;
+              line-height:1.5;
+            "
+          ></textarea>
+    
+        </div>
+    
+      </div>
+    
+    </section>
+
         <section id="reports" class="page">
           <div class="page-title">
             <div><h2>Reports</h2><p>DistrictOS live building analytics and collection overview.</p></div>
