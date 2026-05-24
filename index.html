@@ -246,90 +246,39 @@
         </section>
 
         <section id="admins" class="page">
-          
-          <div id="page-admins" class="page">
-          
-            <div class="hero">
-              <div>
-                <h1>Admins</h1>
-                <p>Manage DistrictOS staff access and permissions.</p>
-              </div>
-          
-              <div class="status-pill">
-                Admin System Active
-              </div>
-            </div>
-          
-            <div class="card wide" style="margin-bottom:18px;">
-          
-              <label>Admin Avatar UUID</label>
-          
-              <input
-                id="adminAvatar"
-                placeholder="Avatar UUID"
-                style="
-                  width:100%;
-                  margin-bottom:12px;
-                  background:#111318;
-                  border:1px solid rgba(255,255,255,0.08);
-                  border-radius:12px;
-                  color:#fff;
-                  padding:12px;
-                "
-              />
-          
-              <label>Admin Name</label>
-          
-              <input
-                id="adminName"
-                placeholder="Admin display name"
-                style="
-                  width:100%;
-                  margin-bottom:16px;
-                  background:#111318;
-                  border:1px solid rgba(255,255,255,0.08);
-                  border-radius:12px;
-                  color:#fff;
-                  padding:12px;
-                "
-              />
-          
-              <div class="grid cols-2">
-          
-                <label><input type="checkbox" id="permUnits"> Units</label>
-          
-                <label><input type="checkbox" id="permRent"> Rent</label>
-          
-                <label><input type="checkbox" id="permUtilities"> Utilities</label>
-          
-                <label><input type="checkbox" id="permDoors"> Doors</label>
-          
-                <label><input type="checkbox" id="permMaintenance"> Maintenance</label>
-          
-                <label><input type="checkbox" id="permPayments"> Payments</label>
-          
-                <label><input type="checkbox" id="permDeleteUnits"> Delete Units</label>
-          
-              </div>
-          
-              <button
-                class="action"
-                style="margin-top:18px;"
-                onclick="saveAdmin()"
-              >
-                <strong>Save Admin</strong>
-                <span>Create or update admin permissions.</span>
-              </button>
-          
-            </div>
-          
-            <div
-              id="admins-list"
-              class="grid cols-2"
-            ></div>
-          
-          </div>
-        </section>
+  <div class="page-title">
+    <div>
+      <h2>Admins</h2>
+      <p>Manage DistrictOS staff access and permissions.</p>
+    </div>
+    <div class="pill">Admin System Active</div>
+  </div>
+
+  <div class="card wide" style="margin-bottom:18px;">
+    <label>Admin Avatar UUID</label>
+    <input id="adminAvatar" placeholder="Avatar UUID" style="width:100%;margin-bottom:12px;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;padding:12px;" />
+
+    <label>Admin Name</label>
+    <input id="adminName" placeholder="Admin display name" style="width:100%;margin-bottom:16px;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;padding:12px;" />
+
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;color:#ddd;">
+      <label><input type="checkbox" id="permUnits"> Units</label>
+      <label><input type="checkbox" id="permRent"> Rent</label>
+      <label><input type="checkbox" id="permUtilities"> Utilities</label>
+      <label><input type="checkbox" id="permDoors"> Doors</label>
+      <label><input type="checkbox" id="permMaintenance"> Maintenance</label>
+      <label><input type="checkbox" id="permPayments"> Payments</label>
+      <label><input type="checkbox" id="permDeleteUnits"> Delete Units</label>
+    </div>
+
+    <button class="action" style="margin-top:18px;" onclick="saveAdmin()">
+      <strong>Save Admin</strong>
+      <span>Create or update admin permissions.</span>
+    </button>
+  </div>
+
+  <div id="admins-list" class="grid"></div>
+</section>
 
         <section id="reports" class="page">
           <div class="page-title">
