@@ -170,26 +170,26 @@
 
         <section id="utilities" class="page">
           <div class="page-title">
-            <div><h2>Utilities</h2><p>Smart meter status and billing controls per unit.</p></div>
+            <div><h2>Utilities</h2><p>Selected-unit utility controls and billing.</p></div>
             <div class="pill warn" id="util-last-sync">Not synced</div>
           </div>
 
-          <div class="action-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 18px;">
-            <button class="action" onclick="runUtilityCycle()">
-              <strong>Generate Utility Charges</strong>
-              <span>Apply weekly/monthly utility charges.</span>
-            </button>
-
-            <button class="action" onclick="sendUtilityWarnings()">
-              <strong>Send Payment Warnings</strong>
-              <span>Notify residents with unpaid balances.</span>
-            </button>
-
-            <button class="action" onclick="runUtilityShutoff()">
-              <strong>Enforce Utility Shutoff</strong>
-              <span>Disable utilities for overdue balances.</span>
-            </button>
-          </div>
+            <div class="action-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 18px;">
+              <button class="action" onclick="generateBillForSelectedUnit()">
+                <strong>Generate Bill</strong>
+                <span>Create a utility bill for the selected unit.</span>
+              </button>
+            
+              <button class="action" onclick="sendUtilityWarnings()">
+                <strong>Send Warning</strong>
+                <span>Notify residents with unpaid balances.</span>
+              </button>
+            
+              <button class="action" onclick="runUtilityShutoff()">
+                <strong>Enforce Shutoff</strong>
+                <span>Disable utilities for overdue balances.</span>
+              </button>
+            </div>
 
           <div id="utilities-content">
             <div style="color:#999;text-align:center;padding:40px;">Loading utility data...</div>
@@ -455,6 +455,11 @@
 
       return true;
     }
+
+    function generateBillForSelectedUnit() {
+    if (!requireSelectedUnit()) return;
+    generateUtilityBill(selectedUnit);
+  }
 
     function sendDistrictCommand(action, extraParams) {
       var url = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action);
