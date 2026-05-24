@@ -130,12 +130,12 @@
               <span>Bind nearby objects to selected unit.</span>
             </button>
 
-            <button class="action" id="dynamic-lock-btn" onclick="toggleSelectedLock()">
+            <button class="action" id="dynamic-lock-btn" onclick="toggleSelectedLock()" data-permission="doors">
               <strong id="dynamic-lock-title">Lock Unit</strong>
               <span id="dynamic-lock-sub">Disable selected unit access.</span>
             </button>
 
-            <button class="action" onclick="resetSelectedTenant()">
+            <button class="action" onclick="resetSelectedTenant()" data-permission="units">
               <strong>Clear Lease</strong>
               <span>Reset tenant and access.</span>
             </button>
@@ -164,12 +164,12 @@
               <span>Notify residents with expired or ending leases.</span>
             </button>
 
-            <button class="action" onclick="resetSelectedTenant()">
+            <button class="action" onclick="resetSelectedTenant()" data-permission="units">
               <strong>Clear Selected Lease</strong>
               <span>Reset tenant and access for the selected unit.</span>
             </button>
 
-            <button class="action" onclick="setSelectedRent()">
+            <button class="action" onclick="setSelectedRent()" data-permission="rent">
               <strong>Set Selected Rent</strong>
               <span>Update rent across DistrictOS for the selected unit.</span>
             </button>
@@ -185,17 +185,17 @@
           </div>
 
             <div class="action-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 18px;">
-              <button class="action" onclick="generateBillForSelectedUnit()">
+              <button class="action" onclick="generateBillForSelectedUnit()" data-permission="utilities">
                 <strong>Generate Bill</strong>
                 <span>Create a utility bill for the selected unit.</span>
               </button>
             
-              <button class="action" onclick="sendUtilityWarnings()">
+              <button class="action" onclick="sendUtilityWarnings()" data-permission="utilities">
                 <strong>Send Warning</strong>
                 <span>Notify residents with unpaid balances.</span>
               </button>
             
-              <button class="action" onclick="runUtilityShutoff()">
+              <button class="action" onclick="runUtilityShutoff()" data-permission="utilities">
                 <strong>Enforce Shutoff</strong>
                 <span>Disable utilities for overdue balances.</span>
               </button>
@@ -517,6 +517,19 @@
       }
     
       return true;
+    }
+
+    function applyPermissions() {
+      if (isRootOwner) return;
+    
+      document.querySelectorAll("[data-permission]").forEach(function(el) {
+        const perm = el.getAttribute("data-permission");
+    
+        if (!hasPermission(perm)) {
+          el.style.display = "none";
+        }
+        
+      });
     }
 
     function sendDistrictCommand(action, extraParams) {
@@ -1063,7 +1076,7 @@ function setSelectedRent() {
               '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' + escapeHtml(u.tenant || "Vacant") + '</div>' +
               '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')"><span class="' + sc + '">' + escapeHtml(u.status || "Vacant") + '</span></div>' +
               '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' + escapeHtml(u.lease || "--") + '</div>' +
-              '<div><button class="util-btn off" onclick="deleteUnit(\'' + jsString(u.unit) + '\')">Delete</button></div>' +
+              '<div><button class="util-btn off" data-permission="deleteUnits" onclick="deleteUnit(\'' + jsString(u.unit) + '\')">Delete</button></div>' +
               '</div>';
             });
           }
@@ -1237,8 +1250,8 @@ function setSelectedRent() {
               '<div>' + escapeHtml(t.type || "general") + '</div>' +
               '<div><span class="' + statusClass + '">' + escapeHtml(t.status || "Pending") + '</span></div>' +
               '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-              '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + jsString(t.id) + '\',\'In Progress\')">Start</button>' +
-              '<button class="util-btn on" onclick="updateMaintenanceTicket(\'' + jsString(t.id) + '\',\'Completed\')">Done</button>' +
+              '<button class="util-btn on" data-permission="maintenance" onclick="updateMaintenanceTicket(\'' + jsString(t.id) + '\',\'In Progress\')">Start</button>' +
+              '<button class="util-btn on" data-permission="maintenance" onclick="updateMaintenanceTicket(\'' + jsString(t.id) + '\',\'Completed\')">Done</button>' +
               '</div>' +
               '</div>';
           });
