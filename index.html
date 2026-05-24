@@ -510,7 +510,7 @@
 
     function resetSelectedTenant() {
       if (!requireSelectedUnit()) return;
-      if (!confirm("Clear lease for " + selectedUnit + "?")) return;
+      showToast("Clearing lease for " + selectedUnit);
 
       sendDistrictCommand("resetTenant", { unit: selectedUnit });
       refreshSelectedUnit();
@@ -949,7 +949,7 @@
     }
 
     function deleteUnit(unit) {
-    if (!confirm("Delete unit " + unit + "? This cannot be undone."))
+    showToast("Deleting unit: " + unit);
       return;
   
     fetch(SL_BRIDGE_URL + "/units/delete", {
