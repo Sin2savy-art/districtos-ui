@@ -148,7 +148,7 @@
             <div class="pill warn" id="units-last-sync">Not synced</div>
           </div>
 
-          <div class="action-row" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 18px;">
+          <div class="action-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 18px;">
             <button class="action" onclick="sendLeaseWarnings()">
               <strong>Send Lease Warnings</strong>
               <span>Notify residents with expired or ending leases.</span>
@@ -157,6 +157,11 @@
             <button class="action" onclick="resetSelectedTenant()">
               <strong>Clear Selected Lease</strong>
               <span>Reset tenant and access for the selected unit.</span>
+            </button>
+
+            <button class="action" onclick="setSelectedRent()">
+              <strong>Set Selected Rent</strong>
+              <span>Update rent across DistrictOS for the selected unit.</span>
             </button>
           </div>
 
@@ -534,6 +539,61 @@
         }
       }, 1200);
     }
+
+    function setSelectedRent() {
+    if (!requireSelectedUnit()) return;
+  
+    const amount =
+      prompt(
+        "Set rent for " + selectedUnit + ":"
+      );
+  
+    if (!amount) return;
+  
+    const rent = parseInt(amount);
+  
+    if (!rent || rent <= 0) {
+      showToast("Invalid rent amount");
+      return;
+    }
+  
+    fetch(SL_BRIDGE_URL + "/unit/set-rent", {
+      method: "POST",
+      headers: {
+        "Content-Type":
+          "application/x-www-form-urlencoded"
+      },
+      body:
+        "unit=" +
+        encodeURIComponent(selectedUnit) +
+        "&rent=" +
+        encodeURIComponent(rent)
+    })
+    .then(function(r) {
+      return r.json();
+    })
+    .then(function() {
+  
+      showToast(
+        "Rent updated: L$" + rent
+      );
+  
+      sendDistrictCommand(
+        "syncUnitRent",
+        {
+          unit: selectedUnit,
+          rent: rent
+        }
+      );
+  
+      loadUnits();
+      loadUtilities();
+  
+    })
+    .catch(function() {
+      showToast("Rent update failed");
+    });
+  }
 
     function toggleUtility(unit, type, state) {
       showToast('DistrictOS: ' + type + ' ' + state + ' for ' + unit);
