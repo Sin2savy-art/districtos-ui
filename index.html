@@ -94,6 +94,7 @@
         <div class="nav-btn" data-page="payments"><span class="icon">$</span>Payments</div>
         <div class="nav-btn" data-page="maintenance"><span class="icon">⚙</span>Maintenance</div>
         <div class="nav-btn" data-page="admins"><span class="icon">◉</span>Admins</div>
+        <div class="nav-btn" data-page="notecards"><span class="icon">✦</span>Notecards</div>
         <div class="nav-btn" data-page="reports"><span class="icon">▤</span>Reports</div>
         <div class="nav-btn" data-page="settings"><span class="icon">◌</span>Settings</div>
       </nav>
@@ -281,11 +282,6 @@
 
   <div id="admins-list" class="grid"></div>
 </section>
-
-        <div class="nav-btn" data-page="notecards">
-          <span class="icon">✦</span>
-          Notecards
-        </div>
 
             <section id="notecards" class="page">
     
@@ -499,9 +495,6 @@
       if (pageId === 'payments') loadPayments();
       if (pageId === 'utilities') loadUtilities();
       if (pageId === 'notecards') generateNotecard();
-      
-      loadAdmins();
-      
       if (pageId === 'maintenance') loadMaintenance();
       if (pageId === 'reports') { loadUnits(); loadUtilities(); loadPayments(); }
     }
@@ -1609,6 +1602,7 @@ function setSelectedRent() {
     loadMaintenance();
     loadUtilities();
     loadCommunityName();
+    loadAdmins();
 
     setInterval(loadUnits, 30000);
     setInterval(loadMaintenance, 12000);
