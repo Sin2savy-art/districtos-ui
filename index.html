@@ -306,6 +306,8 @@
 
     let selectedUnit = "";
 
+    let pendingDeleteUnit = "";
+
     function escapeHtml(value) {
       return String(value ?? "")
         .replace(/&/g, "&amp;")
@@ -965,36 +967,31 @@
         });
     }
 
-    function deleteUnit(unit) {
-    showToast("Deleting unit: " + unit);
+   function deleteUnit(unit) {
+    if (pendingDeleteUnit !== unit) {
+      pendingDeleteUnit = unit;
+      showToast("Tap Delete again to confirm: " + unit);
       return;
+    }
+  
+    pendingDeleteUnit = "";
   
     fetch(SL_BRIDGE_URL + "/units/delete", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: "unit=" + encodeURIComponent(unit)
     })
-      .then(function(r) {
-        return r.json();
-      })
+      .then(r => r.json())
       .then(function() {
+        showToast("Unit deleted: " + unit);
+  
         if (selectedUnit === unit) {
           selectedUnit = "";
           localStorage.removeItem("districtos_selected_unit");
-          document.getElementById("selected-unit-display").textContent =
-            "No Unit Selected";
-          document.getElementById("selected-unit-card").textContent =
-            "None";
-          document.getElementById("selected-unit-sub").textContent =
-            "Click a unit in the Units tab.";
         }
   
-        showToast("Unit deleted: " + unit);
         loadUnits();
         loadUtilities();
-      })
-      .catch(function() {
-        showToast("Delete failed");
       });
   }
 
