@@ -416,10 +416,14 @@
 
       const nav = document.querySelector('[data-page="' + pageId + '"]');
       if (nav) nav.classList.add('active');
-
+      
+      if (pageId === 'admins') loadAdmins();
       if (pageId === 'units') loadUnits();
       if (pageId === 'payments') loadPayments();
       if (pageId === 'utilities') loadUtilities();
+      
+      loadAdmins();
+      
       if (pageId === 'maintenance') loadMaintenance();
       if (pageId === 'reports') { loadUnits(); loadUtilities(); loadPayments(); }
     }
@@ -1270,6 +1274,78 @@ function setSelectedRent() {
           }
         });
     }
+
+    function saveAdmin() {
+    const avatar = document.getElementById("adminAvatar").value.trim();
+    const name = document.getElementById("adminName").value.trim() || "Unknown";
+  
+    if (!avatar) {
+      showToast("Enter admin UUID");
+      return;
+    }
+  
+    const body =
+      "avatar=" + encodeURIComponent(avatar) +
+      "&name=" + encodeURIComponent(name) +
+      "&units=" + (document.getElementById("permUnits").checked ? "1" : "0") +
+      "&rent=" + (document.getElementById("permRent").checked ? "1" : "0") +
+      "&utilities=" + (document.getElementById("permUtilities").checked ? "1" : "0") +
+      "&doors=" + (document.getElementById("permDoors").checked ? "1" : "0") +
+      "&maintenance=" + (document.getElementById("permMaintenance").checked ? "1" : "0") +
+      "&payments=" + (document.getElementById("permPayments").checked ? "1" : "0") +
+      "&deleteUnits=" + (document.getElementById("permDeleteUnits").checked ? "1" : "0");
+  
+    fetch(SL_BRIDGE_URL + "/admins/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body
+    })
+    .then(r => r.json())
+    .then(function() {
+      showToast("Admin saved");
+      loadAdmins();
+    });
+  }
+  
+  function loadAdmins() {
+    fetch(SL_BRIDGE_URL + "/admins?t=" + Date.now())
+      .then(r => r.json())
+      .then(function(admins) {
+        const list = document.getElementById("admins-list");
+        if (!list) return;
+  
+        if (!admins.length) {
+          list.innerHTML = '<div class="sub">No admins added.</div>';
+          return;
+        }
+  
+        list.innerHTML = "";
+  
+        admins.forEach(function(a) {
+          list.innerHTML +=
+            '<div class="card">' +
+            '<label>' + escapeHtml(a.name || "Unknown") + '</label>' +
+            '<div class="sub" style="word-break:break-all;">' + escapeHtml(a.avatar) + '</div>' +
+            '<div class="sub">Units: ' + a.units + ' · Rent: ' + a.rent + ' · Utilities: ' + a.utilities + '</div>' +
+            '<div class="sub">Doors: ' + a.doors + ' · Maintenance: ' + a.maintenance + ' · Payments: ' + a.payments + '</div>' +
+            '<button class="util-btn off" style="margin-top:12px;" onclick="removeAdmin(\'' + jsString(a.avatar) + '\')">Remove</button>' +
+            '</div>';
+        });
+      });
+  }
+  
+  function removeAdmin(avatar) {
+    fetch(SL_BRIDGE_URL + "/admins/remove", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "avatar=" + encodeURIComponent(avatar)
+    })
+    .then(r => r.json())
+    .then(function() {
+      showToast("Admin removed");
+      loadAdmins();
+    });
+  }
 
     navButtons.forEach(function(btn) {
       btn.addEventListener('click', function() {
