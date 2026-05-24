@@ -498,6 +498,7 @@
       if (pageId === 'units') loadUnits();
       if (pageId === 'payments') loadPayments();
       if (pageId === 'utilities') loadUtilities();
+      if (pageId === 'notecards') generateNotecard();
       
       loadAdmins();
       
@@ -1543,6 +1544,35 @@ function setSelectedRent() {
     
         loadCommunityName();
     
+      });
+    }
+
+    function generateNotecard() {
+      const type =
+        document.getElementById("notecardType").value;
+    
+      const unit =
+        selectedUnit || "";
+    
+      fetch(
+        SL_BRIDGE_URL +
+        "/notecards/generate?type=" +
+        encodeURIComponent(type) +
+        "&unit=" +
+        encodeURIComponent(unit) +
+        "&resident=" +
+        encodeURIComponent("Resident") +
+        "&rent=" +
+        encodeURIComponent("0") +
+        "&t=" +
+        Date.now()
+      )
+      .then(r => r.json())
+      .then(function(data) {
+        document.getElementById("notecardOutput").value =
+          data.content || "";
+    
+        showToast("Notecard generated");
       });
     }
 
