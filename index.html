@@ -1541,45 +1541,58 @@ function setSelectedRent() {
     }
 
     function generateNotecard() {
-      const type =
-        document.getElementById("notecardType").value;
-    
-      const unit =
-        selectedUnit || "";
-    
-      fetch(
+    const type =
+      document.getElementById("notecardType").value;
+  
+    const unit =
+      selectedUnit || "";
+  
+    if (!unit) {
+      showToast("Select a unit first");
+      setPage("units");
+      return;
+    }
+  
+    fetch(
+      SL_BRIDGE_URL +
+      "/unit?unit=" +
+      encodeURIComponent(unit) +
+      "&t=" +
+      Date.now()
+    )
+    .then(r => r.json())
+    .then(function(unitData) {
+      const resident =
+        unitData.tenant || "Resident";
+  
+      const rent =
+        unitData.rent ||
+        unitData.rentPrice ||
+        unitData.price ||
+        0;
+  
+      return fetch(
         SL_BRIDGE_URL +
         "/notecards/generate?type=" +
         encodeURIComponent(type) +
         "&unit=" +
         encodeURIComponent(unit) +
         "&resident=" +
-        encodeURIComponent("Resident") +
+        encodeURIComponent(resident) +
         "&rent=" +
-        encodeURIComponent("0") +
+        encodeURIComponent(rent) +
         "&t=" +
         Date.now()
-      )
-      .then(r => r.json())
-      .then(function(data) {
-        document.getElementById("notecardOutput").value =
-          data.content || "";
-    
-        showToast("Notecard generated");
-      });
-    }
-
-    navButtons.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        setPage(btn.dataset.page);
-      });
+      );
+    })
+    .then(r => r.json())
+    .then(function(data) {
+      document.getElementById("notecardOutput").value =
+        data.content || "";
+  
+      showToast("Notecard generated");
     });
-
-    document.querySelectorAll('[data-action]').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        sendDistrictCommand(btn.dataset.action);
-      });
-    });
+  }
 
     function updateClock() {
       var now = new Date();
