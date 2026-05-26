@@ -1437,9 +1437,11 @@ function setSelectedRent() {
               '">' +
               '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' +
                   escapeHtml(u.unit) +
-                  ' <span class="pill" style="margin-left:8px;font-size:10px;">' +
-                  escapeHtml(u.type || "residential") +
-                  '</span></div>' +
+                ' <span class="pill" style="margin-left:8px;font-size:10px;">' +
+                escapeHtml(u.type || "residential") +
+                ' · ' +
+                escapeHtml(u.subtype || "standard") +
+                '</span></div>' +
               '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' + escapeHtml(u.tenant || "Vacant") + '</div>' +
               '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')"><span class="' + sc + '">' + escapeHtml(u.status || "Vacant") + '</span></div>' +
               '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' + escapeHtml(u.lease || "--") + '</div>' +
