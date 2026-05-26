@@ -455,6 +455,17 @@
   </div>
 
   <script>
+    const params =
+    new URLSearchParams(
+      window.location.search
+    );
+  
+  const avatarUUID =
+    params.get("avatar") || "";
+  
+  const avatarName =
+    params.get("name") || "";
+    
     const pages = document.querySelectorAll('.page');
     const navButtons = document.querySelectorAll('.nav-btn');
     const toast = document.getElementById('toast');
