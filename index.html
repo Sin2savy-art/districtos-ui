@@ -161,6 +161,85 @@
         />
       </div>
 
+          <div class="card wide" style="margin-bottom:18px;">
+
+  <label>Property Configuration</label>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+    <div>
+      <div style="font-size:12px;color:#999;margin-bottom:6px;">
+        Property Type
+      </div>
+
+      <select
+        id="selectedTypeInput"
+        style="
+          width:100%;
+          background:#111318;
+          border:1px solid rgba(255,255,255,0.08);
+          border-radius:12px;
+          color:#fff;
+          padding:12px;
+        "
+      >
+        <option value="residential">
+          Residential
+        </option>
+
+        <option value="commercial">
+          Commercial
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <div style="font-size:12px;color:#999;margin-bottom:6px;">
+        Property Subtype
+      </div>
+
+      <select
+        id="selectedSubtypeInput"
+        style="
+          width:100%;
+          background:#111318;
+          border:1px solid rgba(255,255,255,0.08);
+          border-radius:12px;
+          color:#fff;
+          padding:12px;
+        "
+      >
+        <option value="standard">
+          Standard
+        </option>
+
+        <option value="luxury">
+          Luxury
+        </option>
+
+        <option value="storefront">
+          Storefront
+        </option>
+
+        <option value="office">
+          Office
+        </option>
+      </select>
+    </div>
+
+  </div>
+
+  <button
+    class="action"
+    style="margin-top:14px;"
+    onclick="savePropertyConfig()"
+  >
+    <strong>Save Property Type</strong>
+    <span>Update unit ecosystem configuration.</span>
+  </button>
+
+</div>
+
           <div class="action-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 18px;">
             <button class="action" onclick="sendLeaseWarnings()">
               <strong>Send Lease Warnings</strong>
