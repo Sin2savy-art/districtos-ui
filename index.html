@@ -1604,6 +1604,18 @@ function setSelectedRent() {
       });
     }
 
+    navButtons.forEach(function(btn) {
+  btn.addEventListener("click", function() {
+    setPage(btn.dataset.page);
+  });
+});
+
+document.querySelectorAll("[data-action]").forEach(function(btn) {
+  btn.addEventListener("click", function() {
+    sendDistrictCommand(btn.dataset.action);
+  });
+});
+
     function updateClock() {
       var now = new Date();
       document.getElementById('clock').textContent =
