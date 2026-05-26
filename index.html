@@ -1435,13 +1435,17 @@ function setSelectedRent() {
                 ? 'background:linear-gradient(135deg, rgba(255,70,45,0.16), rgba(255,120,60,0.05));border-left:4px solid #ff4a35;box-shadow:inset 0 0 18px rgba(255,70,45,0.10);'
                 : 'background:rgba(255,255,255,0.01);') +
               '">' +
-              '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' +
-                  escapeHtml(u.unit) +
-                ' <span class="pill" style="margin-left:8px;font-size:10px;">' +
-                escapeHtml(u.type || "residential") +
-                ' · ' +
-                escapeHtml(u.subtype || "standard") +
-                '</span></div>' +
+              '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')" style="line-height:1.25;">' +
+                '<div style="font-weight:700;">' + escapeHtml(u.unit) + '</div>' +
+                '<div style="margin-top:4px;">' +
+                  '<span class="pill" style="font-size:9px;padding:3px 7px;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' +
+                    escapeHtml(u.type || "residential") +
+                  '</span>' +
+                  '<span class="pill warn" style="font-size:9px;padding:3px 7px;margin-left:4px;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' +
+                    escapeHtml(u.subtype || "standard") +
+                  '</span>' +
+                '</div>' +
+              '</div>' +
               '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' + escapeHtml(u.tenant || "Vacant") + '</div>' +
               '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')"><span class="' + sc + '">' + escapeHtml(u.status || "Vacant") + '</span></div>' +
               '<div onclick="selectTabletUnit(\'' + jsString(u.unit) + '\')">' + escapeHtml(u.lease || "--") + '</div>' +
