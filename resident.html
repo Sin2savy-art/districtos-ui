@@ -882,6 +882,18 @@ async function loadResidentProperties()
         p.unit +
         '</strong>' +
 
+        '<div style="margin-top:4px;">' +
+
+          '<span class="pill" style="font-size:9px;padding:2px 7px;">' +
+          (p.type || "residential") +
+          '</span>' +
+          
+          '<span class="pill warn" style="font-size:9px;padding:2px 7px;margin-left:4px;">' +
+          (p.subtype || "standard") +
+          '</span>' +
+          
+          '</div>' +
+
         '<span class="' +
         (p.status === "Active"
           ? 'pill'
