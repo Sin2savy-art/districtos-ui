@@ -101,6 +101,7 @@ html, body {
   margin-bottom:20px;
   border-radius:28px;
   padding:22px;
+  transition:0.22s ease;
   background:
     linear-gradient(
       145deg,
@@ -111,6 +112,12 @@ html, body {
     1px solid rgba(255,255,255,0.08);
   box-shadow:
     0 20px 40px rgba(0,0,0,0.22);
+}
+
+.hero-loading{
+  opacity:0.55;
+  transform:scale(0.985);
+  filter:blur(0.4px);
 }
 
 .hero-top{
@@ -944,6 +951,18 @@ function selectResidentProperty(unit)
       p => p.unit === unit
     );
 
+  const hero =
+  document.querySelector(
+    ".hero-property"
+  );
+
+if (hero)
+{
+  hero.classList.add(
+    "hero-loading"
+  );
+}
+
   if (!found) return;
 
   residentData.unit = found.unit;
@@ -977,6 +996,21 @@ residentData.subtype =
     '<div class="notice">Loading...</div>';
 
   renderResident(residentData);
+  setTimeout(function(){
+
+  const hero =
+    document.querySelector(
+      ".hero-property"
+    );
+
+  if (hero)
+  {
+    hero.classList.remove(
+      "hero-loading"
+    );
+  }
+
+}, 160);
   
   loadUtilityBalance();
   loadNotices();
