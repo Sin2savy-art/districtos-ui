@@ -398,6 +398,20 @@ html, body {
       </div>
     </div>
 
+    <div class="hero-stat">
+  <label>Lease Remaining</label>
+  <div id="hero-lease-time">
+    --
+  </div>
+</div>
+
+<div class="hero-stat">
+  <label>Status</label>
+  <div id="hero-status-text">
+    Stable
+  </div>
+</div>
+
   </div>
 
 </div>
@@ -411,28 +425,13 @@ html, body {
             </div>
           </div>
         </div>
-      <div class="card">
-        <div class="label">Current Unit</div>
-        <div class="big" id="homeUnit">Loading…</div>
-        <div class="sub" id="homeTenant">Checking lease…</div>
-      </div>
-      <div class="grid">
-        <div class="card">
-          <div class="label">Lease</div>
-          <div class="big" id="homeLease">--</div>
-          <div class="sub">remaining</div>
-        </div>
+
         <div class="card">
           <div class="label">Rent</div>
           <div class="big" id="homeRent">L$0</div>
           <div class="sub">weekly</div>
         </div>
-      </div>
-      <div class="card">
-        <div class="label">Apartment Status</div>
-        <span class="pill" id="homeStatus">Checking</span>
-        <div class="sub" id="homeWarning" style="margin-top:5px;">Loading resident data…</div>
-      </div>
+  
         <div class="card" style="flex:1; min-height:0;">
           <div class="label">Latest Notice</div>
           <div class="sub" id="latestNotice">No notices yet.</div>
@@ -749,6 +748,30 @@ function renderResident(data) {
     heroTenant.textContent =
       data.tenant || "Resident";
   }
+
+  const heroLeaseTime =
+      document.getElementById(
+        "hero-lease-time"
+      );
+    
+    if (heroLeaseTime)
+    {
+      heroLeaseTime.textContent =
+        data.lease || "--";
+    }
+    
+    const heroStatusText =
+      document.getElementById(
+        "hero-status-text"
+      );
+    
+    if (heroStatusText)
+    {
+      heroStatusText.textContent =
+        active
+          ? "Stable"
+          : "Attention";
+    }
 
   document.getElementById("homeUnit").textContent   = data.unit   || "No Unit";
   document.getElementById("homeTenant").textContent = data.tenant || "Resident";
