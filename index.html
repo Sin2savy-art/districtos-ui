@@ -257,6 +257,39 @@
             </button>
           </div>
 
+          <div style="
+              display:flex;
+              gap:8px;
+              margin-bottom:16px;
+              flex-wrap:wrap;
+            ">
+            
+              <button
+                class="util-btn on"
+                onclick="setUnitFilter('all')"
+                id="filter-all"
+              >
+                All
+              </button>
+            
+              <button
+                class="util-btn"
+                onclick="setUnitFilter('residential')"
+                id="filter-residential"
+              >
+                Residential
+              </button>
+            
+              <button
+                class="util-btn"
+                onclick="setUnitFilter('commercial')"
+                id="filter-commercial"
+              >
+                Commercial
+              </button>
+            
+            </div>
+
           <div class="list" id="units-list"></div>
         </section>
 
@@ -551,6 +584,7 @@
     const SL_BRIDGE_URL = "https://districtos-bridge.districtos.workers.dev";
 
     let selectedUnit = "";
+    let unitFilter = "all";
 
     let currentAdmin = null;
     let isRootOwner = true;
@@ -654,6 +688,31 @@
       showToast("Selected unit cleared");
       loadUnits();
     }
+
+    function setUnitFilter(type) {
+
+        unitFilter = type;
+      
+        document
+          .querySelectorAll(
+            "#filter-all,#filter-residential,#filter-commercial"
+          )
+          .forEach(function(btn) {
+            btn.classList.remove("on");
+          });
+      
+        const active =
+          document.getElementById(
+            "filter-" + type
+          );
+      
+        if (active)
+        {
+          active.classList.add("on");
+        }
+      
+        loadUnits();
+      }
 
     function updateSelectedUnitDetails(unitData) {
       if (!unitData) return;
@@ -1408,6 +1467,16 @@ function setSelectedRent() {
         .then(r => r.json())
         .then(data => {
           var units = data.filter(u => u.unit && u.unit !== "APT-TEST");
+          if (unitFilter !== "all")
+          {
+            units = units.filter(function(u) {
+              return (
+                (u.type || "residential") ===
+                unitFilter
+              );
+            });
+          }
+          
           units.sort((a, b) => a.unit.localeCompare(b.unit));
 
           var list = document.getElementById('units-list');
