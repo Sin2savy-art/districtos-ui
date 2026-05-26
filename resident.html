@@ -666,6 +666,90 @@ function renderResident(data) {
 
   const active = data.status === "Active";
 
+  // HERO PROPERTY CARD
+  const heroName =
+    document.getElementById(
+      "hero-property-name"
+    );
+  
+  if (heroName)
+  {
+    heroName.textContent =
+      data.unit || "No Property";
+  }
+  
+  const heroType =
+    document.getElementById(
+      "hero-property-type"
+    );
+  
+  if (heroType)
+  {
+    heroType.textContent =
+      data.type || "residential";
+  }
+  
+  const heroSubtype =
+    document.getElementById(
+      "hero-property-subtype"
+    );
+  
+  if (heroSubtype)
+  {
+    heroSubtype.textContent =
+      data.subtype || "standard";
+  }
+  
+  const heroLease =
+    document.getElementById(
+      "hero-lease-status"
+    );
+  
+  if (heroLease)
+  {
+    heroLease.textContent =
+      data.status || "Unknown";
+  
+    heroLease.style.color =
+      active
+        ? "#5dff91"
+        : "#ff5b47";
+  }
+  
+  const heroRent =
+    document.getElementById(
+      "hero-rent"
+    );
+  
+  if (heroRent)
+  {
+    heroRent.textContent =
+      "L$" + (data.rent || 0);
+  }
+  
+  const heroUtilities =
+    document.getElementById(
+      "hero-utilities"
+    );
+  
+  if (heroUtilities)
+  {
+    heroUtilities.textContent =
+      "L$" +
+      (data.utilityBalance || 0);
+  }
+  
+  const heroTenant =
+    document.getElementById(
+      "hero-tenant"
+    );
+  
+  if (heroTenant)
+  {
+    heroTenant.textContent =
+      data.tenant || "Resident";
+  }
+
   document.getElementById("homeUnit").textContent   = data.unit   || "No Unit";
   document.getElementById("homeTenant").textContent = data.tenant || "Resident";
   document.getElementById("homeLease").textContent  = data.lease  || "--";
