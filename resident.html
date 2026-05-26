@@ -929,6 +929,13 @@ function selectResidentProperty(unit)
   0;
   residentData.lease = found.lease;
   residentData.status = found.status;
+
+  residentData.type =
+  found.type || "residential";
+
+residentData.subtype =
+  found.subtype || "standard";
+  
   residentData.utilityBalance =
     found.utilityBalance;
 
