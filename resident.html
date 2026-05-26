@@ -1154,10 +1154,43 @@ async function loadNotices() {
       return;
     }
 
-    latest.textContent =
+let latestIcon = "📢";
+
+if (data[0].type === "emergency")
+{
+  latestIcon = "🚨";
+}
+else if (data[0].type === "rent")
+{
+  latestIcon = "💰";
+}
+else if (data[0].type === "maintenance")
+{
+  latestIcon = "🛠️";
+}
+else if (data[0].type === "community")
+{
+  latestIcon = "🏙️";
+}
+
+latest.innerHTML =
+  '<div style="display:flex;align-items:flex-start;gap:10px;">' +
+
+    '<div style="font-size:18px;line-height:1;">' +
+      latestIcon +
+    '</div>' +
+
+    '<div>' +
+      '<strong>' +
       (data[0].title || "DistrictOS Notice") +
-      ": " +
-      (data[0].message || "");
+      '</strong><br>' +
+
+      '<span style="color:#bbb;">' +
+      (data[0].message || "") +
+      '</span>' +
+    '</div>' +
+
+  '</div>';
 
     list.innerHTML = "";
 
