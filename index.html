@@ -669,7 +669,7 @@
     if (typeInput)
     {
       typeInput.value =
-        u.type || "residential";
+        unitData.type || "residential";
     }
     
     const subtypeInput =
@@ -679,8 +679,8 @@
     
     if (subtypeInput)
     {
-      subtypeInput.value =
-        u.subtype || "standard";
+    subtypeInput.value =
+      unitData.subtype || "standard";
     }
 
       let statusText =
@@ -962,6 +962,58 @@ function setSelectedRent() {
     loadUtilities();
   });
 }
+
+    function savePropertyConfig() {
+
+      if (!selectedUnit)
+      {
+        showToast(
+          "Select a unit first"
+        );
+        return;
+      }
+    
+      const type =
+        document.getElementById(
+          "selectedTypeInput"
+        ).value;
+    
+      const subtype =
+        document.getElementById(
+          "selectedSubtypeInput"
+        ).value;
+    
+      fetch(
+        SL_BRIDGE_URL +
+        "/unit/set-config",
+        {
+          method:"POST",
+    
+          headers:{
+            "Content-Type":
+            "application/x-www-form-urlencoded"
+          },
+    
+          body:
+            "unit=" +
+            encodeURIComponent(selectedUnit) +
+            "&type=" +
+            encodeURIComponent(type) +
+            "&subtype=" +
+            encodeURIComponent(subtype)
+        }
+      )
+      .then(r => r.json())
+      .then(function() {
+    
+        showToast(
+          "Property configuration updated"
+        );
+    
+        loadUnits();
+    
+      });
+    }
 
     function toggleUtility(unit, type, state) {
       showToast('DistrictOS: ' + type + ' ' + state + ' for ' + unit);
