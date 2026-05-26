@@ -97,6 +97,94 @@ html, body {
   box-shadow: 0 10px 24px rgba(0,0,0,0.22);
 }
 
+.hero-property{
+  margin-bottom:20px;
+  border-radius:28px;
+  padding:22px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,0.08),
+      rgba(255,255,255,0.03)
+    );
+  border:
+    1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.22);
+}
+
+.hero-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:18px;
+}
+
+.hero-label{
+  font-size:11px;
+  letter-spacing:1.5px;
+  color:#999;
+  margin-bottom:6px;
+}
+
+.hero-name{
+  font-size:30px;
+  font-weight:900;
+  line-height:1;
+  margin-bottom:10px;
+}
+
+.hero-badges{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.hero-status{
+  text-align:right;
+}
+
+.hero-status-label{
+  font-size:11px;
+  color:#888;
+  margin-bottom:6px;
+}
+
+.hero-status-pill{
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(49,255,120,0.12);
+  border:1px solid rgba(49,255,120,0.25);
+  color:#5dff91;
+  font-size:12px;
+  font-weight:700;
+}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:
+    repeat(3,1fr);
+  gap:14px;
+}
+
+.hero-stat{
+  border-radius:18px;
+  padding:14px;
+  background:rgba(255,255,255,0.03);
+}
+
+.hero-stat label{
+  display:block;
+  font-size:11px;
+  color:#888;
+  margin-bottom:8px;
+}
+
+.hero-stat div{
+  font-size:20px;
+  font-weight:800;
+}
+
 .label {
   font-size: 11px;
   text-transform: uppercase;
@@ -237,6 +325,83 @@ html, body {
 
     <!-- Home -->
     <section id="home" class="page active">
+              <div class="hero-property">
+
+  <div class="hero-top">
+
+    <div>
+      <div class="hero-label">
+        SELECTED PROPERTY
+      </div>
+
+      <div
+        class="hero-name"
+        id="hero-property-name"
+      >
+        House 1
+      </div>
+
+      <div class="hero-badges">
+
+        <span
+          class="pill"
+          id="hero-property-type"
+        >
+          residential
+        </span>
+
+        <span
+          class="pill warn"
+          id="hero-property-subtype"
+        >
+          luxury
+        </span>
+
+      </div>
+    </div>
+
+    <div class="hero-status">
+      <div class="hero-status-label">
+        Lease Status
+      </div>
+
+      <div
+        class="hero-status-pill"
+        id="hero-lease-status"
+      >
+        Active
+      </div>
+    </div>
+
+  </div>
+
+  <div class="hero-grid">
+
+    <div class="hero-stat">
+      <label>Monthly Rent</label>
+      <div id="hero-rent">
+        L$0
+      </div>
+    </div>
+
+    <div class="hero-stat">
+      <label>Utilities</label>
+      <div id="hero-utilities">
+        L$0
+      </div>
+    </div>
+
+    <div class="hero-stat">
+      <label>Tenant</label>
+      <div id="hero-tenant">
+        Resident
+      </div>
+    </div>
+
+  </div>
+
+</div>
+      
               <div class="card">
           <div class="label">My Properties</div>
         
