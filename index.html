@@ -662,6 +662,37 @@
       });
     }
 
+    function loadAccessProfile() {
+      if (!avatarUUID) {
+        isRootOwner = true;
+        return;
+      }
+    
+      fetch(
+        SL_BRIDGE_URL +
+        "/admins/check?avatar=" +
+        encodeURIComponent(avatarUUID) +
+        "&t=" +
+        Date.now()
+      )
+      .then(r => r.json())
+      .then(function(data) {
+        if (data && data.avatar) {
+          currentAdmin = data;
+          isRootOwner = false;
+    
+          showToast("Admin access loaded");
+    
+          applyPermissions();
+        } else {
+          isRootOwner = true;
+        }
+      })
+      .catch(function() {
+        isRootOwner = true;
+      });
+    }
+
     function sendDistrictCommand(action, extraParams) {
       var url = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action);
 
@@ -1649,6 +1680,7 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
     loadUtilities();
     loadCommunityName();
     loadAdmins();
+    loadAccessProfile();
 
     setInterval(loadUnits, 30000);
     setInterval(loadMaintenance, 12000);
