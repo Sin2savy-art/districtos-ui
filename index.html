@@ -661,6 +661,28 @@
       document.getElementById("selected-unit-card").textContent =
         unitData.unit || "None";
 
+      const typeInput =
+      document.getElementById(
+        "selectedTypeInput"
+      );
+    
+    if (typeInput)
+    {
+      typeInput.value =
+        u.type || "residential";
+    }
+    
+    const subtypeInput =
+      document.getElementById(
+        "selectedSubtypeInput"
+      );
+    
+    if (subtypeInput)
+    {
+      subtypeInput.value =
+        u.subtype || "standard";
+    }
+
       let statusText =
         "Tenant: " +
         (unitData.tenant || "Vacant") +
