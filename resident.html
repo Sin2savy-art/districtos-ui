@@ -982,12 +982,6 @@ residentData.subtype =
   loadGuestPasses();
   loadCoTenants();
 
-  selectedResidentUnit =
-  localStorage.getItem(
-    "districtos_resident_unit"
-  ) || "";
-  
-  loadResidentProperties();
 
   setPage("home");
 
@@ -1645,6 +1639,11 @@ document.querySelectorAll(".nav button").forEach(btn => {
 });
 
 renderResident(residentData);
+
+selectedResidentUnit =
+  localStorage.getItem(
+    "districtos_resident_unit"
+  ) || "";
 
 loadResidentProperties();
 
