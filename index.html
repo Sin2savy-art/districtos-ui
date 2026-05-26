@@ -650,15 +650,16 @@
     }
 
     function applyPermissions() {
-      if (isRootOwner) return;
-    
       document.querySelectorAll("[data-permission]").forEach(function(el) {
-        const perm = el.getAttribute("data-permission");
+        el.style.display = "";
     
-        if (!hasPermission(perm)) {
-          el.style.display = "none";
+        if (!isRootOwner) {
+          const perm = el.getAttribute("data-permission");
+    
+          if (!hasPermission(perm)) {
+            el.style.display = "none";
+          }
         }
-        
       });
     }
 
@@ -1680,6 +1681,7 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
     loadUtilities();
     loadCommunityName();
     loadAdmins();
+    applyPermissions();
     loadAccessProfile();
 
     setInterval(loadUnits, 30000);
