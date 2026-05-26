@@ -1166,13 +1166,75 @@ async function loadNotices() {
         ? new Date(n.timestamp * 1000).toLocaleString()
         : "";
 
-      const div = document.createElement("div");
-      div.className = "notice";
+const div = document.createElement("div");
+
+let noticeClass =
+  "rgba(255,255,255,0.04)";
+
+let borderColor =
+  "rgba(255,255,255,0.08)";
+
+let icon = "📢";
+
+if (n.type === "emergency")
+{
+  noticeClass =
+    "rgba(255,42,22,0.12)";
+
+  borderColor =
+    "rgba(255,42,22,0.30)";
+
+  icon = "🚨";
+}
+else if (n.type === "rent")
+{
+  noticeClass =
+    "rgba(255,173,51,0.10)";
+
+  borderColor =
+    "rgba(255,173,51,0.26)";
+
+  icon = "💰";
+}
+else if (n.type === "maintenance")
+{
+  noticeClass =
+    "rgba(90,170,255,0.10)";
+
+  borderColor =
+    "rgba(90,170,255,0.24)";
+
+  icon = "🛠️";
+}
+else if (n.type === "community")
+{
+  noticeClass =
+    "rgba(49,255,120,0.08)";
+
+  borderColor =
+    "rgba(49,255,120,0.22)";
+
+  icon = "🏙️";
+}
+
+div.className = "notice";
+
+div.style.background =
+  noticeClass;
+
+div.style.border =
+  "1px solid " + borderColor;
+
+div.style.borderRadius =
+  "14px";
+
+div.style.marginBottom =
+  "10px";
 
       div.innerHTML =
         `<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
           <div style="flex:1;">
-            <strong>${n.title || "DistrictOS Notice"}</strong><br>
+            <strong>${icon}${n.title || "DistrictOS Notice"}</strong><br>
             <span>${n.message || ""}</span><br>
             <span style="color:#888;font-size:10px;">
               ${n.type || "general"} ${date ? "· " + date : ""}
