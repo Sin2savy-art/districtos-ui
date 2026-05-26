@@ -7,7 +7,7 @@
   <style>
     * { box-sizing: border-box; user-select: none; }
     html, body { margin: 0; width: 100%; height: 100%; background: #050506; font-family: Arial, Helvetica, sans-serif; overflow: hidden; color: #f4f4f4; }
-    body { display: flex; align-items: center; justify-content: center; }
+    body { display: flex; align-items: stretch; justify-content: stretch; }
     .tablet { width: 100vw; height: 100vh; background: radial-gradient(circle at 80% 10%, rgba(255,60,30,0.18), transparent 28%), linear-gradient(135deg, #08090b 0%, #111318 48%, #050506 100%); border: 1px solid rgba(255,255,255,0.08); position: relative; overflow: hidden; }
     .scanline { position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.025), rgba(255,255,255,0.025) 1px, transparent 1px, transparent 4px); opacity: 0.18; pointer-events: none; }
     .topbar { height: 9%; display: flex; align-items: center; justify-content: space-between; padding: 0 3.2%; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.22); backdrop-filter: blur(10px); }
@@ -17,23 +17,23 @@
     .brand span { color: #ff4a35; }
     .status { display: flex; gap: 16px; align-items: center; color: #b8b8b8; font-size: 13px; }
     .dot { width: 9px; height: 9px; border-radius: 50%; background: #31ff78; box-shadow: 0 0 12px rgba(49,255,120,0.8); display: inline-block; margin-right: 7px; }
-    .layout { height: 91%; display: grid; grid-template-columns: 20% 80%; }
+    .layout { height: 91%; display: grid; grid-template-columns: 17% 83%; }
     .sidebar { padding: 4% 7%; border-right: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.20); overflow-y: auto; }
     .nav-btn { min-height: 44px; margin-bottom: 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.035); color: #d8d8d8; display: flex; align-items: center; padding: 0 14px; gap: 10px; font-size: 14px; cursor: pointer; transition: 0.18s ease; }
     .nav-btn:hover, .nav-btn.active { background: linear-gradient(135deg, rgba(255,42,22,0.28), rgba(255,130,48,0.08)); border-color: rgba(255,72,45,0.45); color: white; transform: translateX(3px); }
     .icon { color: #ff4a35; width: 22px; text-align: center; font-size: 17px; }
-    .content { padding: 3.2%; position: relative; overflow-y: auto; height: 100%; }
+    .content { padding: 2%; position: relative; overflow-y: auto; height: 100%; }
     .page { display: none; animation: fadeIn 0.22s ease; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .page-title { display: flex; justify-content: space-between; align-items: end; margin-bottom: 24px; }
-    .page-title h2 { margin: 0; font-size: 28px; }
+    .page-title h2 { margin: 0; font-size: 22px; }
     .page-title p { margin: 6px 0 0; color: #a7a7a7; font-size: 14px; }
-    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-    .card { min-height: 120px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025)); border-radius: 24px; padding: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.22); position: relative; overflow: hidden; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card { min-height: 100px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025)); border-radius: 24px; padding: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.22); position: relative; overflow: hidden; }
     .card::after { content: ""; position: absolute; top: -40%; right: -40%; width: 90%; height: 90%; background: radial-gradient(circle, rgba(255,55,30,0.18), transparent 60%); pointer-events: none; }
     .card label { display: block; color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 12px; }
-    .stat { font-size: 31px; font-weight: 900; }
+    .stat { font-size: 24px; font-weight: 900; }
     .sub { color: #9c9c9c; font-size: 13px; margin-top: 7px; line-height: 1.45; }
     .wide { grid-column: span 2; }
     .action-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 22px; }
