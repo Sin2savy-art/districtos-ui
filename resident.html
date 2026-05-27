@@ -822,37 +822,33 @@ function renderResident(data) {
     data.meters?.[type] || 0;
 
     let stateText = "Stable";
-  
-      if (usage > 85)
-      {
-        stateText = "Critical";
-      }
-      else if (usage > 60)
-      {
-        stateText = "Heavy Usage";
-      }
-      else if (usage > 30)
-      {
-        stateText = "Normal";
-      }
-      
-      const stateEl =
-        document.getElementById(
-          type + "State"
-        );
-      
-      if (stateEl)
-      {
-        stateEl.textContent =
-          stateText;
-      
-        stateEl.className =
-          usage > 85
-            ? "pill bad"
-            : usage > 60
-              ? "pill warn"
-              : "pill";
-      }
+
+    if (usage <= 0) {
+      stateText = "Off";
+    }
+    else if (usage <= 30) {
+      stateText = "Critical";
+    }
+    else if (usage <= 60) {
+      stateText = "Low";
+    }
+    else if (usage <= 85) {
+      stateText = "Normal";
+    }
+    
+    const stateEl =
+      document.getElementById(type + "State");
+    
+    if (stateEl) {
+      stateEl.textContent = stateText;
+    
+      stateEl.className =
+        usage <= 30
+          ? "pill bad"
+          : usage <= 60
+            ? "pill warn"
+            : "pill";
+    }
 
   if (!meter) return;
 
