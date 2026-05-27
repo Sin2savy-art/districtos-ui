@@ -241,7 +241,22 @@ html, body {
 .utility:last-child { margin-bottom: 0; }
 .utility-head { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
 .meter { height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; margin-top: 7px; }
-.bar   { height: 100%; background: linear-gradient(90deg, #ff2a16, #ffb347); border-radius: 999px; transition: width 0.4s ease; }
+.bar{
+  height:100%;
+  background:
+    linear-gradient(
+      90deg,
+      #ff2a16,
+      #ffb347
+    );
+
+  border-radius:999px;
+
+  transition:
+    width 0.5s ease,
+    filter 0.25s ease,
+    opacity 0.25s ease;
+}
 
 /* Notices */
 .notice { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #d8d8d8; font-size: 12px; }
@@ -791,6 +806,49 @@ function renderResident(data) {
   document.getElementById("internetMeter").style.width  = (data.meters?.internet  || 0) + "%";
   document.getElementById("gasMeter").style.width       = (data.meters?.gas       || 0) + "%";
 
+  [
+  "electric",
+  "water",
+  "internet",
+  "gas"
+].forEach(function(type){
+
+  const meter =
+    document.getElementById(
+      type + "Meter"
+    );
+
+  const usage =
+    data.meters?.[type] || 0;
+
+  if (!meter) return;
+
+  meter.style.opacity =
+    usage > 90 ? "1" : "0.88";
+
+  meter.style.filter =
+    usage > 90
+      ? "brightness(1.2)"
+      : "none";
+
+  if (usage > 85)
+  {
+    meter.style.background =
+      "linear-gradient(90deg,#ff2a16,#ff5b47)";
+  }
+  else if (usage > 55)
+  {
+    meter.style.background =
+      "linear-gradient(90deg,#ff9f2f,#ffd16b)";
+  }
+  else
+  {
+    meter.style.background =
+      "linear-gradient(90deg,#ff2a16,#ffb347)";
+  }
+
+});
+
   document.getElementById("utilityBalance").textContent = "L$" + (data.utilityBalance || 0);
 
   const notices = data.notices || [];
@@ -1094,8 +1152,29 @@ async function loadUtilityBalance() {
 
     const data = await res.json();
     const balance = data.utility?.balance || 0;
+    const overdue =
+      balance > 250;
+  
+    const critical =
+      balance > 500;
 
-    document.getElementById("utilityBalance").textContent = "L$" + balance;
+const utilityEl =
+  document.getElementById(
+    "utilityBalance"
+  );
+
+if (utilityEl)
+{
+  utilityEl.textContent =
+    "L$" + balance;
+
+  utilityEl.style.color =
+    critical
+      ? "#ff5b47"
+      : overdue
+        ? "#ffbe55"
+        : "#5dff91";
+  
   } catch (e) {
     console.log(e);
   }
