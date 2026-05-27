@@ -1152,29 +1152,22 @@ async function loadUtilityBalance() {
 
     const data = await res.json();
     const balance = data.utility?.balance || 0;
-    const overdue =
-      balance > 250;
-  
-    const critical =
-      balance > 500;
 
-const utilityEl =
-  document.getElementById(
-    "utilityBalance"
-  );
+    const overdue = balance > 250;
+    const critical = balance > 500;
 
-if (utilityEl)
-{
-  utilityEl.textContent =
-    "L$" + balance;
+    const utilityEl = document.getElementById("utilityBalance");
 
-  utilityEl.style.color =
-    critical
-      ? "#ff5b47"
-      : overdue
-        ? "#ffbe55"
-        : "#5dff91";
-  
+    if (utilityEl) {
+      utilityEl.textContent = "L$" + balance;
+
+      utilityEl.style.color =
+        critical
+          ? "#ff5b47"
+          : overdue
+            ? "#ffbe55"
+            : "#5dff91";
+    }
   } catch (e) {
     console.log(e);
   }
