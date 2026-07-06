@@ -2080,8 +2080,8 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
       }
 
       function pairBtn(dtype) {
-        return "<button class='util-btn on' style='margin-left:8px' onclick="pairDevice('" +
-          (currentSnapshot ? currentSnapshot.unit : '') + "','" + dtype + "')">Pair</button>";
+        var u = currentSnapshot ? currentSnapshot.unit : '';
+        return '<button class="util-btn on" style="margin-left:8px" onclick="pairDevice(\'' + u + '\',\'' + dtype + '\')" >Pair</button>';
       }
 
       el.innerHTML =
