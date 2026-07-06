@@ -119,6 +119,7 @@
             <div class="card wide"><label>System Feed</label><div id="system-feed"><div class="sub" style="color:#999;">Loading...</div></div></div>
             <div class="card wide"><label>District Health</label><div class="stat" id="stat-health">--</div><div class="sub" id="stat-health-sub">Fetching...</div></div>
             <div class="card wide"><label>Selected Unit</label><div class="stat" id="selected-unit-card">None</div><div class="sub" id="selected-unit-sub">Click a unit in the Units tab.</div></div>
+            <div class="card wide"><label>Unit Snapshot</label><div id="unit-snapshot-panel"><div class="sub" style="color:#999">Select a unit to view status.</div></div></div>
             <div class="card wide"><label>Last Action</label><div class="stat" id="last-action-card">Idle</div><div class="sub" id="last-action-sub">No recent landlord actions.</div></div>
           </div>
 
@@ -128,9 +129,17 @@
               <span>Push access and mailbox data.</span>
             </button>
 
-            <button class="action" data-action="autoAssign">
-              <strong>Auto Assign</strong>
-              <span>Bind nearby objects to selected unit.</span>
+            <button class="action" data-action="pairDoor">
+              <strong>Pair Door</strong>
+              <span>Provision door to selected unit.</span>
+            </button>
+            <button class="action" data-action="pairMailbox">
+              <strong>Pair Mailbox</strong>
+              <span>Provision mailbox to selected unit.</span>
+            </button>
+            <button class="action" data-action="pairMeter">
+              <strong>Pair Meter</strong>
+              <span>Provision meter to selected unit.</span>
             </button>
 
             <button class="action" id="dynamic-lock-btn" onclick="toggleSelectedLock()" data-permission="doors">
@@ -148,6 +157,9 @@
         <section id="units" class="page">
           <div class="page-title">
             <div><h2>Units</h2><p>Apartment registry and lease status.</p></div>
+            <button class="action" style="min-height:44px;padding:10px 18px" onclick="createUnit()">
+              <strong style="font-size:13px">+ Create Unit</strong>
+            </button>
             <div class="pill warn" id="units-last-sync">Not synced</div>
           </div>
 
@@ -670,6 +682,7 @@
       showToast("Selected unit: " + unit);
       loadUnits();
       loadUtilities();
+      loadUnitSnapshot(unit);
     }
 
     function clearSelectedUnit() {
@@ -905,14 +918,21 @@
     function sendDistrictCommand(action, extraParams) {
       var url = SL_BRIDGE_URL + "?action=" + encodeURIComponent(action);
 
-      if ((action === "syncDoors" || action === "autoAssign" || action === "pairDoor") && !selectedUnit) {
+      if ((action === "syncDoors" || action === "autoAssign" || action === "pairDoor" || action === "pairMailbox" || action === "pairMeter") && !selectedUnit) {
         showToast("Select a unit first");
         setPage("units");
         return;
       }
 
-      if (action === "syncDoors" || action === "autoAssign" || action === "pairDoor") {
+      if (action === "syncDoors" || action === "autoAssign") {
         url += "&unit=" + encodeURIComponent(selectedUnit);
+      }
+
+      // pairDoor/pairMailbox/pairMeter handled separately via provisioning
+      if (action === "pairDoor" || action === "pairMailbox" || action === "pairMeter") {
+        var deviceType = action === "pairDoor" ? "door" : action === "pairMailbox" ? "mailbox" : "meter";
+        pairDevice(selectedUnit, deviceType);
+        return;
       }
 
       if (extraParams) {
@@ -1490,7 +1510,7 @@ function setSelectedRent() {
             list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No units found.</div></div>';
           } else {
             units.forEach(function(u) {
-              var sc = u.status === "Active" ? "pill" : u.status === "Expired" ? "pill bad" : "pill warn";
+              var sc = (u.status === "occupied" || u.status === "Active") ? "pill" : (u.status === "expired" || u.status === "Expired") ? "pill bad" : "pill warn";
 
               if (u.unit === selectedUnit) {
                 updateSelectedUnitDetails(u);
@@ -1966,6 +1986,147 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
 
     setInterval(loadUnits, 30000);
     setInterval(loadMaintenance, 12000);
-  </script>
+  
+    // ============================================================
+    // PROVISIONING -- Zero-touch device pairing
+    // Creates a provisioning session and polls for completion.
+    // Device scripts auto-discover and self-provision.
+    // ============================================================
+    var pairingPolls = {};
+
+    function pairDevice(unit, deviceType) {
+      if (!unit) { showToast("Select a unit first"); return; }
+
+      showToast("Creating " + deviceType + " session for " + unit + "...");
+
+      fetch(SL_BRIDGE_URL + "/provision/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "unit=" + encodeURIComponent(unit) +
+              "&device_type=" + encodeURIComponent(deviceType) +
+              "&owner_uuid=00000000-0000-0000-0000-000000000002" +
+              "&device_name=" + encodeURIComponent(unit + " " + deviceType)
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (!data.ok) {
+          showToast("Pairing failed: " + (data.message || data.error));
+          return;
+        }
+        showToast(deviceType + " session ready. Reset the device object.");
+        // Poll for completion
+        var pvId   = data.provisioning_id;
+        var polls  = 0;
+        var maxPoll = 20;
+        pairingPolls[deviceType] = setInterval(function() {
+          polls++;
+          if (polls > maxPoll) {
+            clearInterval(pairingPolls[deviceType]);
+            showToast(deviceType + " pairing timed out.");
+            return;
+          }
+          fetch(SL_BRIDGE_URL + "/provision/status?unit=" +
+            encodeURIComponent(unit) + "&device_type=" +
+            encodeURIComponent(deviceType) + "&provisioning_id=" +
+            encodeURIComponent(pvId))
+          .then(r => r.json())
+          .then(status => {
+            if (status.status === "ACTIVE" || status.status === "BOUND") {
+              clearInterval(pairingPolls[deviceType]);
+              showToast(deviceType + " paired to " + unit + "!");
+              loadUnitSnapshot(unit);
+            } else if (status.status === "FAILED" || status.status === "EXPIRED") {
+              clearInterval(pairingPolls[deviceType]);
+              showToast(deviceType + " pairing " + status.status.toLowerCase() + ". Try again.");
+            }
+          }).catch(function() {});
+        }, 30000);
+      })
+      .catch(function(e) {
+        showToast("Pairing error: " + e.message);
+      });
+    }
+
+    // ============================================================
+    // UNIT SNAPSHOT -- Load and display full unit state
+    // ============================================================
+    var currentSnapshot = null;
+
+    function loadUnitSnapshot(unit) {
+      if (!unit) return;
+      fetch(SL_BRIDGE_URL + "/unit/" + encodeURIComponent(unit))
+        .then(r => r.json())
+        .then(data => {
+          currentSnapshot = data;
+          renderUnitSnapshot(data);
+        })
+        .catch(function() {});
+    }
+
+    function renderUnitSnapshot(data) {
+      var el = document.getElementById("unit-snapshot-panel");
+      if (!el) return;
+      if (!data || !data.ok) { el.innerHTML = "<div class='sub' style='color:#999'>No data.</div>"; return; }
+
+      var occ   = data.occupancy || {};
+      var bill  = data.billing   || {};
+      var devs  = data.devices   || {};
+
+      function devBadge(d) {
+        if (!d.paired) return "<span class='pill warn'>Unpaired</span>";
+        return d.connected
+          ? "<span class='pill'>Online</span>"
+          : "<span class='pill bad'>Offline</span>";
+      }
+
+      function pairBtn(dtype) {
+        return "<button class='util-btn on' style='margin-left:8px' onclick="pairDevice('" +
+          (currentSnapshot ? currentSnapshot.unit : '') + "','" + dtype + "')">Pair</button>";
+      }
+
+      el.innerHTML =
+        "<div class='util-card'>" +
+        "<div class='util-header'><span class='util-name'>" + (data.unit || "") + " Snapshot</span>" +
+        "<span class='pill" + (occ.status === "occupied" ? "" : " warn") + "'>" +
+        (occ.status || "vacant").toUpperCase() + "</span></div>" +
+        "<div class='sub'>Tenant: " + (occ.tenant || "Vacant") + "</div>" +
+        "<div class='sub'>Lease: " + (occ.time_remaining || "--") + "</div>" +
+        "<div class='sub'>Rent: L$" + (bill.rent_price || 0) + " / " + (bill.lease_days || 7) + " days</div>" +
+        "<div class='sub'>Utility Balance: L$" + (bill.utility_balance || 0) + "</div>" +
+        "</div>" +
+        "<div class='util-card'>" +
+        "<div class='util-header'><span class='util-name'>Devices</span></div>" +
+        "<div class='sub' style='display:flex;align-items:center;gap:8px;margin-bottom:8px'>Door " +
+        devBadge(devs.door || {}) + pairBtn("door") + "</div>" +
+        "<div class='sub' style='display:flex;align-items:center;gap:8px;margin-bottom:8px'>Mailbox " +
+        devBadge(devs.mailbox || {}) + pairBtn("mailbox") + "</div>" +
+        "<div class='sub' style='display:flex;align-items:center;gap:8px'>Meter " +
+        devBadge(devs.meter || {}) + pairBtn("meter") + "</div>" +
+        "</div>";
+    }
+
+
+    function createUnit() {
+      var name = prompt("Enter unit name (e.g. APT-102):");
+      if (!name || !name.trim()) return;
+      name = name.trim().toUpperCase();
+      fetch(SL_BRIDGE_URL + "/units/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "unit=" + encodeURIComponent(name)
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.ok) {
+          showToast("Unit " + name + " created.");
+          loadUnits();
+        } else {
+          showToast("Error: " + (data.message || data.error));
+        }
+      })
+      .catch(function(e) { showToast("Error: " + e.message); });
+    }
+
+</script>
 </body>
 </html>
