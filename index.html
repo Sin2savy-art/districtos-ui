@@ -2088,6 +2088,8 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
       el.innerHTML =
         "<div class='util-card'>" +
         "<div class='util-header'><span class='util-name'>" + (data.unit || "") + " Snapshot</span>" +
+        "<button class='util-btn on' style='margin-left:auto;font-size:11px' " +
+        "id='snapshot-config-btn'>Configure</button>" +
         "<span class='pill" + (occ.status === "occupied" ? "" : " warn") + "'>" +
         (occ.status || "vacant").toUpperCase() + "</span></div>" +
         "<div class='sub'>Tenant: " + (occ.tenant || "Vacant") + "</div>" +
@@ -2104,6 +2106,14 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
         "<div class='sub' style='display:flex;align-items:center;gap:8px'>Meter " +
         devBadge(devs.meter || {}) + pairBtn("meter") + "</div>" +
         "</div>";
+
+      // Wire configure button after innerHTML is set
+      var cfgBtn = document.getElementById("snapshot-config-btn");
+      if (cfgBtn && data && data.unit) {
+        (function(u) {
+          cfgBtn.onclick = function() { openUnitConfig(u); };
+        })(data.unit);
+      }
     }
 
 
@@ -2121,11 +2131,150 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
         if (data.ok) {
           showToast("Unit " + name + " created.");
           loadUnits();
+          // Auto-open config for the new unit
+          setTimeout(function() { openUnitConfig(name); }, 500);
         } else {
           showToast("Error: " + (data.message || data.error));
         }
       })
       .catch(function(e) { showToast("Error: " + e.message); });
+    }
+
+    // ============================================================
+    // UNIT CONFIGURATION MODAL
+    // Sets rent, lease days, utility cost, billing cycle.
+    // Called after unit creation and from the unit config button.
+    // ============================================================
+
+    function openUnitConfig(unit) {
+      if (!unit) { showToast("Select a unit first."); return; }
+
+      // Fetch current config
+      fetch(SL_BRIDGE_URL + "/unit/" + encodeURIComponent(unit))
+        .then(r => r.json())
+        .then(function(data) {
+          var bill = data.billing || {};
+          var rent = bill.rent_price || 0;
+          var days = bill.lease_days || 7;
+          var util = bill.utility_balance || 0;
+          var cycle = bill.cycle || "weekly";
+
+          // Build modal HTML
+          var modal = document.getElementById("unit-config-modal");
+          if (!modal) {
+            modal = document.createElement("div");
+            modal.id = "unit-config-modal";
+            modal.style.cssText =
+              "position:fixed;top:0;left:0;width:100%;height:100%;" +
+              "background:rgba(0,0,0,0.85);z-index:9999;" +
+              "display:flex;align-items:center;justify-content:center;";
+            document.body.appendChild(modal);
+          }
+
+          // Build modal using DOM to avoid quote escaping issues
+          modal.innerHTML = "";
+          var box = document.createElement("div");
+          box.style.cssText = "background:#0d0d1a;border:1px solid #2a2a4a;border-radius:12px;padding:24px;width:340px;color:#f4f4f4";
+
+          var title = document.createElement("h3");
+          title.style.cssText = "margin:0 0 16px;color:#7b9fff;font-size:15px";
+          title.textContent = "Configure " + unit;
+          box.appendChild(title);
+
+          function makeField(labelText, inputId, type, value, min) {
+            var lbl = document.createElement("label");
+            lbl.style.cssText = "font-size:11px;color:#aaa;display:block;margin-bottom:4px";
+            lbl.textContent = labelText;
+            box.appendChild(lbl);
+            var inp = document.createElement("input");
+            inp.id = inputId; inp.type = type; inp.value = value; inp.min = min;
+            inp.style.cssText = "width:100%;background:#0a0a18;border:1px solid #2a2a4a;color:#f4f4f4;padding:8px;border-radius:6px;margin-bottom:12px;box-sizing:border-box";
+            box.appendChild(inp);
+          }
+
+          makeField("Rent Price (L$)", "cfg-rent", "number", rent, 0);
+          makeField("Lease Length (days)", "cfg-days", "number", days, 1);
+          makeField("Utility Cost per Cycle (L$)", "cfg-util", "number", 0, 0);
+
+          var cyLbl = document.createElement("label");
+          cyLbl.style.cssText = "font-size:11px;color:#aaa;display:block;margin-bottom:4px";
+          cyLbl.textContent = "Billing Cycle";
+          box.appendChild(cyLbl);
+          var sel = document.createElement("select");
+          sel.id = "cfg-cycle";
+          sel.style.cssText = "width:100%;background:#0a0a18;border:1px solid #2a2a4a;color:#f4f4f4;padding:8px;border-radius:6px;margin-bottom:20px;box-sizing:border-box";
+          ["weekly","biweekly","monthly"].forEach(function(v) {
+            var opt = document.createElement("option");
+            opt.value = v; opt.textContent = v.charAt(0).toUpperCase() + v.slice(1);
+            if (v === cycle) opt.selected = true;
+            sel.appendChild(opt);
+          });
+          box.appendChild(sel);
+
+          var btns = document.createElement("div");
+          btns.style.cssText = "display:flex;gap:10px";
+
+          var saveBtn = document.createElement("button");
+          saveBtn.textContent = "Save";
+          saveBtn.style.cssText = "flex:1;background:#2a4aff;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+          saveBtn.onclick = function() { saveUnitConfig(unit); };
+
+          var cancelBtn = document.createElement("button");
+          cancelBtn.textContent = "Cancel";
+          cancelBtn.style.cssText = "flex:1;background:#2a2a4a;color:#aaa;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+          cancelBtn.onclick = closeUnitConfig;
+
+          btns.appendChild(saveBtn);
+          btns.appendChild(cancelBtn);
+          box.appendChild(btns);
+          modal.appendChild(box);
+          modal.style.display = "flex";
+        })
+        .catch(function() {
+          showToast("Could not load unit config.");
+        });
+    }
+
+    function saveUnitConfig(unit) {
+      var rent  = parseInt(document.getElementById("cfg-rent").value) || 0;
+      var days  = parseInt(document.getElementById("cfg-days").value) || 7;
+      var util  = parseInt(document.getElementById("cfg-util").value) || 0;
+      var cycle = document.getElementById("cfg-cycle").value;
+
+      // Update unit rent + days
+      var p1 = fetch(SL_BRIDGE_URL + "/units/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "unit=" + encodeURIComponent(unit) +
+              "&rent=" + rent +
+              "&lease_days=" + days
+      });
+
+      // Update utility settings
+      var p2 = fetch(SL_BRIDGE_URL + "/utilities/set-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "unit=" + encodeURIComponent(unit) +
+              "&cost=" + util +
+              "&cycle=" + encodeURIComponent(cycle) +
+              "&electric=1&water=1&internet=1&gas=1"
+      });
+
+      Promise.all([p1, p2])
+        .then(function() {
+          showToast("Unit " + unit + " configured.");
+          closeUnitConfig();
+          loadUnits();
+          loadUnitSnapshot(unit);
+        })
+        .catch(function(e) {
+          showToast("Save error: " + e.message);
+        });
+    }
+
+    function closeUnitConfig() {
+      var modal = document.getElementById("unit-config-modal");
+      if (modal) modal.style.display = "none";
     }
 
 </script>
