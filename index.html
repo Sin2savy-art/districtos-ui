@@ -899,12 +899,13 @@
       )
       .then(r => r.json())
       .then(function(data) {
-        if (data && data.avatar) {
+        if (data && data.isOwner === true) {
+          isRootOwner = true;
+          showToast("Owner access confirmed.");
+        } else if (data && data.isAdmin === true) {
           currentAdmin = data;
           isRootOwner = false;
-    
-          showToast("Admin access loaded");
-    
+          showToast("Admin access loaded.");
           applyPermissions();
         } else {
           isRootOwner = true;
