@@ -90,7 +90,7 @@
         <div class="nav-btn active" data-page="dashboard"><span class="icon">◆</span>Dashboard</div>
         <div class="nav-btn" data-page="units"><span class="icon">▦</span>Units</div>
         <div class="nav-btn" data-page="utilities"><span class="icon">⚡</span>Utilities</div>
-        <div class="nav-btn" data-page="doors"><span class="icon">▣</span>Doors</div>
+        <div class="nav-btn" data-page="doors"><span class="icon">▣</span>Devices</div>
         <div class="nav-btn" data-page="payments"><span class="icon">$</span>Payments</div>
         <div class="nav-btn" data-page="maintenance"><span class="icon">⚙</span>Maintenance</div>
         <div class="nav-btn" data-page="admins"><span class="icon">◉</span>Admins</div>
@@ -118,8 +118,8 @@
             <div class="card"><label>Utility Alerts</label><div class="stat" id="stat-util-alerts">--</div><div class="sub">Services offline</div></div>
             <div class="card wide"><label>System Feed</label><div id="system-feed"><div class="sub" style="color:#999;">Loading...</div></div></div>
             <div class="card wide"><label>District Health</label><div class="stat" id="stat-health">--</div><div class="sub" id="stat-health-sub">Fetching...</div></div>
-            <div class="card wide"><label>Selected Unit</label><div class="stat" id="selected-unit-card">None</div><div class="sub" id="selected-unit-sub">Click a unit in the Units tab.</div></div>
-            <div class="card wide"><label>Unit Snapshot</label><div id="unit-snapshot-panel"><div class="sub" style="color:#999">Select a unit to view status.</div></div></div>
+            <div class="card wide"><label>Selected Unit</label><div class="stat" id="selected-unit-card">None</div><div class="sub" id="selected-unit-sub">Click a unit in the Units tab.</div>
+            <div class="card wide"><label>Unit Snapshot</label><div id="unit-snapshot-panel"><div class="sub" style="color:#999">Select a unit to view status.</div></div></div></div>
             <div class="card wide"><label>Last Action</label><div class="stat" id="last-action-card">Idle</div><div class="sub" id="last-action-sub">No recent landlord actions.</div></div>
           </div>
 
@@ -163,96 +163,11 @@
             <div class="pill warn" id="units-last-sync">Not synced</div>
           </div>
 
-          <div class="card wide" style="margin-bottom:18px;">
-        <label>Selected Unit Rent</label>
-        <input
-          id="selectedRentInput"
-          type="number"
-          placeholder="Enter rent amount"
-          style="width:100%;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;padding:12px;font-size:14px;"
-        />
-      </div>
+          
 
-          <div class="card wide" style="margin-bottom:18px;">
+          
 
-  <label>Property Configuration</label>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-
-    <div>
-      <div style="font-size:12px;color:#999;margin-bottom:6px;">
-        Property Type
-      </div>
-
-      <select
-        id="selectedTypeInput"
-        style="
-          width:100%;
-          background:#111318;
-          border:1px solid rgba(255,255,255,0.08);
-          border-radius:12px;
-          color:#fff;
-          padding:12px;
-        "
-      >
-        <option value="residential">
-          Residential
-        </option>
-
-        <option value="commercial">
-          Commercial
-        </option>
-      </select>
-    </div>
-
-    <div>
-      <div style="font-size:12px;color:#999;margin-bottom:6px;">
-        Property Subtype
-      </div>
-
-      <select
-        id="selectedSubtypeInput"
-        style="
-          width:100%;
-          background:#111318;
-          border:1px solid rgba(255,255,255,0.08);
-          border-radius:12px;
-          color:#fff;
-          padding:12px;
-        "
-      >
-        <option value="standard">
-          Standard
-        </option>
-
-        <option value="luxury">
-          Luxury
-        </option>
-
-        <option value="storefront">
-          Storefront
-        </option>
-
-        <option value="office">
-          Office
-        </option>
-      </select>
-    </div>
-
-  </div>
-
-  <button
-    class="action"
-    style="margin-top:14px;"
-    onclick="savePropertyConfig()"
-  >
-    <strong>Save Property Type</strong>
-    <span>Update unit ecosystem configuration.</span>
-  </button>
-
-</div>
-
-          <div class="action-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 18px;">
+          <div class="action-row" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 18px;">
             <button class="action" onclick="sendLeaseWarnings()">
               <strong>Send Lease Warnings</strong>
               <span>Notify residents with expired or ending leases.</span>
@@ -263,10 +178,7 @@
               <span>Reset tenant and access for the selected unit.</span>
             </button>
 
-            <button class="action" onclick="setSelectedRent()" data-permission="rent">
-              <strong>Set Selected Rent</strong>
-              <span>Update rent across DistrictOS for the selected unit.</span>
-            </button>
+
           </div>
 
           <div style="
@@ -311,7 +223,7 @@
             <div class="pill warn" id="util-last-sync">Not synced</div>
           </div>
 
-            <div class="action-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 18px;">
+            <div class="action-row" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 18px;">
               <button class="action" onclick="generateBillForSelectedUnit()" data-permission="utilities">
                 <strong>Generate Bill</strong>
                 <span>Create a utility bill for the selected unit.</span>
@@ -335,79 +247,34 @@
 
         <section id="doors" class="page">
           <div class="page-title">
-            <div>
-              <h2>Door Network</h2>
-              <p>Door devices receive commands from the selected-unit dashboard controls.</p>
-            </div>
-            <div class="pill">Access Grid</div>
+            <div><h2>Device Status</h2><p>Door, mailbox and meter status for the selected unit.</p></div>
+            <div class="pill" id="doors-status-badge">No Unit Selected</div>
           </div>
 
-          <div class="coming">
-            <div>
-              <h3>Door Control Ready</h3>
-              <p class="muted">Use Dashboard → Sync Unit or Auto Assign to manage selected-unit doors and mailboxes.</p>
+          <div id="device-status-panel">
+            <div class="card wide" style="text-align:center;padding:40px;color:#666">
+              <div style="font-size:32px;margin-bottom:12px">📡</div>
+              <div>Select a unit from the Units tab to view device status.</div>
             </div>
           </div>
+
+          <div class="action-row" style="grid-template-columns:repeat(3,1fr);margin-top:18px">
+            <button class="action" onclick="pairSelectedDevice('door')" data-permission="devices">
+              <strong>Pair Door</strong>
+              <span>Provision door to selected unit.</span>
+            </button>
+            <button class="action" onclick="pairSelectedDevice('mailbox')" data-permission="devices">
+              <strong>Pair Mailbox</strong>
+              <span>Provision mailbox to selected unit.</span>
+            </button>
+            <button class="action" onclick="pairSelectedDevice('meter')" data-permission="devices">
+              <strong>Pair Meter</strong>
+              <span>Provision meter to selected unit.</span>
+            </button>
+          </div>
         </section>
 
-        <section id="payments" class="page">
-          <div class="page-title">
-            <div><h2>Payments</h2><p>Rent, utility, mailbox, and custom payment history.</p></div>
-            <div class="pill warn" id="payments-last-sync">Not loaded</div>
-          </div>
-          <div class="list" id="payments-list"></div>
-        </section>
-
-        <section id="maintenance" class="page">
-          <div class="page-title">
-            <div><h2>Maintenance</h2><p>Live repair tickets submitted by residents.</p></div>
-            <div class="pill warn" id="maintenance-last-sync">Not loaded</div>
-          </div>
-
-          <div class="grid">
-            <div class="card"><label>Open Tickets</label><div class="stat" id="maintenance-open">--</div><div class="sub">Pending repair requests</div></div>
-            <div class="card wide"><label>Latest Issue</label><div class="stat" id="maintenance-latest">--</div><div class="sub" id="maintenance-latest-sub">Waiting for activity</div></div>
-          </div>
-
-          <div class="list" id="maintenance-list"></div>
-        </section>
-
-        <section id="admins" class="page">
-  <div class="page-title">
-    <div>
-      <h2>Admins</h2>
-      <p>Manage DistrictOS staff access and permissions.</p>
-    </div>
-    <div class="pill">Admin System Active</div>
-  </div>
-
-  <div class="card wide" style="margin-bottom:18px;">
-    <label>Admin Avatar UUID</label>
-    <input id="adminAvatar" placeholder="Avatar UUID" style="width:100%;margin-bottom:12px;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;padding:12px;" />
-
-    <label>Admin Name</label>
-    <input id="adminName" placeholder="Admin display name" style="width:100%;margin-bottom:16px;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;padding:12px;" />
-
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;color:#ddd;">
-      <label><input type="checkbox" id="permUnits"> Units</label>
-      <label><input type="checkbox" id="permRent"> Rent</label>
-      <label><input type="checkbox" id="permUtilities"> Utilities</label>
-      <label><input type="checkbox" id="permDoors"> Doors</label>
-      <label><input type="checkbox" id="permMaintenance"> Maintenance</label>
-      <label><input type="checkbox" id="permPayments"> Payments</label>
-      <label><input type="checkbox" id="permDeleteUnits"> Delete Units</label>
-    </div>
-
-    <button class="action" style="margin-top:18px;" onclick="saveAdmin()">
-      <strong>Save Admin</strong>
-      <span>Create or update admin permissions.</span>
-    </button>
-  </div>
-
-  <div id="admins-list" class="grid"></div>
-</section>
-
-            <section id="notecards" class="page">
+        <section id="notecards" class="page">
     
       <div class="page-title">
         <div>
@@ -645,7 +512,6 @@
       if (pageId === 'units') loadUnits();
       if (pageId === 'payments') loadPayments();
       if (pageId === 'utilities') loadUtilities();
-      if (pageId === 'notecards') generateNotecard();
       if (pageId === 'maintenance') loadMaintenance();
       if (pageId === 'reports') { loadUnits(); loadUtilities(); loadPayments(); }
     }
@@ -683,6 +549,7 @@
       loadUnits();
       loadUtilities();
       loadUnitSnapshot(unit);
+      // Device status panel loads from snapshot callback
     }
 
     function clearSelectedUnit() {
@@ -928,8 +795,6 @@
       if (action === "syncDoors" || action === "autoAssign") {
         url += "&unit=" + encodeURIComponent(selectedUnit);
       }
-
-      // pairDoor/pairMailbox/pairMeter handled separately via provisioning
       if (action === "pairDoor" || action === "pairMailbox" || action === "pairMeter") {
         var deviceType = action === "pairDoor" ? "door" : action === "pairMailbox" ? "mailbox" : "meter";
         pairDevice(selectedUnit, deviceType);
@@ -1243,18 +1108,15 @@ function setSelectedRent() {
       inp.id = "late-fee-amount"; inp.type = "number"; inp.placeholder = "Amount (L$)"; inp.min = "1";
       inp.style.cssText = "width:100%;background:#0a0a18;border:1px solid #2a2a4a;color:#f4f4f4;padding:8px;border-radius:6px;margin-bottom:16px;box-sizing:border-box;font-size:14px";
       box.appendChild(inp);
-      var btns = document.createElement("div");
-      btns.style.cssText = "display:flex;gap:10px";
+      var btns = document.createElement("div"); btns.style.cssText = "display:flex;gap:10px";
       var ok = document.createElement("button");
-      ok.textContent = "Apply";
-      ok.style.cssText = "flex:1;background:#ff4a4a;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+      ok.textContent = "Apply"; ok.style.cssText = "flex:1;background:#ff4a4a;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
       ok.onclick = function() {
         var amount = parseInt(document.getElementById("late-fee-amount").value || "0");
         if (!amount || amount <= 0) { showToast("Enter a valid amount."); return; }
         modal.style.display = "none";
         fetch(SL_BRIDGE_URL + "/utilities/late-fee", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: "unit=" + encodeURIComponent(unit) + "&amount=" + amount
         }).then(r => r.json()).then(function(data) {
           if (data.ok) showToast("Late fee applied.");
@@ -1263,8 +1125,7 @@ function setSelectedRent() {
         }).catch(function(e) { showToast("Error: " + e.message); });
       };
       var cancel = document.createElement("button");
-      cancel.textContent = "Cancel";
-      cancel.style.cssText = "flex:1;background:#2a2a4a;color:#aaa;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+      cancel.textContent = "Cancel"; cancel.style.cssText = "flex:1;background:#2a2a4a;color:#aaa;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
       cancel.onclick = function() { modal.style.display = "none"; };
       btns.appendChild(ok); btns.appendChild(cancel);
       box.appendChild(btns); modal.appendChild(box);
@@ -1528,7 +1389,7 @@ function setSelectedRent() {
             list.innerHTML += '<div class="row" style="grid-template-columns:1fr;"><div style="color:#999;">No units found.</div></div>';
           } else {
             units.forEach(function(u) {
-              var sc = (u.status === "occupied" || u.status === "Active") ? "pill" : (u.status === "expired" || u.status === "Expired") ? "pill bad" : "pill warn";
+              var sc = (u.status==="occupied"||u.status==="Active") ? "pill" : (u.status==="expired"||u.status==="Expired") ? "pill bad" : "pill warn";
 
               if (u.unit === selectedUnit) {
                 updateSelectedUnitDetails(u);
@@ -1902,67 +1763,33 @@ function setSelectedRent() {
     }
 
     function generateNotecard() {
-      const type =
-        document.getElementById("notecardType").value;
-    
-      const output =
-        document.getElementById("notecardOutput");
-    
-      const unit =
-        selectedUnit || "";
-    
-      function finishGenerate(unitName, residentName, rentAmount) {
-        fetch(
-          SL_BRIDGE_URL +
-          "/notecards/generate?type=" +
-          encodeURIComponent(type) +
-          "&unit=" +
-          encodeURIComponent(unitName || "") +
-          "&resident=" +
-          encodeURIComponent(residentName || "Resident") +
-          "&rent=" +
-          encodeURIComponent(rentAmount || 0) +
-          "&t=" +
-          Date.now()
-        )
-        .then(r => r.json())
-        .then(function(data) {
-          output.value =
-            data.content || "";
-    
-          showToast("Notecard generated");
-        })
-        .catch(function() {
-          showToast("Notecard failed");
-        });
+      var typeEl = document.getElementById("notecardType");
+      var outputEl = document.getElementById("notecard-output");
+      if (!typeEl || !outputEl) return;
+      var type = typeEl.value;
+      var unit = selectedUnit || "[Unit]";
+      var now = new Date().toLocaleDateString();
+      var text = "";
+      if (type === "welcome") {
+        text = "Welcome to DistrictOS\n============================\n\nUnit: " + unit + "\nDate: " + now + "\n\nWelcome to your new home!\n\n- Your rent is due at the start of each lease period.\n- Touch the mailbox to pay rent or utilities.\n- Your door is configured for your access.\n- For maintenance, touch the terminal.\n\n-- Property Management";
+      } else if (type === "rent_reminder") {
+        text = "DistrictOS Rent Reminder\n============================\n\nUnit: " + unit + "\nDate: " + now + "\n\nYour rent is due soon. Please touch the mailbox to pay.\n\n-- Property Management";
+      } else if (type === "lease_expiry") {
+        text = "DistrictOS Lease Expiry Notice\n============================\n\nUnit: " + unit + "\nDate: " + now + "\n\nYour lease is expiring soon. Please renew at the mailbox or contact management.\n\n-- Property Management";
+      } else if (type === "eviction") {
+        text = "DistrictOS Notice to Vacate\n============================\n\nUnit: " + unit + "\nDate: " + now + "\n\nYour lease has been terminated. Please vacate the premises. Door access has been revoked.\n\n-- Property Management";
+      } else {
+        text = "DistrictOS Notice\n============================\n\nUnit: " + unit + "\nDate: " + now + "\n\n[Add your message here]\n\n-- Property Management";
       }
-    
-      if (!unit) {
-        finishGenerate("", "Resident", 0);
-        return;
+      outputEl.style.display = "block";
+      var pre = outputEl.querySelector("pre");
+      if (!pre) {
+        pre = document.createElement("pre");
+        pre.style.cssText = "background:#0a0a18;border:1px solid #2a2a4a;border-radius:8px;padding:16px;color:#f4f4f4;font-size:12px;white-space:pre-wrap;margin:0";
+        outputEl.insertBefore(pre, outputEl.firstChild);
       }
-    
-      fetch(
-        SL_BRIDGE_URL +
-        "/unit?unit=" +
-        encodeURIComponent(unit) +
-        "&t=" +
-        Date.now()
-      )
-      .then(r => r.json())
-      .then(function(unitData) {
-        finishGenerate(
-          unit,
-          unitData.tenant || "Resident",
-          unitData.rent ||
-            unitData.rentPrice ||
-            unitData.price ||
-            0
-        );
-      })
-      .catch(function() {
-        finishGenerate(unit, "Resident", 0);
-      });
+      pre.textContent = text;
+      showToast("Text generated. Copy it into a notecard in Second Life.");
     }
 
     navButtons.forEach(function(btn) {
@@ -2005,306 +1832,154 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
     setInterval(loadUnits, 30000);
     setInterval(loadMaintenance, 12000);
   
-    // ============================================================
-    // PROVISIONING -- Zero-touch device pairing
-    // Creates a provisioning session and polls for completion.
-    // Device scripts auto-discover and self-provision.
-    // ============================================================
     var pairingPolls = {};
 
     function pairDevice(unit, deviceType) {
-      if (!unit) { showToast("Select a unit first"); return; }
-
-      showToast("Creating " + deviceType + " session for " + unit + "...");
-
+      if (!unit) { showToast("Select a unit first."); return; }
+      showToast("Creating " + deviceType + " pairing session for " + unit + "...");
       fetch(SL_BRIDGE_URL + "/provision/request", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "unit=" + encodeURIComponent(unit) +
-              "&device_type=" + encodeURIComponent(deviceType) +
+        method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "unit=" + encodeURIComponent(unit) + "&device_type=" + encodeURIComponent(deviceType) +
               "&owner_uuid=" + encodeURIComponent(avatarUUID || "00000000-0000-0000-0000-000000000002") +
               "&device_name=" + encodeURIComponent(unit + " " + deviceType)
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (!data.ok) {
-          showToast("Pairing failed: " + (data.message || data.error));
-          return;
-        }
-        showToast(deviceType + " session ready. Reset the device object.");
-        // Poll for completion
-        var pvId   = data.provisioning_id;
-        var polls  = 0;
-        var maxPoll = 20;
+      }).then(r => r.json()).then(function(data) {
+        if (!data.ok) { showToast("Pairing failed: " + (data.message || data.error)); return; }
+        showToast(deviceType + " session ready. Reset the device object now.");
+        var pvId = data.provisioning_id;
+        var polls = 0;
+        if (pairingPolls[deviceType]) clearInterval(pairingPolls[deviceType]);
         pairingPolls[deviceType] = setInterval(function() {
           polls++;
-          if (polls > maxPoll) {
-            clearInterval(pairingPolls[deviceType]);
-            showToast(deviceType + " pairing timed out.");
-            return;
-          }
-          fetch(SL_BRIDGE_URL + "/provision/status?unit=" +
-            encodeURIComponent(unit) + "&device_type=" +
-            encodeURIComponent(deviceType) + "&provisioning_id=" +
-            encodeURIComponent(pvId))
-          .then(r => r.json())
-          .then(status => {
-            if (status.status === "ACTIVE" || status.status === "BOUND") {
-              clearInterval(pairingPolls[deviceType]);
-              showToast(deviceType + " paired to " + unit + "!");
-              loadUnitSnapshot(unit);
-            } else if (status.status === "FAILED" || status.status === "EXPIRED") {
-              clearInterval(pairingPolls[deviceType]);
-              showToast(deviceType + " pairing " + status.status.toLowerCase() + ". Try again.");
-            }
-          }).catch(function() {});
+          if (polls > 20) { clearInterval(pairingPolls[deviceType]); showToast(deviceType + " pairing timed out."); return; }
+          fetch(SL_BRIDGE_URL + "/provision/status?unit=" + encodeURIComponent(unit) +
+            "&device_type=" + encodeURIComponent(deviceType) + "&provisioning_id=" + encodeURIComponent(pvId))
+            .then(r => r.json()).then(function(s) {
+              if (s.status === "ACTIVE" || s.status === "BOUND") {
+                clearInterval(pairingPolls[deviceType]);
+                showToast(deviceType + " paired to " + unit + "!");
+                loadUnitSnapshot(unit);
+              } else if (s.status === "FAILED" || s.status === "EXPIRED") {
+                clearInterval(pairingPolls[deviceType]);
+                showToast(deviceType + " pairing " + s.status.toLowerCase() + ". Try again.");
+              }
+            }).catch(function(){});
         }, 30000);
-      })
-      .catch(function(e) {
-        showToast("Pairing error: " + e.message);
-      });
+      }).catch(function(e) { showToast("Error: " + e.message); });
     }
 
-    // ============================================================
-    // UNIT SNAPSHOT -- Load and display full unit state
-    // ============================================================
     var currentSnapshot = null;
 
     function loadUnitSnapshot(unit) {
       if (!unit) return;
       fetch(SL_BRIDGE_URL + "/unit/" + encodeURIComponent(unit))
-        .then(r => r.json())
-        .then(data => {
+        .then(r => r.json()).then(function(data) {
           currentSnapshot = data;
           renderUnitSnapshot(data);
-        })
-        .catch(function() {});
+          renderDeviceNetwork(data);
+        }).catch(function(){});
     }
 
     function renderUnitSnapshot(data) {
       var el = document.getElementById("unit-snapshot-panel");
       if (!el) return;
       if (!data || !data.ok) { el.innerHTML = "<div class='sub' style='color:#999'>No data.</div>"; return; }
-
-      var occ   = data.occupancy || {};
-      var bill  = data.billing   || {};
-      var devs  = data.devices   || {};
-
+      var occ = data.occupancy || {};
+      var bill = data.billing || {};
+      var devs = data.devices || {};
       function devBadge(d) {
-        if (!d.paired) return "<span class='pill warn'>Unpaired</span>";
-        return d.connected
-          ? "<span class='pill'>Online</span>"
-          : "<span class='pill bad'>Offline</span>";
+        if (!d || !d.paired) return "<span class='pill warn'>Unpaired</span>";
+        return d.connected ? "<span class='pill'>Online</span>" : "<span class='pill bad'>Offline</span>";
       }
-
-      function pairBtn(dtype) {
-        var u = currentSnapshot ? currentSnapshot.unit : '';
-        return '<button class="util-btn on" style="margin-left:8px" onclick="pairDevice(\'' + u + '\',\'' + dtype + '\')" >Pair</button>';
-      }
-
       el.innerHTML =
         "<div class='util-card'>" +
-        "<div class='util-header'><span class='util-name'>" + (data.unit || "") + " Snapshot</span>" +
-        "<button class='util-btn on' style='margin-left:auto;font-size:11px' " +
-        "id='snapshot-config-btn'>Configure</button>" +
-        "<span class='pill" + (occ.status === "occupied" ? "" : " warn") + "'>" +
-        (occ.status || "vacant").toUpperCase() + "</span></div>" +
-        "<div class='sub'>Tenant: " + (occ.tenant || "Vacant") + "</div>" +
-        "<div class='sub'>Lease: " + (occ.time_remaining || "--") + "</div>" +
-        "<div class='sub'>Rent: L$" + (bill.rent_price || 0) + " / " + (bill.lease_days || 7) + " days</div>" +
-        "<div class='sub'>Utility Balance: L$" + (bill.utility_balance || 0) + "</div>" +
+        "<div class='util-header'><span class='util-name'>" + escapeHtml(data.unit || "") + " Status</span>" +
+        "<button class='util-btn on' style='margin-left:auto;font-size:11px' id='snapshot-cfg-btn'>Configure</button></div>" +
+        "<div class='sub'>Occupancy: " + escapeHtml((occ.status||"vacant").toUpperCase()) + "</div>" +
+        "<div class='sub'>Tenant: " + escapeHtml(occ.tenant||"Vacant") + "</div>" +
+        "<div class='sub'>Lease: " + escapeHtml(occ.time_remaining||"--") + "</div>" +
+        "<div class='sub'>Rent: L$" + (bill.rent_price||0) + " / " + (bill.lease_days||7) + " days</div>" +
+        "<div class='sub'>Utilities: L$" + (bill.utility_balance||0) + "</div>" +
         "</div>" +
         "<div class='util-card'>" +
         "<div class='util-header'><span class='util-name'>Devices</span></div>" +
-        "<div class='sub' style='display:flex;align-items:center;gap:8px;margin-bottom:8px'>Door " +
-        devBadge(devs.door || {}) + pairBtn("door") + "</div>" +
-        "<div class='sub' style='display:flex;align-items:center;gap:8px;margin-bottom:8px'>Mailbox " +
-        devBadge(devs.mailbox || {}) + pairBtn("mailbox") + "</div>" +
-        "<div class='sub' style='display:flex;align-items:center;gap:8px'>Meter " +
-        devBadge(devs.meter || {}) + pairBtn("meter") + "</div>" +
+        "<div class='sub' style='display:flex;align-items:center;gap:8px;margin-bottom:6px'>Door " + devBadge(devs.door) + "</div>" +
+        "<div class='sub' style='display:flex;align-items:center;gap:8px;margin-bottom:6px'>Mailbox " + devBadge(devs.mailbox) + "</div>" +
+        "<div class='sub' style='display:flex;align-items:center;gap:8px'>Meter " + devBadge(devs.meter) + "</div>" +
         "</div>";
-
-      // Wire configure button after innerHTML is set
-      var cfgBtn = document.getElementById("snapshot-config-btn");
-      if (cfgBtn && data && data.unit) {
-        (function(u) {
-          cfgBtn.onclick = function() { openUnitConfig(u); };
-        })(data.unit);
-      }
+      var btn = document.getElementById("snapshot-cfg-btn");
+      if (btn && data.unit) { btn.onclick = function() { openUnitConfig(data.unit); }; }
+    
+      renderDeviceStatus(data.unit, data.devices);
     }
 
-
-    function createUnit() {
-      // SL browser blocks prompt() -- use inline modal instead
-      var modal = document.getElementById("create-unit-modal");
-      if (!modal) {
-        modal = document.createElement("div");
-        modal.id = "create-unit-modal";
-        modal.style.cssText =
-          "position:fixed;top:0;left:0;width:100%;height:100%;" +
-          "background:rgba(0,0,0,0.85);z-index:9999;" +
-          "display:flex;align-items:center;justify-content:center;";
-        document.body.appendChild(modal);
+    function renderDeviceNetwork(data) {
+      var el = document.getElementById("device-network-panel");
+      if (!el || !data || !data.ok) return;
+      var devs = data.devices || {};
+      function devCard(type, d) {
+        d = d || {};
+        var status = !d.paired ? "Unpaired" : d.connected ? "Online" : "Offline";
+        var cls = !d.paired ? "pill warn" : d.connected ? "pill" : "pill bad";
+        var btn = "<button class='util-btn on' style='margin-top:8px;font-size:11px' id='pair-" + type + "-btn'>Pair / Reprovision</button>";
+        return "<div class='util-card'>" +
+          "<div class='util-header'><span class='util-name'>" + type.charAt(0).toUpperCase() + type.slice(1) + "</span>" +
+          "<span class='" + cls + "'>" + status + "</span></div>" +
+          (d.device_id ? "<div class='sub' style='font-size:10px;color:#666'>" + escapeHtml(d.device_id||"") + "</div>" : "") +
+          btn + "</div>";
       }
-
-      modal.innerHTML = "";
-      var box = document.createElement("div");
-      box.style.cssText = "background:#0d0d1a;border:1px solid #2a2a4a;border-radius:12px;padding:24px;width:300px;color:#f4f4f4";
-
-      var title = document.createElement("h3");
-      title.style.cssText = "margin:0 0 16px;color:#7b9fff;font-size:15px";
-      title.textContent = "Create New Unit";
-      box.appendChild(title);
-
-      var lbl = document.createElement("label");
-      lbl.style.cssText = "font-size:11px;color:#aaa;display:block;margin-bottom:4px";
-      lbl.textContent = "Unit Name (e.g. APT-102)";
-      box.appendChild(lbl);
-
-      var inp = document.createElement("input");
-      inp.id = "create-unit-name";
-      inp.type = "text";
-      inp.placeholder = "APT-102";
-      inp.style.cssText = "width:100%;background:#0a0a18;border:1px solid #2a2a4a;color:#f4f4f4;padding:8px;border-radius:6px;margin-bottom:20px;box-sizing:border-box;font-size:14px;text-transform:uppercase";
-      box.appendChild(inp);
-
-      var btns = document.createElement("div");
-      btns.style.cssText = "display:flex;gap:10px";
-
-      var saveBtn = document.createElement("button");
-      saveBtn.textContent = "Create";
-      saveBtn.style.cssText = "flex:1;background:#2a4aff;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
-      saveBtn.onclick = function() {
-        var name = document.getElementById("create-unit-name").value;
-        if (!name || !name.trim()) { showToast("Enter a unit name."); return; }
-        name = name.trim().toUpperCase();
-        modal.style.display = "none";
-        fetch(SL_BRIDGE_URL + "/units/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: "unit=" + encodeURIComponent(name)
-        })
-        .then(r => r.json())
-        .then(function(data) {
-          if (data.ok) {
-            showToast("Unit " + name + " created.");
-            loadUnits();
-            setTimeout(function() { openUnitConfig(name); }, 400);
-          } else {
-            showToast("Error: " + (data.message || data.error));
-          }
-        })
-        .catch(function(e) { showToast("Error: " + e.message); });
-      };
-
-      var cancelBtn = document.createElement("button");
-      cancelBtn.textContent = "Cancel";
-      cancelBtn.style.cssText = "flex:1;background:#2a2a4a;color:#aaa;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
-      cancelBtn.onclick = function() { modal.style.display = "none"; };
-
-      btns.appendChild(saveBtn);
-      btns.appendChild(cancelBtn);
-      box.appendChild(btns);
-      modal.appendChild(box);
-      modal.style.display = "flex";
-
-      // Focus the input after render
-      setTimeout(function() { inp.focus(); }, 100);
+      el.innerHTML = devCard("door", devs.door) + devCard("mailbox", devs.mailbox) + devCard("meter", devs.meter);
+      document.getElementById("doors-status-badge").textContent = data.unit || "Unknown";
+      ["door","mailbox","meter"].forEach(function(t) {
+        var b = document.getElementById("pair-" + t + "-btn");
+        if (b) (function(type){ b.onclick = function(){ pairDevice(data.unit, type); }; })(t);
+      });
     }
-
-    // ============================================================
-    // UNIT CONFIGURATION MODAL
-    // Sets rent, lease days, utility cost, billing cycle.
-    // Called after unit creation and from the unit config button.
-    // ============================================================
 
     function openUnitConfig(unit) {
       if (!unit) { showToast("Select a unit first."); return; }
-
-      // Fetch current config
       fetch(SL_BRIDGE_URL + "/unit/" + encodeURIComponent(unit))
-        .then(r => r.json())
-        .then(function(data) {
+        .then(r => r.json()).then(function(data) {
           var bill = data.billing || {};
           var rent = bill.rent_price || 0;
           var days = bill.lease_days || 7;
-          var util = bill.utility_balance || 0;
           var cycle = bill.cycle || "weekly";
-
-          // Build modal HTML
           var modal = document.getElementById("unit-config-modal");
           if (!modal) {
             modal = document.createElement("div");
             modal.id = "unit-config-modal";
-            modal.style.cssText =
-              "position:fixed;top:0;left:0;width:100%;height:100%;" +
-              "background:rgba(0,0,0,0.85);z-index:9999;" +
-              "display:flex;align-items:center;justify-content:center;";
+            modal.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;";
             document.body.appendChild(modal);
           }
-
-          // Build modal using DOM to avoid quote escaping issues
           modal.innerHTML = "";
           var box = document.createElement("div");
           box.style.cssText = "background:#0d0d1a;border:1px solid #2a2a4a;border-radius:12px;padding:24px;width:340px;color:#f4f4f4";
-
           var title = document.createElement("h3");
           title.style.cssText = "margin:0 0 16px;color:#7b9fff;font-size:15px";
           title.textContent = "Configure " + unit;
           box.appendChild(title);
-
-          function makeField(labelText, inputId, type, value, min) {
-            var lbl = document.createElement("label");
-            lbl.style.cssText = "font-size:11px;color:#aaa;display:block;margin-bottom:4px";
-            lbl.textContent = labelText;
-            box.appendChild(lbl);
-            var inp = document.createElement("input");
-            inp.id = inputId; inp.type = type; inp.value = value; inp.min = min;
-            inp.style.cssText = "width:100%;background:#0a0a18;border:1px solid #2a2a4a;color:#f4f4f4;padding:8px;border-radius:6px;margin-bottom:12px;box-sizing:border-box";
-            box.appendChild(inp);
+          function field(label, id, val, min) {
+            var l = document.createElement("label"); l.style.cssText = "font-size:11px;color:#aaa;display:block;margin-bottom:4px"; l.textContent = label; box.appendChild(l);
+            var i = document.createElement("input"); i.id = id; i.type = "number"; i.value = val; i.min = min;
+            i.style.cssText = "width:100%;background:#0a0a18;border:1px solid #2a2a4a;color:#f4f4f4;padding:8px;border-radius:6px;margin-bottom:12px;box-sizing:border-box"; box.appendChild(i);
           }
-
-          makeField("Rent Price (L$)", "cfg-rent", "number", rent, 0);
-          makeField("Lease Length (days)", "cfg-days", "number", days, 1);
-          makeField("Utility Cost per Cycle (L$)", "cfg-util", "number", 0, 0);
-
-          var cyLbl = document.createElement("label");
-          cyLbl.style.cssText = "font-size:11px;color:#aaa;display:block;margin-bottom:4px";
-          cyLbl.textContent = "Billing Cycle";
-          box.appendChild(cyLbl);
-          var sel = document.createElement("select");
-          sel.id = "cfg-cycle";
+          field("Rent Price (L$)", "cfg-rent", rent, 0);
+          field("Lease Length (days)", "cfg-days", days, 1);
+          field("Utility Cost per Cycle (L$)", "cfg-util", 0, 0);
+          var cl = document.createElement("label"); cl.style.cssText = "font-size:11px;color:#aaa;display:block;margin-bottom:4px"; cl.textContent = "Billing Cycle"; box.appendChild(cl);
+          var sel = document.createElement("select"); sel.id = "cfg-cycle";
           sel.style.cssText = "width:100%;background:#0a0a18;border:1px solid #2a2a4a;color:#f4f4f4;padding:8px;border-radius:6px;margin-bottom:20px;box-sizing:border-box";
-          ["weekly","biweekly","monthly"].forEach(function(v) {
-            var opt = document.createElement("option");
-            opt.value = v; opt.textContent = v.charAt(0).toUpperCase() + v.slice(1);
-            if (v === cycle) opt.selected = true;
-            sel.appendChild(opt);
-          });
+          ["weekly","biweekly","monthly"].forEach(function(v) { var o = document.createElement("option"); o.value = v; o.textContent = v.charAt(0).toUpperCase()+v.slice(1); if(v===cycle) o.selected=true; sel.appendChild(o); });
           box.appendChild(sel);
-
-          var btns = document.createElement("div");
-          btns.style.cssText = "display:flex;gap:10px";
-
-          var saveBtn = document.createElement("button");
-          saveBtn.textContent = "Save";
-          saveBtn.style.cssText = "flex:1;background:#2a4aff;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
-          saveBtn.onclick = function() { saveUnitConfig(unit); };
-
-          var cancelBtn = document.createElement("button");
-          cancelBtn.textContent = "Cancel";
-          cancelBtn.style.cssText = "flex:1;background:#2a2a4a;color:#aaa;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
-          cancelBtn.onclick = closeUnitConfig;
-
-          btns.appendChild(saveBtn);
-          btns.appendChild(cancelBtn);
-          box.appendChild(btns);
-          modal.appendChild(box);
-          modal.style.display = "flex";
-        })
-        .catch(function() {
-          showToast("Could not load unit config.");
-        });
+          var btns = document.createElement("div"); btns.style.cssText = "display:flex;gap:10px";
+          var save = document.createElement("button"); save.textContent = "Save";
+          save.style.cssText = "flex:1;background:#2a4aff;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+          save.onclick = function() { saveUnitConfig(unit); };
+          var cancel = document.createElement("button"); cancel.textContent = "Cancel";
+          cancel.style.cssText = "flex:1;background:#2a2a4a;color:#aaa;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+          cancel.onclick = function() { modal.style.display = "none"; };
+          btns.appendChild(save); btns.appendChild(cancel); box.appendChild(btns);
+          modal.appendChild(box); modal.style.display = "flex";
+        }).catch(function() { showToast("Could not load unit config."); });
     }
 
     function saveUnitConfig(unit) {
@@ -2312,41 +1987,56 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
       var days  = parseInt(document.getElementById("cfg-days").value) || 7;
       var util  = parseInt(document.getElementById("cfg-util").value) || 0;
       var cycle = document.getElementById("cfg-cycle").value;
-
-      // Update unit rent + days
-      var p1 = fetch(SL_BRIDGE_URL + "/units/config", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "unit=" + encodeURIComponent(unit) +
-              "&rent=" + rent +
-              "&lease_days=" + days
-      });
-
-      // Update utility settings
-      var p2 = fetch(SL_BRIDGE_URL + "/utilities/set-settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "unit=" + encodeURIComponent(unit) +
-              "&cost=" + util +
-              "&cycle=" + encodeURIComponent(cycle) +
-              "&electric=1&water=1&internet=1&gas=1"
-      });
-
-      Promise.all([p1, p2])
-        .then(function() {
-          showToast("Unit " + unit + " configured.");
-          closeUnitConfig();
-          loadUnits();
-          loadUnitSnapshot(unit);
-        })
-        .catch(function(e) {
-          showToast("Save error: " + e.message);
-        });
+      Promise.all([
+        fetch(SL_BRIDGE_URL + "/units/config", { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:"unit="+encodeURIComponent(unit)+"&rent="+rent+"&lease_days="+days }),
+        fetch(SL_BRIDGE_URL + "/utilities/set-settings", { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:"unit="+encodeURIComponent(unit)+"&cost="+util+"&cycle="+encodeURIComponent(cycle)+"&electric=1&water=1&internet=1&gas=1" })
+      ]).then(function() {
+        showToast("Unit " + unit + " configured.");
+        document.getElementById("unit-config-modal").style.display = "none";
+        loadUnits(); loadUnitSnapshot(unit);
+      }).catch(function(e) { showToast("Save error: " + e.message); });
     }
 
-    function closeUnitConfig() {
-      var modal = document.getElementById("unit-config-modal");
-      if (modal) modal.style.display = "none";
+    function selectTabletUnitAndSnapshot(unit) {
+      selectedUnit = unit;
+      document.getElementById("selected-unit-card").textContent = unit || "None";
+      showToast("Selected unit: " + unit);
+      loadUnits(); loadUtilities(); loadUnitSnapshot(unit);
+    }
+
+
+    function pairSelectedDevice(deviceType) {
+      if (!selectedUnit) { showToast("Select a unit first."); return; }
+      pairDevice(selectedUnit, deviceType);
+    }
+
+    function renderDeviceStatus(unit, devices) {
+      var panel = document.getElementById("device-status-panel");
+      var badge = document.getElementById("doors-status-badge");
+      if (!panel) return;
+      if (badge) badge.textContent = unit;
+
+      function statusBadge(d) {
+        if (!d || !d.paired) return "<span class='pill warn' style='font-size:11px'>Unpaired</span>";
+        return d.connected
+          ? "<span class='pill' style='font-size:11px'>Online</span>"
+          : "<span class='pill bad' style='font-size:11px'>Offline</span>";
+      }
+
+      var rows = ["door","mailbox","meter"].map(function(dt) {
+        var d = (devices && devices[dt]) || {};
+        var devId = d.device_id ? ("<div style='font-size:10px;color:#555;margin-top:2px'>" + d.device_id.slice(0,20) + "...</div>") : "";
+        return "<div class='util-card' style='margin-bottom:12px'>" +
+          "<div class='util-header'>" +
+          "<span class='util-name' style='text-transform:capitalize'>" + dt + "</span>" +
+          statusBadge(d) +
+          "</div>" +
+          (d.paired ? "<div style='font-size:11px;color:#666;margin-top:4px'>Presence: " + (d.presence || "unknown") + "</div>" : "") +
+          devId +
+          "</div>";
+      }).join("");
+
+      panel.innerHTML = rows;
     }
 
 </script>
