@@ -2004,7 +2004,7 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "unit=" + encodeURIComponent(unit) +
               "&device_type=" + encodeURIComponent(deviceType) +
-              "&owner_uuid=00000000-0000-0000-0000-000000000002" +
+              "&owner_uuid=" + encodeURIComponent(avatarUUID || "00000000-0000-0000-0000-000000000002") +
               "&device_name=" + encodeURIComponent(unit + " " + deviceType)
       })
       .then(r => r.json())
