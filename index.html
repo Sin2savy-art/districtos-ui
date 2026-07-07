@@ -1225,34 +1225,51 @@ function setSelectedRent() {
     }
 
     async function addLateFee(unit) {
-      const amount = prompt("Enter late fee amount:");
-      if (!amount) return;
-
-      try {
-        await fetch(SL_BRIDGE_URL + "/utilities/late-fee", {
+      var modal = document.getElementById("late-fee-modal");
+      if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "late-fee-modal";
+        modal.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;";
+        document.body.appendChild(modal);
+      }
+      modal.innerHTML = "";
+      var box = document.createElement("div");
+      box.style.cssText = "background:#0d0d1a;border:1px solid #2a2a4a;border-radius:12px;padding:24px;width:280px;color:#f4f4f4";
+      var title = document.createElement("h3");
+      title.style.cssText = "margin:0 0 12px;color:#7b9fff;font-size:15px";
+      title.textContent = "Late Fee - " + (unit || "");
+      box.appendChild(title);
+      var inp = document.createElement("input");
+      inp.id = "late-fee-amount"; inp.type = "number"; inp.placeholder = "Amount (L$)"; inp.min = "1";
+      inp.style.cssText = "width:100%;background:#0a0a18;border:1px solid #2a2a4a;color:#f4f4f4;padding:8px;border-radius:6px;margin-bottom:16px;box-sizing:border-box;font-size:14px";
+      box.appendChild(inp);
+      var btns = document.createElement("div");
+      btns.style.cssText = "display:flex;gap:10px";
+      var ok = document.createElement("button");
+      ok.textContent = "Apply";
+      ok.style.cssText = "flex:1;background:#ff4a4a;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+      ok.onclick = function() {
+        var amount = parseInt(document.getElementById("late-fee-amount").value || "0");
+        if (!amount || amount <= 0) { showToast("Enter a valid amount."); return; }
+        modal.style.display = "none";
+        fetch(SL_BRIDGE_URL + "/utilities/late-fee", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body:
-            "unit=" + encodeURIComponent(unit) +
-            "&amount=" + encodeURIComponent(amount)
-        });
-
-        setTimeout(function() {
-          var syncImg = new Image();
-          syncImg.src =
-            SL_BRIDGE_URL +
-            "?action=syncUtilityBill" +
-            "&unit=" + encodeURIComponent(unit) +
-            "&t=" + Date.now();
-
+          body: "unit=" + encodeURIComponent(unit) + "&amount=" + amount
+        }).then(r => r.json()).then(function(data) {
+          if (data.ok) showToast("Late fee applied.");
+          else showToast("Error: " + (data.message || data.error));
           loadUtilities();
-        }, 800);
-
-        showToast("Late fee added");
-      } catch(e) {
-        console.log(e);
-        showToast("Late fee failed");
-      }
+        }).catch(function(e) { showToast("Error: " + e.message); });
+      };
+      var cancel = document.createElement("button");
+      cancel.textContent = "Cancel";
+      cancel.style.cssText = "flex:1;background:#2a2a4a;color:#aaa;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+      cancel.onclick = function() { modal.style.display = "none"; };
+      btns.appendChild(ok); btns.appendChild(cancel);
+      box.appendChild(btns); modal.appendChild(box);
+      modal.style.display = "flex";
+      setTimeout(function() { inp.focus(); }, 100);
     }
 
     function sendUtilityWarnings() {
@@ -2118,26 +2135,81 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
 
 
     function createUnit() {
-      var name = prompt("Enter unit name (e.g. APT-102):");
-      if (!name || !name.trim()) return;
-      name = name.trim().toUpperCase();
-      fetch(SL_BRIDGE_URL + "/units/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "unit=" + encodeURIComponent(name)
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (data.ok) {
-          showToast("Unit " + name + " created.");
-          loadUnits();
-          // Auto-open config for the new unit
-          setTimeout(function() { openUnitConfig(name); }, 500);
-        } else {
-          showToast("Error: " + (data.message || data.error));
-        }
-      })
-      .catch(function(e) { showToast("Error: " + e.message); });
+      // SL browser blocks prompt() -- use inline modal instead
+      var modal = document.getElementById("create-unit-modal");
+      if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "create-unit-modal";
+        modal.style.cssText =
+          "position:fixed;top:0;left:0;width:100%;height:100%;" +
+          "background:rgba(0,0,0,0.85);z-index:9999;" +
+          "display:flex;align-items:center;justify-content:center;";
+        document.body.appendChild(modal);
+      }
+
+      modal.innerHTML = "";
+      var box = document.createElement("div");
+      box.style.cssText = "background:#0d0d1a;border:1px solid #2a2a4a;border-radius:12px;padding:24px;width:300px;color:#f4f4f4";
+
+      var title = document.createElement("h3");
+      title.style.cssText = "margin:0 0 16px;color:#7b9fff;font-size:15px";
+      title.textContent = "Create New Unit";
+      box.appendChild(title);
+
+      var lbl = document.createElement("label");
+      lbl.style.cssText = "font-size:11px;color:#aaa;display:block;margin-bottom:4px";
+      lbl.textContent = "Unit Name (e.g. APT-102)";
+      box.appendChild(lbl);
+
+      var inp = document.createElement("input");
+      inp.id = "create-unit-name";
+      inp.type = "text";
+      inp.placeholder = "APT-102";
+      inp.style.cssText = "width:100%;background:#0a0a18;border:1px solid #2a2a4a;color:#f4f4f4;padding:8px;border-radius:6px;margin-bottom:20px;box-sizing:border-box;font-size:14px;text-transform:uppercase";
+      box.appendChild(inp);
+
+      var btns = document.createElement("div");
+      btns.style.cssText = "display:flex;gap:10px";
+
+      var saveBtn = document.createElement("button");
+      saveBtn.textContent = "Create";
+      saveBtn.style.cssText = "flex:1;background:#2a4aff;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+      saveBtn.onclick = function() {
+        var name = document.getElementById("create-unit-name").value;
+        if (!name || !name.trim()) { showToast("Enter a unit name."); return; }
+        name = name.trim().toUpperCase();
+        modal.style.display = "none";
+        fetch(SL_BRIDGE_URL + "/units/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: "unit=" + encodeURIComponent(name)
+        })
+        .then(r => r.json())
+        .then(function(data) {
+          if (data.ok) {
+            showToast("Unit " + name + " created.");
+            loadUnits();
+            setTimeout(function() { openUnitConfig(name); }, 400);
+          } else {
+            showToast("Error: " + (data.message || data.error));
+          }
+        })
+        .catch(function(e) { showToast("Error: " + e.message); });
+      };
+
+      var cancelBtn = document.createElement("button");
+      cancelBtn.textContent = "Cancel";
+      cancelBtn.style.cssText = "flex:1;background:#2a2a4a;color:#aaa;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+      cancelBtn.onclick = function() { modal.style.display = "none"; };
+
+      btns.appendChild(saveBtn);
+      btns.appendChild(cancelBtn);
+      box.appendChild(btns);
+      modal.appendChild(box);
+      modal.style.display = "flex";
+
+      // Focus the input after render
+      setTimeout(function() { inp.focus(); }, 100);
     }
 
     // ============================================================
