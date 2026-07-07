@@ -341,7 +341,7 @@
           <label>Generated Output</label>
     
           <textarea
-            id="notecardOutput"
+            id="notecardOutput" style="width:100%;height:200px;background:#0a0a18;color:#f4f4f4;border:1px solid #2a2a4a;border-radius:6px;padding:10px;font-family:monospace;font-size:12px;resize:vertical"
             readonly
             style="
               width:100%;
@@ -686,7 +686,7 @@
 
     function generateBillForSelectedUnit() {
     if (!requireSelectedUnit()) return;
-    if (!requirePermission("utilities")) return;
+    if (!hasPermission("utilities")) return;
     generateUtilityBill(selectedUnit);
   }
 
@@ -842,21 +842,21 @@
 
     function lockSelectedUnit() {
       if (!requireSelectedUnit()) return;
-      if (!requirePermission("doors")) return;
+      if (!hasPermission("doors")) return;
       sendDistrictCommand("lockUnit", { unit: selectedUnit });
       refreshSelectedUnit();
     }
 
     function unlockSelectedUnit() {
       if (!requireSelectedUnit()) return;
-      if (!requirePermission("doors")) return;
+      if (!hasPermission("doors")) return;
       sendDistrictCommand("unlockUnit", { unit: selectedUnit });
       refreshSelectedUnit();
     }
 
     function resetSelectedTenant() {
       if (!requireSelectedUnit()) return;
-      if (!requirePermission("units")) return;
+      if (!hasPermission("units")) return;
       showToast("Clearing lease for " + selectedUnit);
 
       sendDistrictCommand("resetTenant", { unit: selectedUnit });
@@ -882,7 +882,7 @@
 
 function setSelectedRent() {
   if (!requireSelectedUnit()) return;
-  if (!requirePermission("rent")) return;
+  if (!hasPermission("rent")) return;
 
   const input = document.getElementById("selectedRentInput");
   const rent = parseInt(input.value || "0");
@@ -1464,7 +1464,7 @@ function setSelectedRent() {
 
    function deleteUnit(unit) {
 
-    if (!requirePermission("deleteUnits")) return;
+    if (!hasPermission("deleteUnits")) return;
      
     if (pendingDeleteUnit !== unit) {
       pendingDeleteUnit = unit;
@@ -1769,32 +1769,80 @@ function setSelectedRent() {
 
     function generateNotecard() {
       var typeEl = document.getElementById("notecardType");
-      var outputEl = document.getElementById("notecard-output");
+      var outputEl = document.getElementById("notecardOutput");
       if (!typeEl || !outputEl) return;
+
       var type = typeEl.value;
-      var unit = selectedUnit || "[Unit]";
-      var now = new Date().toLocaleDateString();
-      var text = "";
-      if (type === "welcome") {
-        text = "Welcome to DistrictOS\n============================\n\nUnit: " + unit + "\nDate: " + now + "\n\nWelcome to your new home!\n\n- Your rent is due at the start of each lease period.\n- Touch the mailbox to pay rent or utilities.\n- Your door is configured for your access.\n- For maintenance, touch the terminal.\n\n-- Property Management";
-      } else if (type === "rent_reminder") {
-        text = "DistrictOS Rent Reminder\n============================\n\nUnit: " + unit + "\nDate: " + now + "\n\nYour rent is due soon. Please touch the mailbox to pay.\n\n-- Property Management";
-      } else if (type === "lease_expiry") {
-        text = "DistrictOS Lease Expiry Notice\n============================\n\nUnit: " + unit + "\nDate: " + now + "\n\nYour lease is expiring soon. Please renew at the mailbox or contact management.\n\n-- Property Management";
-      } else if (type === "eviction") {
-        text = "DistrictOS Notice to Vacate\n============================\n\nUnit: " + unit + "\nDate: " + now + "\n\nYour lease has been terminated. Please vacate the premises. Door access has been revoked.\n\n-- Property Management";
-      } else {
-        text = "DistrictOS Notice\n============================\n\nUnit: " + unit + "\nDate: " + now + "\n\n[Add your message here]\n\n-- Property Management";
-      }
-      outputEl.style.display = "block";
-      var pre = outputEl.querySelector("pre");
-      if (!pre) {
-        pre = document.createElement("pre");
-        pre.style.cssText = "background:#0a0a18;border:1px solid #2a2a4a;border-radius:8px;padding:16px;color:#f4f4f4;font-size:12px;white-space:pre-wrap;margin:0";
-        outputEl.insertBefore(pre, outputEl.firstChild);
-      }
-      pre.textContent = text;
-      showToast("Text generated. Copy it into a notecard in Second Life.");
+      var unit = selectedUnit || "your unit";
+      var instName = document.getElementById("installationName") ?
+        document.getElementById("installationName").textContent : "BlackWire Heights";
+
+      var templates = {
+        "Resident Welcome":
+          "Welcome to " + instName + "!\n\n" +
+          "Your unit: " + unit + "\n\n" +
+          "GETTING STARTED\n" +
+          "---------------\n" +
+          "- Your door will unlock automatically when your lease is active.\n" +
+          "- Rent is paid via the payment mailbox at your unit.\n" +
+          "- Contact management via the support kiosk or IM.\n\n" +
+          "HOUSE RULES\n" +
+          "-----------\n" +
+          "- No noise beyond parcel boundaries.\n" +
+          "- Guests must be registered with management.\n" +
+          "- Keep common areas clear.\n\n" +
+          "We hope you enjoy your stay!\n\n" +
+          "-- " + instName + " Management",
+
+        "Lease Agreement":
+          "LEASE AGREEMENT\n" +
+          "===============\n\n" +
+          "Property: " + instName + "\n" +
+          "Unit: " + unit + "\n" +
+          "Date: " + new Date().toLocaleDateString() + "\n\n" +
+          "TERMS\n" +
+          "-----\n" +
+          "By accepting occupancy of the above unit, the resident agrees to:\n\n" +
+          "1. Pay rent on time via the in-world payment mailbox.\n" +
+          "2. Keep the unit and common areas tidy.\n" +
+          "3. Register all guests with management prior to visits.\n" +
+          "4. Respect other residents and neighbors.\n" +
+          "5. Not sublease the unit without written permission.\n\n" +
+          "Management reserves the right to terminate the lease for\n" +
+          "non-payment or violation of house rules.\n\n" +
+          "-- " + instName + " Management",
+
+        "Payment Reminder":
+          "PAYMENT REMINDER\n" +
+          "================\n\n" +
+          "Unit: " + unit + "\n" +
+          "Property: " + instName + "\n\n" +
+          "Your rent or utility payment is due or overdue.\n\n" +
+          "HOW TO PAY\n" +
+          "----------\n" +
+          "1. Visit your unit mailbox in-world.\n" +
+          "2. Touch the mailbox and select Pay Rent or Pay Utilities.\n" +
+          "3. Right-click the mailbox and pay the amount shown.\n\n" +
+          "If you have questions, please contact management.\n\n" +
+          "-- " + instName + " Management",
+
+        "Eviction Notice":
+          "NOTICE OF LEASE TERMINATION\n" +
+          "============================\n\n" +
+          "Unit: " + unit + "\n" +
+          "Property: " + instName + "\n" +
+          "Date: " + new Date().toLocaleDateString() + "\n\n" +
+          "This notice is to inform you that your lease has been\n" +
+          "terminated effective immediately due to non-payment or\n" +
+          "violation of the lease agreement.\n\n" +
+          "Please remove your belongings from the unit at your\n" +
+          "earliest convenience. Access will be revoked shortly.\n\n" +
+          "-- " + instName + " Management",
+      };
+
+      var text = templates[type] || templates["Resident Welcome"];
+      outputEl.value = text;
+      showToast("Notecard text generated. Copy and paste into a new notecard.");
     }
 
     navButtons.forEach(function(btn) {
