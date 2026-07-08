@@ -272,6 +272,63 @@
           </div>
         </section>
 
+        <section id="payments" class="page">
+          <div class="page-title">
+            <div><h2>Payments</h2><p>Rent, utility, mailbox, and custom payment history.</p></div>
+            <div class="pill warn" id="payments-last-sync">Not loaded</div>
+          </div>
+          <div class="list" id="payments-list"></div>
+        </section>
+
+        <section id="maintenance" class="page">
+          <div class="page-title">
+            <div><h2>Maintenance</h2><p>Live repair tickets submitted by residents.</p></div>
+            <div class="pill warn" id="maintenance-last-sync">Not loaded</div>
+          </div>
+
+          <div class="grid">
+            <div class="card"><label>Open Tickets</label><div class="stat" id="maintenance-open">--</div><div class="sub">Pending repair requests</div></div>
+            <div class="card wide"><label>Latest Issue</label><div class="stat" id="maintenance-latest">--</div><div class="sub" id="maintenance-latest-sub">Waiting for activity</div></div>
+          </div>
+
+          <div class="list" id="maintenance-list"></div>
+        </section>
+
+        <section id="admins" class="page">
+  <div class="page-title">
+    <div>
+      <h2>Admins</h2>
+      <p>Manage DistrictOS staff access and permissions.</p>
+    </div>
+    <div class="pill">Admin System Active</div>
+  </div>
+
+  <div class="card wide" style="margin-bottom:18px;">
+    <label>Admin Avatar UUID</label>
+    <input id="adminAvatar" placeholder="Avatar UUID" style="width:100%;margin-bottom:12px;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;padding:12px;" />
+
+    <label>Admin Name</label>
+    <input id="adminName" placeholder="Admin display name" style="width:100%;margin-bottom:16px;background:#111318;border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;padding:12px;" />
+
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;color:#ddd;">
+      <label><input type="checkbox" id="permUnits"> Units</label>
+      <label><input type="checkbox" id="permRent"> Rent</label>
+      <label><input type="checkbox" id="permUtilities"> Utilities</label>
+      <label><input type="checkbox" id="permDoors"> Doors</label>
+      <label><input type="checkbox" id="permMaintenance"> Maintenance</label>
+      <label><input type="checkbox" id="permPayments"> Payments</label>
+      <label><input type="checkbox" id="permDeleteUnits"> Delete Units</label>
+    </div>
+
+    <button class="action" style="margin-top:18px;" onclick="saveAdmin()">
+      <strong>Save Admin</strong>
+      <span>Create or update admin permissions.</span>
+    </button>
+  </div>
+
+  <div id="admins-list" class="grid"></div>
+</section>
+
         <section id="notecards" class="page">
     
       <div class="page-title">
