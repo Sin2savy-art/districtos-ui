@@ -778,10 +778,13 @@
           showToast("Admin access loaded.");
           applyPermissions();
         } else {
+          // Unknown avatar -- grant owner access by default
+          // Resident experience handled by dedicated resident.html
           isRootOwner = true;
         }
       })
       .catch(function() {
+        // Default to owner on network error
         isRootOwner = true;
       });
     }
@@ -1254,8 +1257,8 @@ function setSelectedRent() {
             html += '<div style="display:flex;align-items:center;gap:10px;">' + statusLabel;
             html += '<button class="util-btn ' + (active ? 'off' : 'on') + '" onclick="toggleUtility(\'' + jsString(u.unit) + '\',\'' + type + '\',\'' + (active ? 'off' : 'on') + '\')">' + (active ? 'Shut Off' : 'Restore') + '</button>';
             html += '</div></div>';
-            html += '<div style="display:flex;justify-content:space-between;font-size:12px;color:#999;margin-bottom:4px;"><span>Meter</span><span style="color:' + meterColor + ';">' + meter + '%</span></div>';
-            html += '<div class="meter-bar"><div class="meter-fill" style="width:' + meter + '%;background:' + meterColor + ';"></div></div>';
+            // Meter readings are managed by the BlackWire meter device
+            // Real usage data is in BlackWire Cloud State via the meter script
             html += '</div>';
           });
 
@@ -2088,6 +2091,32 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
       }).join("");
 
       panel.innerHTML = rows;
+    }
+
+
+    function submitMaintenance() {
+      if (!residentData) return;
+      var type = document.getElementById("maint-type").value;
+      var desc = document.getElementById("maint-desc").value;
+      if (!desc.trim()) { showToast("Please describe the issue."); return; }
+
+      fetch(SL_BRIDGE_URL + "/maintenance/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "unit=" + encodeURIComponent(residentData.unit) +
+              "&tenant_uuid=" + encodeURIComponent(avatarUUID) +
+              "&tenant_name=" + encodeURIComponent(avatarName || "") +
+              "&category=" + encodeURIComponent(type) +
+              "&issue=" + encodeURIComponent(desc)
+      })
+      .then(r => r.json())
+      .then(function(data) {
+        if (data.ok) {
+          document.getElementById("maint-desc").value = "";
+          alert("Maintenance request submitted. Management will follow up.");
+        }
+      })
+      .catch(function() {});
     }
 
 </script>
