@@ -158,7 +158,7 @@
             <button class="action" style="min-height:44px;padding:10px 18px" onclick="createUnit()">
               <strong style="font-size:13px">+ Create Unit</strong>
             </button>
-            <div class="pill warn" id="units-last-sync">Not synced</div>
+            <div class="pill" id="units-last-sync" style="background:#2a2a4a;color:#666">Not synced</div>
           </div>
 
           
@@ -1313,7 +1313,7 @@ function setSelectedRent() {
         container.innerHTML = html;
 
         const now = new Date();
-        if (sync) sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        if (sync) { sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); sync.className = 'pill'; }
 
         const utilEl = document.getElementById('stat-util-alerts');
         if (utilEl) utilEl.textContent = alerts;
@@ -1429,7 +1429,7 @@ function setSelectedRent() {
           }
 
           var now = new Date();
-          if (sync) sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+          if (sync) { sync.textContent = 'Synced ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); sync.className = 'pill'; }
 
           var total = units.length;
           var active = units.filter(u => u.status === "Active").length;
@@ -1456,8 +1456,15 @@ function setSelectedRent() {
           if (feed) {
             feed.innerHTML = "";
             units.slice(0, 6).forEach(function(u) {
-              var color = u.status === "Active" ? "#5dff91" : u.status === "Expired" ? "#ff5b47" : "#ffbe55";
-              feed.innerHTML += '<div class="sub" style="color:' + color + '">' + escapeHtml(u.unit) + ' — ' + escapeHtml(u.status || "Vacant") + (u.tenant && u.tenant !== "Vacant" ? ' · ' + escapeHtml(u.tenant) : '') + '</div>';
+              var st = u.status || "vacant";
+              var color = (st === "occupied" || st === "Active") ? "#5dff91" :
+                          (st === "expired"  || st === "Expired") ? "#ff5b47" : "#ffbe55";
+              var label = st === "occupied" ? "occupied" :
+                          st === "expired"  ? "expired"  : "vacant";
+              feed.innerHTML += '<div class="sub" style="color:' + color + '">' +
+                escapeHtml(u.unit) + ' - ' + label +
+                (u.tenant && u.tenant !== "Vacant" ? ' (' + escapeHtml(u.tenant) + ')' : '') +
+                '</div>';
             });
           }
         });
@@ -1531,7 +1538,7 @@ function setSelectedRent() {
           }
 
           var now = new Date();
-          if (sync) sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+          if (sync) { sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); sync.className = 'pill'; }
         });
     }
 
@@ -1604,7 +1611,7 @@ function setSelectedRent() {
           });
 
           var now = new Date();
-          if (sync) sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+          if (sync) { sync.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); sync.className = 'pill'; }
         })
         .catch(function() {
           var list = document.getElementById('maintenance-list');
@@ -1991,12 +1998,17 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
 
     function openUnitConfig(unit) {
       if (!unit) { showToast("Select a unit first."); return; }
-      fetch(SL_BRIDGE_URL + "/unit/" + encodeURIComponent(unit))
-        .then(r => r.json()).then(function(data) {
-          var bill = data.billing || {};
-          var rent = bill.rent_price || 0;
-          var days = bill.lease_days || 7;
-          var cycle = bill.cycle || "weekly";
+      Promise.all([
+        fetch(SL_BRIDGE_URL + "/unit/" + encodeURIComponent(unit)).then(r => r.json()),
+        fetch(SL_BRIDGE_URL + "/utilities?unit=" + encodeURIComponent(unit)).then(r => r.json())
+      ]).then(function(results) {
+          var data     = results[0];
+          var utilData = (results[1] && results[1].utility) ? results[1].utility : {};
+          var bill  = data.billing || {};
+          var rent  = bill.rent_price || 0;
+          var days  = bill.lease_days || 7;
+          var util  = utilData.cost  || 0;
+          var cycle = utilData.cycle || bill.cycle || "weekly";
           var modal = document.getElementById("unit-config-modal");
           if (!modal) {
             modal = document.createElement("div");
