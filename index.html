@@ -2125,7 +2125,7 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
       .then(function(data) {
         if (data.ok) {
           document.getElementById("maint-desc").value = "";
-          alert("Maintenance request submitted. Management will follow up.");
+          showToast("Request submitted.");
         }
       })
       .catch(function() {});
