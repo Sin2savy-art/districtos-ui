@@ -2011,12 +2011,14 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
       el.innerHTML =
         "<div class='util-card'>" +
         "<div class='util-header'><span class='util-name'>" + escapeHtml(data.unit || "") + " Status</span>" +
-        "<button class='util-btn on' style='margin-left:auto;font-size:11px' id='snapshot-cfg-btn'>Configure</button></div>" +
+        "<button class='util-btn on' style='margin-left:auto;font-size:11px' id='snapshot-cfg-btn'>Configure</button>" +
+        "<button class='util-btn' style='font-size:11px;margin-left:6px' id='snapshot-xfer-btn'>Transfer Lease</button></div>" +
         "<div class='sub'>Occupancy: " + escapeHtml((occ.status||"vacant").toUpperCase()) + "</div>" +
         "<div class='sub'>Tenant: " + escapeHtml(occ.tenant||"Vacant") + "</div>" +
         "<div class='sub'>Lease: " + escapeHtml(occ.time_remaining||"--") + "</div>" +
         "<div class='sub'>Rent: L$" + (bill.rent_price||0) + " / " + (bill.lease_days||7) + " days</div>" +
-        "<div class='sub'>Utilities: L$" + (bill.utility_balance||0) + "</div>" +
+        "<div class='sub'>Util Rate: L$" + (bill.utility_cost||0) + "/" + (bill.utility_cycle||"weekly") + "</div>" +
+        "<div class='sub'>Util Owed: L$" + (bill.utility_balance||0) + "</div>" +
         "</div>" +
         "<div class='util-card'>" +
         "<div class='util-header'><span class='util-name'>Devices</span></div>" +
@@ -2025,8 +2027,18 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
         "<div class='sub' style='display:flex;align-items:center;gap:8px'>Meter " + devBadge(devs.meter) + "</div>" +
         "</div>";
       var btn = document.getElementById("snapshot-cfg-btn");
-      if (btn && data.unit) { btn.onclick = function() { openUnitConfig(data.unit); }; }
-    
+      if (btn && data.unit) { (function(u) { btn.onclick = function() { openUnitConfig(u); }; })(data.unit); }
+      var xBtn = document.getElementById("snapshot-xfer-btn");
+      if (xBtn && data.unit) {
+        var isOccupied = occ && (occ.status === "occupied" || occ.status === "Active");
+        xBtn.style.display = isOccupied ? "" : "none";
+        if (isOccupied) {
+          (function(u, t) {
+            xBtn.onclick = function() { openLeaseTransfer(u, t); };
+          })(data.unit, occ.tenant_uuid || "");
+        }
+      }
+
       renderDeviceStatus(data.unit, data.devices);
     }
 
@@ -2186,6 +2198,113 @@ document.querySelectorAll("[data-action]").forEach(function(btn) {
         }
       })
       .catch(function() {});
+    }
+
+
+    // ============================================================
+    // LEASE TRANSFER
+    // Move a tenant's remaining lease time to a different unit.
+    // ============================================================
+    function openLeaseTransfer(fromUnit, tenantUuid) {
+      if (!fromUnit) { showToast("Select an occupied unit first."); return; }
+
+      // Build modal
+      var modal = document.getElementById("lease-transfer-modal");
+      if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "lease-transfer-modal";
+        modal.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;";
+        document.body.appendChild(modal);
+      }
+      modal.innerHTML = "";
+
+      var box = document.createElement("div");
+      box.style.cssText = "background:#0d0d1a;border:1px solid #2a2a4a;border-radius:12px;padding:24px;width:340px;color:#f4f4f4";
+
+      var title = document.createElement("h3");
+      title.style.cssText = "margin:0 0 16px;color:#7b9fff;font-size:15px";
+      title.textContent = "Transfer Lease from " + fromUnit;
+      box.appendChild(title);
+
+      var sub = document.createElement("div");
+      sub.style.cssText = "font-size:11px;color:#aaa;margin-bottom:16px";
+      sub.textContent = "Move remaining lease time to a vacant unit. Guests and co-tenants transfer automatically.";
+      box.appendChild(sub);
+
+      var lbl = document.createElement("label");
+      lbl.style.cssText = "font-size:11px;color:#aaa;display:block;margin-bottom:4px";
+      lbl.textContent = "Destination Unit";
+      box.appendChild(lbl);
+
+      var sel = document.createElement("select");
+      sel.id = "transfer-to-unit";
+      sel.style.cssText = "width:100%;background:#0a0a18;border:1px solid #2a2a4a;color:#f4f4f4;padding:8px;border-radius:6px;margin-bottom:20px;box-sizing:border-box";
+      box.appendChild(sel);
+
+      // Load vacant units into select
+      fetch(SL_BRIDGE_URL + "/units")
+        .then(r => r.json())
+        .then(function(data) {
+          var units = data.units || data || [];
+          units.forEach(function(u) {
+            if (u.unit !== fromUnit &&
+                (u.status === "vacant" || u.status === "Vacant")) {
+              var opt = document.createElement("option");
+              opt.value = u.unit;
+              opt.textContent = u.unit;
+              sel.appendChild(opt);
+            }
+          });
+          if (sel.options.length === 0) {
+            var opt = document.createElement("option");
+            opt.textContent = "No vacant units available";
+            opt.disabled = true;
+            sel.appendChild(opt);
+          }
+        });
+
+      var btns = document.createElement("div");
+      btns.style.cssText = "display:flex;gap:10px";
+
+      var ok = document.createElement("button");
+      ok.textContent = "Transfer";
+      ok.style.cssText = "flex:1;background:#2a4aff;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+      ok.onclick = function() {
+        var toUnit = sel.value;
+        if (!toUnit || toUnit === fromUnit) {
+          showToast("Select a destination unit."); return;
+        }
+        modal.style.display = "none";
+        fetch(SL_BRIDGE_URL + "/lease/transfer", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: "from_unit=" + encodeURIComponent(fromUnit) +
+                "&to_unit="   + encodeURIComponent(toUnit) +
+                "&tenant_uuid=" + encodeURIComponent(tenantUuid)
+        })
+        .then(r => r.json())
+        .then(function(data) {
+          if (data.ok) {
+            showToast(data.message || "Lease transferred.");
+            loadUnits();
+            loadUnitSnapshot(toUnit);
+          } else {
+            showToast("Error: " + (data.message || data.error));
+          }
+        })
+        .catch(function(e) { showToast("Error: " + e.message); });
+      };
+
+      var cancel = document.createElement("button");
+      cancel.textContent = "Cancel";
+      cancel.style.cssText = "flex:1;background:#2a2a4a;color:#aaa;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:13px";
+      cancel.onclick = function() { modal.style.display = "none"; };
+
+      btns.appendChild(ok);
+      btns.appendChild(cancel);
+      box.appendChild(btns);
+      modal.appendChild(box);
+      modal.style.display = "flex";
     }
 
 </script>
